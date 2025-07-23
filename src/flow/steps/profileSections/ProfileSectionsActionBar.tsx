@@ -4,7 +4,7 @@ import { Plus, Download, Trash2, Bot, FileText, Sparkle, Sparkles } from "lucide
 
 interface ProfileSectionsActionBarProps {
   onNewSection: () => void;
-  onImportAI: () => void;
+  // onImportAI: () => void;
   onImportFile: () => void;
   onExport: () => void;
   onDeleteAll: () => void;
@@ -14,7 +14,7 @@ interface ProfileSectionsActionBarProps {
 
 export const ProfileSectionsActionBar: React.FC<ProfileSectionsActionBarProps> = ({
   onNewSection,
-  onImportAI,
+  // onImportAI,
   onImportFile,
   onExport,
   onDeleteAll,
@@ -28,10 +28,10 @@ export const ProfileSectionsActionBar: React.FC<ProfileSectionsActionBarProps> =
         New Profile Section
       </Button>
       
-      <Button variant="outline" onClick={onImportAI} className="flex items-center gap-2">
+      {/* <Button variant="outline" onClick={onImportAI} className="flex items-center gap-2">
         <Sparkles className="w-4 text-blue-500" />
         Import With AI
-      </Button>
+      </Button> */}
       
       <Button variant="outline" onClick={onImportFile} className="flex items-center gap-2">
         <FileText className="h-4 w-4" />

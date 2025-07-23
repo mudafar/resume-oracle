@@ -39,9 +39,9 @@ const ProfileSections: React.FC = () => {
   const [importSuccess, setImportSuccess] = useState<string | null>(null);
   const fileInputRef = React.useRef<HTMLInputElement>(null);
   const [showPrompt, setShowPrompt] = useState(llmConfig.provider === "free" && llmConfig.variant === "default");
-  const [importAIModalOpen, setImportAIModalOpen] = useState(false);
+  // const [importAIModalOpen, setImportAIModalOpen] = useState(false);
   const [importJSONModalOpen, setImportJSONModalOpen] = useState(false);
-  const [heroSkipped, setHeroSkipped] = useState(false);
+  // const [heroSkipped, setHeroSkipped] = useState(false);
   const [deleteAllConfirm, setDeleteAllConfirm] = useState(false);
   const [newSectionModalOpen, setNewSectionModalOpen] = useState(false);
   const [exportModalOpen, setExportModalOpen] = useState(false);
@@ -74,11 +74,11 @@ const ProfileSections: React.FC = () => {
   //   const stored = localStorage.getItem("profileSectionsHeroSkipped");
   //   if (stored === "true") setHeroSkipped(true);
   // }, []);
-  const handleSkipHero = () => {
-    setHeroSkipped(true);
-    setNewSectionModalOpen(true);
-    // localStorage.setItem("profileSectionsHeroSkipped", "true");
-  };
+  // const handleSkipHero = () => {
+  //   setHeroSkipped(true);
+  //   setNewSectionModalOpen(true);
+  //   // localStorage.setItem("profileSectionsHeroSkipped", "true");
+  // };
 
   const handleAdd = () => {
     if (addContent.trim()) {
@@ -156,7 +156,7 @@ const ProfileSections: React.FC = () => {
       {/* Action Bar */}
       <ProfileSectionsActionBar
         onNewSection={() => setNewSectionModalOpen(true)}
-        onImportAI={() => setImportAIModalOpen(true)}
+        // onImportAI={() => setImportAIModalOpen(true)}
         onImportFile={() => setImportJSONModalOpen(true)}
         onExport={() => setExportModalOpen(true)}
         onDeleteAll={() => setDeleteAllConfirm(true)}
@@ -164,7 +164,7 @@ const ProfileSections: React.FC = () => {
         disabledDeleteAll={sections.length === 0}
       />
       {/* Hero Panel (Empty State, below Action Bar) */}
-      {sections.length === 0 && !importAIModalOpen && !heroSkipped && (
+      {/* {sections.length === 0 && !importAIModalOpen && !heroSkipped && (
         <NoProfileSections
           onImportWithAI={() => setImportAIModalOpen(true)}
           onImportFromJSON={() => setImportJSONModalOpen(true)}
@@ -174,7 +174,7 @@ const ProfileSections: React.FC = () => {
         //   onPasteExtract={() => setImportAIModalOpen(true)}
         //   onSkip={handleSkipHero}
         // />
-      )}
+      )} */}
       <ProfileSectionsExportModal
         open={exportModalOpen}
         onClose={() => setExportModalOpen(false)}
@@ -211,17 +211,7 @@ const ProfileSections: React.FC = () => {
           setToastOpen(true);
         }}
       /> */}
-      <ProfileSectionImportAIModal
-        open={importAIModalOpen}
-        onClose={() => setImportAIModalOpen(false)}
-        onImportSection={(section: ProfileSection) => dispatch(addSection(section))}
-        onImportAll={(sectionsArr: ProfileSection[]) => sectionsArr.forEach(section => dispatch(addSection(section)))}
-        onToast={(msg, type = "success") => {
-          setToastMessage(msg);
-          setToastType(type);
-          setToastOpen(true);
-        }}
-      />
+      {/* ProfileSectionImportAIModal moved to GetStartedStep */}
       <ProfileSectionsImportJSONModal
         open={importJSONModalOpen}
         onClose={() => setImportJSONModalOpen(false)}
@@ -236,7 +226,7 @@ const ProfileSections: React.FC = () => {
 
       {/* Remove Add Section Card - now handled by modal only */}
       <div>
-      {sections.length === 0 && heroSkipped && (
+      {sections.length === 0 && (
           <div className="text-gray-500">No profile sections yet. Add one above.</div>
         )}
         {sections.map((section) => (
