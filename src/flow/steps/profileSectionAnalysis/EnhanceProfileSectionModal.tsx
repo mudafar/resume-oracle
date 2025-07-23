@@ -1,6 +1,6 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { ProfileSection } from "@/store/slices/profileSectionsSlice";
-import { BaseJobRequirementMatch } from "@/store/slices/matchesSlice";
+import { useEnhanceMatchedProfileSectionMutation, EnhancementResponse, BaseJobRequirementMatch } from "@/store/services/llmApi";
 import {
   Dialog,
   DialogContent,
@@ -46,13 +46,6 @@ interface EnhanceProfileSectionModalProps {
   onKeepOriginal: () => void;
 }
 
-interface EnhancementResponse {
-  original_profile_section: ProfileSection;
-  enhanced_profile_section: ProfileSection;
-  enhancements_made: string[];
-  reasoning: string;
-}
-
 export const EnhanceProfileSectionModal: React.FC<EnhanceProfileSectionModalProps> = ({
   profileSection,
   baseJobRequirementMatches,
@@ -61,44 +54,50 @@ export const EnhanceProfileSectionModal: React.FC<EnhanceProfileSectionModalProp
   onApplyChanges,
   onKeepOriginal,
 }) => {
-  const [loading, setLoading] = useState(false);
   const [enhancedContent, setEnhancedContent] = useState("");
   const [enhancementsMade, setEnhancementsMade] = useState<string[]>([]);
   const [reasoning, setReasoning] = useState("");
   const [error, setError] = useState<string | null>(null);
-  const [fetched, setFetched] = useState(false);
+  const [triggerEnhance, { data, isLoading, isError, error: apiError, isSuccess, reset }] = useEnhanceMatchedProfileSectionMutation();
 
-  React.useEffect(() => {
-    if (open && !fetched) {
-      setLoading(true);
+  // Fetch enhancement when modal opens
+  useEffect(() => {
+    if (open) {
+      setEnhancedContent("");
+      setEnhancementsMade([]);
+      setReasoning("");
       setError(null);
-      fetch("http://localhost:8000/api/enhance-matched-profile-section/", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          profile_section: profileSection,
-          base_job_requirement_matches: baseJobRequirementMatches,
-        }),
-      })
-        .then(async (res) => {
-          if (!res.ok) throw new Error("Failed to fetch enhancement");
-          const data: EnhancementResponse = await res.json();
-          setEnhancedContent(data.enhanced_profile_section.content);
-          setEnhancementsMade(data.enhancements_made);
-          setReasoning(data.reasoning);
-          setFetched(true);
-        })
-        .catch((e) => setError(e.message))
-        .finally(() => setLoading(false));
-    }
-    if (!open) {
-      setFetched(false);
+      triggerEnhance({
+        profile_section: profileSection,
+        base_job_requirement_matches: baseJobRequirementMatches,
+      });
+    } else {
+      reset();
       setEnhancedContent("");
       setEnhancementsMade([]);
       setReasoning("");
       setError(null);
     }
-  }, [open, profileSection, baseJobRequirementMatches, fetched]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [open, profileSection, baseJobRequirementMatches]);
+
+  // Update state when data is received
+  useEffect(() => {
+    if (data) {
+      setEnhancedContent(data.enhanced_profile_section.content);
+      setEnhancementsMade(data.enhancements_made);
+      setReasoning(data.reasoning);
+    }
+  }, [data]);
+
+  // Handle error
+  useEffect(() => {
+    if (isError && apiError && 'message' in apiError) {
+      setError((apiError as any).message || 'Failed to fetch enhancement');
+    } else if (isError) {
+      setError('Failed to fetch enhancement');
+    }
+  }, [isError, apiError]);
 
   const handleApplyChanges = () => {
     onApplyChanges(enhancedContent);
@@ -117,7 +116,7 @@ export const EnhanceProfileSectionModal: React.FC<EnhanceProfileSectionModalProp
           </DialogDescription>
         </DialogHeader>
 
-        {loading ? (
+        {isLoading ? (
           <div className="flex-1 space-y-4 px-1">
             <div className="flex items-center gap-2 text-sm text-gray-600">
               <Loader2 className="w-4 h-4 animate-spin" />
@@ -295,17 +294,17 @@ export const EnhanceProfileSectionModal: React.FC<EnhanceProfileSectionModalProp
             <Button
               variant="outline"
               onClick={onKeepOriginal}
-              disabled={loading}
+              disabled={isLoading}
               className="flex-1 sm:flex-none"
             >
               Keep Original
             </Button>
             <Button
               onClick={handleApplyChanges}
-              disabled={loading || !enhancedContent.trim()}
+              disabled={isLoading || !enhancedContent.trim()}
               className="flex-1 sm:flex-none"
             >
-              {loading ? (
+              {isLoading ? (
                 <>
                   <Loader2 className="w-4 h-4 mr-2 animate-spin" />
                   Processing...

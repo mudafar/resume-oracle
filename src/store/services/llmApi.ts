@@ -3,6 +3,24 @@ import { getLLMConfigHeadersOrParams } from './llmConfigUtil';
 import { RootState } from '../store';
 import { ProfileSection } from '../slices/profileSectionsSlice';
 
+// Copied from EnhanceProfileSectionModal
+export interface EnhancementResponse {
+  original_profile_section: ProfileSection;
+  enhanced_profile_section: ProfileSection;
+  enhancements_made: string[];
+  reasoning: string;
+}
+
+export interface BaseJobRequirementMatch {
+  id: string;
+  requirement_id: string;
+  requirement: string;
+  profile_section_id: string;
+  confidence: string;
+  gap_description: string;
+  recommendation: string;
+}
+
 export interface ResumeSection {
   profile_section_id: string;
   type: string;
@@ -98,6 +116,16 @@ export const llmApi = createApi({
     },
   }),
   endpoints: (builder) => ({
+    enhanceMatchedProfileSection: builder.mutation<
+      EnhancementResponse,
+      { profile_section: ProfileSection; base_job_requirement_matches: BaseJobRequirementMatch[] }
+    >({
+      query: (body) => ({
+        url: 'enhance-matched-profile-section/',
+        method: 'POST',
+        body,
+      }),
+    }),
     // Resume endpoints
     generateResumeSections: builder.mutation<ResumeSection[], GenerateResumeSectionsRequest>({
       query: (body) => ({
@@ -156,4 +184,5 @@ export const {
   useMatchMutation,
   useSuggestProfileSectionQuery,
   useParseProfileSectionsMutation,
-} = llmApi; 
+  useEnhanceMatchedProfileSectionMutation,
+} = llmApi;
