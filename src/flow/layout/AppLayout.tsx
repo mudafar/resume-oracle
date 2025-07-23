@@ -1,18 +1,11 @@
 import React, { useState } from "react";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { cn } from "@/lib/utils";
 import { StepDefinition } from "@/types/stepTypes";
 import {
-  ChevronLeft,
-  ChevronRight,
-  Star,
-  FileText,
+  ScrollText
 } from "lucide-react";
 
 import {
   SidebarProvider,
-  SidebarTrigger,
 } from "@/components/ui/sidebar";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { LeftSidebar } from "./LeftSidebar";
@@ -33,8 +26,8 @@ export const AppLayout: React.FC<AppLayout> = ({
     currentStep,
     onStepChange,
     children,
-    appName = "MyApp",
-    appIcon = <Star className="w-6 h-6" />
+    appName = "Resume Oracle",
+    appIcon = <ScrollText className="w-6 h-6" />
   }) => {
     const isFirst = currentStep === 0;
     const isLast = currentStep === steps.length - 1;

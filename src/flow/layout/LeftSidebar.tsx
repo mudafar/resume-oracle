@@ -48,7 +48,7 @@ export function LeftSidebar({ steps, currentStep, onStepChange, appName, appIcon
           </div>
           <div className="grid flex-1 text-left text-sm leading-tight">
             <span className="truncate font-semibold">{appName}</span>
-            <span className="truncate text-xs text-muted-foreground">v2.0.1</span>
+            <span className="truncate text-xs text-muted-foreground">v0.1</span>
           </div>
         </div>
       </SidebarHeader>
