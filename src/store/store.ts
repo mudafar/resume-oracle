@@ -1,6 +1,7 @@
 import { configureStore, combineReducers } from "@reduxjs/toolkit";
 import { persistStore, persistReducer } from "redux-persist";
 import storage from "redux-persist/lib/storage";
+
 import counterReducer from "./slices/counterSlice";
 import profileSectionsReducer from "./slices/profileSectionsSlice";
 import jobContextReducer from "./slices/jobDescriptionSlice";
@@ -9,6 +10,7 @@ import resumeSectionsReducer from "./slices/resumeSectionsSlice";
 import resumeReducer from "./slices/resumeSlice";
 import coverLetterReducer from "./slices/coverLetterSlice";
 import llmConfigReducer from "./slices/llmConfigSlice";
+import stepReducer from "./slices/stepSlice";
 import { llmApi } from "./services/llmApi";
 
 const rootReducer = combineReducers({
@@ -20,6 +22,7 @@ const rootReducer = combineReducers({
   resume: resumeReducer,
   coverLetter: coverLetterReducer,
   llmConfig: llmConfigReducer,
+  step: stepReducer,
   [llmApi.reducerPath]: llmApi.reducer,
 });
 

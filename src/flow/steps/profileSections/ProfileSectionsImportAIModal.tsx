@@ -35,7 +35,7 @@ interface ProfileSection {
 interface AIImportModalProps {
   open: boolean;
   onClose: () => void;
-  onImportSection: (section: ProfileSection) => void;
+  // onImportSection: (section: ProfileSection) => void;
   onImportAll: (sections: ProfileSection[]) => void;
   onToast: (message: string, type?: "success" | "error") => void;
 }
@@ -45,7 +45,7 @@ type Step = "input" | "preview";
 export const ProfileSectionImportAIModal: React.FC<AIImportModalProps> = ({
   open,
   onClose,
-  onImportSection,
+  // onImportSection,
   onImportAll,
   onToast,
 }) => {
@@ -109,9 +109,10 @@ export const ProfileSectionImportAIModal: React.FC<AIImportModalProps> = ({
   };
 
   const handleImportAll = () => {
-    sections.forEach(section => {
-      onImportSection(section);
-    });
+    onImportAll(sections);
+    // sections.forEach(section => {
+    //   onImportSection(section);
+    // });
     onToast(`Imported ${sections.length} sections!`);
     resetAndClose();
   };
@@ -236,9 +237,9 @@ export const ProfileSectionImportAIModal: React.FC<AIImportModalProps> = ({
                   </div>
                 </div>
                 {/* {charCount < 50 && ( */}
-                  <p className="text-xs text-muted-foreground">
-                    Please add at least 50 characters to analyze your content.
-                  </p>
+                <p className="text-xs text-muted-foreground">
+                  Please add at least 50 characters to analyze your content.
+                </p>
                 {/* )} */}
               </div>
 
@@ -270,60 +271,60 @@ export const ProfileSectionImportAIModal: React.FC<AIImportModalProps> = ({
           )}
         </CardContent>
 
-{/* Footer */}
-<CardFooter className="p-0 border-t bg-muted/30">
-  {step === "preview" && (
-    <div className="p-4 flex justify-between items-center w-full">
-      <div className="text-sm text-muted-foreground">
-        {sections.length} sections ready to import
-      </div>
-      <div className="flex gap-2">
-        <Button variant="outline" onClick={resetAndClose}>
-          Cancel
-        </Button>
-        <Button onClick={handleImportAll} disabled={sections.length === 0}>
-          <CheckCircle className="w-4 h-4 mr-2" />
-          Import All Sections
-        </Button>
-      </div>
-    </div>
-  )}
+        {/* Footer */}
+        <CardFooter className="p-0 border-t bg-muted/30">
+          {step === "preview" && (
+            <div className="p-4 flex justify-between items-center w-full">
+              <div className="text-sm text-muted-foreground">
+                {sections.length} sections ready to import
+              </div>
+              <div className="flex gap-2">
+                <Button variant="outline" onClick={resetAndClose}>
+                  Cancel
+                </Button>
+                <Button onClick={handleImportAll} disabled={sections.length === 0}>
+                  <CheckCircle className="w-4 h-4 mr-2" />
+                  Import All Sections
+                </Button>
+              </div>
+            </div>
+          )}
 
-  {step === "input" && (
-    <div className="p-4 w-full">
-      <div className="flex justify-end items-center gap-4">
-        <Button variant="outline" onClick={resetAndClose}>
-          Cancel
-        </Button>
-        
-        {/* <div className="flex-1 text-center">
+          {step === "input" && (
+            <div className="p-4 w-full">
+              <div className="flex justify-end items-center gap-4">
+                <Button variant="outline" onClick={resetAndClose}>
+                  Cancel
+                </Button>
+
+                {/* <div className="flex-1 text-center">
           <p className="text-xs text-muted-foreground">
             We'll detect Experience, Education, Projects, and more.
           </p>
         </div> */}
-        
-        <Button
-          onClick={handleAnalyze}
-          disabled={!isReady || isAnalyzing}
-          className="text-base font-medium"
-          size="lg"
-        >
-          {isAnalyzing ? (
-            <>
-              <Loader2 className="w-5 h-5 animate-spin mr-2" />
-              Analyzing...
-            </>
-          ) : (
-            <>
-              <Sparkles className="w-5 h-5 mr-2" />
-              Analyze & Preview
-            </>
+
+                <Button
+                  onClick={handleAnalyze}
+                  disabled={!isReady || isAnalyzing}
+                  className="text-base font-medium"
+                  size="lg"
+                >
+                  {isAnalyzing ? (
+                    <>
+                      <Loader2 className="w-5 h-5 animate-spin mr-2" />
+                      Analyzing...
+                    </>
+                  ) : (
+                    <>
+                      <Sparkles className="w-5 h-5 mr-2" />
+                      Analyze & Preview
+                    </>
+                  )}
+                </Button>
+              </div>
+            </div>
           )}
-        </Button>
-      </div>
-    </div>
-  )}
-</CardFooter>
+        </CardFooter>
       </Card>
     </div>
   );
