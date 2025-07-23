@@ -10,6 +10,7 @@ export interface LLMConfigState {
   endpointUrl: string | null;
   showConfigModal: boolean;
   hasSeenConfigModal: boolean;
+  invitationCode: string | null;
 }
 
 const initialState: LLMConfigState = {
@@ -19,6 +20,7 @@ const initialState: LLMConfigState = {
   endpointUrl: null,
   showConfigModal: false,
   hasSeenConfigModal: false,
+  invitationCode: null,
 };
 
 const llmConfigSlice = createSlice({

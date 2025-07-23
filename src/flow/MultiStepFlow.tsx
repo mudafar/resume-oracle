@@ -3,7 +3,7 @@ import React from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { RootState } from "@/store/store";
 import { AppLayout } from "./layout/AppLayout";
-import { LLMConfigLayout } from "./layout/LLMConfigLayout";
+import { SettingsLayout } from "./layout/SettingsLayout";
 import { stepComponents } from "./steps/stepComponents";
 
 export const MultiStepFlow: React.FC = () => {
@@ -18,9 +18,9 @@ export const MultiStepFlow: React.FC = () => {
       currentStep={currentStep}
       onStepChange={setCurrentStep}
     >
-      <LLMConfigLayout>
+      <SettingsLayout>
         <CurrentStepComponent />
-      </LLMConfigLayout>
+      </SettingsLayout>
     </AppLayout>
   )
 };
