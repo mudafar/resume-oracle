@@ -1,0 +1,16 @@
+{
+    "piny.project_settings": {
+        "open-pages": [
+            "pinyfakepage.html"
+        ],
+        "recent-classes": [
+            "4",
+            "-",
+            "x",
+            "p"
+        ]
+    },
+    "[javascript]": {
+        "editor.tabSize": 2
+    }
+}
