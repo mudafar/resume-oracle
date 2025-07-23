@@ -6,7 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
-import { CheckCircle, XCircle, ChevronDown, ChevronUp } from 'lucide-react';
+import { CheckCircle, XCircle, ChevronDown, ChevronUp, Sparkle, Sparkles } from 'lucide-react';
 
 interface MatchCardProps {
   match: any;
@@ -50,7 +50,7 @@ export const MatchCard: React.FC<MatchCardProps> = ({ match, profileSections, on
             <div className="flex items-center gap-2 mt-2">
               <span className="font-semibold">Confidence:</span>
               <Progress value={confidenceValue} className="w-1/2" />
-              <span>{match.confidence}%</span>
+              <span>{confidenceValue}%</span>
             </div>
           </div>
         ) : (
@@ -58,7 +58,10 @@ export const MatchCard: React.FC<MatchCardProps> = ({ match, profileSections, on
             <p className="text-red-600 font-semibold">No matching profile section found</p>
             <p className="text-gray-600">Gap: {match.gap_description || "No profile section covers this requirement."}</p>
             <div className="mt-4">
-              <Button onClick={() => onSeeSuggestions(match.requirement, match.id)}>See Suggestions</Button>
+              <Button onClick={() => onSeeSuggestions(match.requirement, match.id)}>
+                <Sparkles className="mr-2 h-4 w-4" />
+                See Suggestions
+                </Button>
               <Button variant="ghost">Skip</Button>
             </div>
           </div>

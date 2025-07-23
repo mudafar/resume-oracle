@@ -116,7 +116,7 @@ export const SuggestedSectionModal: React.FC<SuggestedSectionModalProps> = ({
           </DialogDescription>
         </DialogHeader>
 
-        <div className="flex-1 flex flex-col min-h-0">
+        <div className="flex-1 flex flex-col min-h-0 overflow-auto">
           {isLoading ? (
             <LoadingState />
           ) : error ? (
@@ -124,7 +124,7 @@ export const SuggestedSectionModal: React.FC<SuggestedSectionModalProps> = ({
               <AlertDescription>{getErrorMessage(error)}</AlertDescription>
             </Alert>
           ) : (
-            <div className="flex flex-col h-full lg:flex-row min-h-0"> 
+            <div className="flex flex-col h-full lg:flex-row min-h-0 "> 
               {/* Left Content Area */}
               <div className="lg:w-2/3 flex flex-col">
                 <GeneratedSectionArea

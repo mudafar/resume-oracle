@@ -45,7 +45,7 @@ export const ModalFooter = ({
             : onSaveAndMatch({ type, content, baseId: "" })
         }
         disabled={disabled}
-        className="bg-blue-600 hover:bg-blue-700"
+        className=""
       >
         {isEditing ? (
           <ArrowRight className="mr-2 h-4 w-4" />

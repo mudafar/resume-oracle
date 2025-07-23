@@ -101,10 +101,12 @@ export interface ProfileSectionSuggestion {
   summary_of_changes: string;
 }
 
+const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL!;
+
 export const llmApi = createApi({
   reducerPath: 'llmApi',
   baseQuery: fetchBaseQuery({
-    baseUrl: 'http://localhost:8000/api/',
+    baseUrl: baseUrl,
     prepareHeaders: (headers, { getState }) => {
       const llmHeaders = getLLMConfigHeadersOrParams(getState() as RootState);
       if (llmHeaders) {

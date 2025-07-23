@@ -281,7 +281,7 @@ const GenerateEditResume: React.FC = () => {
                         <span>Markdown</span>
                       </Button>
 
-                      <Button
+                      {/* <Button
                         variant="outline"
                         size="sm"
                         onClick={exportPdf}
@@ -294,7 +294,7 @@ const GenerateEditResume: React.FC = () => {
                           <Download className="h-4 w-4" />
                         )}
                         <span>PDF</span>
-                      </Button>
+                      </Button> */}
 
                       <Button
                         size="sm"

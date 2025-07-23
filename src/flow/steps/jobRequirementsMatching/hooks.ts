@@ -87,7 +87,7 @@ export const useJobMatching = () => {
       dispatch(editSection({ id: baseId, type, content }));
     }
     if (modalMatchId && id) {
-      dispatch(updateMatch({ id: modalMatchId, match: { profile_section_id: id } }));
+      dispatch(updateMatch({ id: modalMatchId, match: { profile_section_id: id, confidence: 100 } }));
     }
     setModalOpen(false);
   };

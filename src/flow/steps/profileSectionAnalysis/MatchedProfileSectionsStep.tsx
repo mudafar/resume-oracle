@@ -38,22 +38,23 @@ function hasGapsOrRecommendations(matches: MatchedProfileSection["baseJobRequire
   return matches.some(match => match.gap_description || match.recommendation);
 }
 
-function getConfidenceBadgeVariant(confidence: string | null) {
-  if (!confidence) return "secondary";
-  const conf = confidence.toLowerCase();
-  if (conf.includes("high") || conf.includes("strong")) return "default";
-  if (conf.includes("medium") || conf.includes("moderate")) return "secondary";
-  if (conf.includes("low") || conf.includes("weak")) return "destructive";
-  return "secondary";
+
+function getConfidenceBadgeVariant(confidence: number | null) {
+  if (confidence === null || confidence === undefined) return "secondary";
+  
+  if (confidence >= 70) return "default";      // High confidence (70-100)
+  if (confidence >= 40) return "secondary";    // Medium confidence (40-69)
+  if (confidence >= 1) return "destructive";   // Low confidence (1-39)
+  return "secondary";                          // No match (0)
 }
 
-function getConfidenceIcon(confidence: string | null) {
-  if (!confidence) return null;
-  const conf = confidence.toLowerCase();
-  if (conf.includes("high") || conf.includes("strong")) return <CheckCircle className="w-3 h-3" />;
-  if (conf.includes("medium") || conf.includes("moderate")) return <TrendingUp className="w-3 h-3" />;
-  if (conf.includes("low") || conf.includes("weak")) return <AlertTriangle className="w-3 h-3" />;
-  return null;
+function getConfidenceIcon(confidence: number | null) {
+  if (confidence === null || confidence === undefined) return null;
+  
+  if (confidence >= 70) return <CheckCircle className="w-3 h-3" />;      // High confidence
+  if (confidence >= 40) return <TrendingUp className="w-3 h-3" />;       // Medium confidence
+  if (confidence >= 1) return <AlertTriangle className="w-3 h-3" />;     // Low confidence
+  return null;                                                           // No match
 }
 
 const MatchedProfileSections: React.FC = () => {
@@ -145,58 +146,77 @@ const MatchedProfileSections: React.FC = () => {
                 open={isOpen}
                 onOpenChange={() => toggleSection(section.id)}
               >
-                <CollapsibleTrigger asChild>
-                  <CardHeader className="cursor-pointer hover:bg-gray-50 transition-colors duration-150">
-                    <div className="flex items-start justify-between">
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-center gap-3 mb-3">
-                          <h3 className="text-lg font-semibold text-gray-900">
-                            {section.type.charAt(0).toUpperCase() + section.type.slice(1)}
-                          </h3>
-                          <Badge variant="outline" className="text-xs">
-                            {matches.length} {matches.length === 1 ? 'match' : 'matches'}
-                          </Badge>
-                          {!hasIssues ? (
-                            <Badge variant="default" className="bg-green-100 text-green-800 hover:bg-green-100">
-                              <CheckCircle className="w-3 h-3 mr-1" />
-                              Complete
+                <CardHeader className="pb-4">
+                  <CollapsibleTrigger asChild>
+                    <div className="cursor-pointer hover:bg-gray-50 transition-colors duration-150 -mx-6 -my-6 px-6 py-6">
+                      <div className="flex items-start justify-between">
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center gap-3 mb-3">
+                            <h3 className="text-lg font-semibold text-gray-900">
+                              {section.type.charAt(0).toUpperCase() + section.type.slice(1)}
+                            </h3>
+                            <Badge variant="outline" className="text-xs">
+                              {matches.length} {matches.length === 1 ? 'match' : 'matches'}
                             </Badge>
-                          ) : (
-                            <Badge variant="destructive" className="bg-orange-100 text-orange-800 hover:bg-orange-100">
-                              <AlertTriangle className="w-3 h-3 mr-1" />
-                              Needs Enhancement
-                            </Badge>
-                          )}
-                        </div>
-                        <div className="text-sm text-gray-600 leading-relaxed">
-                          <div className="whitespace-pre-wrap">
-                            {isOpen ? section.content : preview}
+                            {!hasIssues ? (
+                              <Badge variant="default" className="bg-green-100 text-green-800 hover:bg-green-100">
+                                <CheckCircle className="w-3 h-3 mr-1" />
+                                Complete
+                              </Badge>
+                            ) : (
+                              <Badge variant="destructive" className="bg-orange-100 text-orange-800 hover:bg-orange-100">
+                                <AlertTriangle className="w-3 h-3 mr-1" />
+                                Needs Enhancement
+                              </Badge>
+                            )}
                           </div>
-                          {isExpandable && !isOpen && (
-                            <Button
-                              variant="link"
-                              size="sm"
-                              className="p-0 h-auto text-xs text-blue-600 hover:text-blue-800"
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                toggleSection(section.id);
-                              }}
-                            >
-                              Show More
-                            </Button>
+                          <div className="text-sm text-gray-600 leading-relaxed">
+                            <div className="whitespace-pre-wrap">
+                              {isOpen ? section.content : preview}
+                            </div>
+                            {isExpandable && !isOpen && (
+                              <Button
+                                variant="link"
+                                size="sm"
+                                className="p-0 h-auto text-xs text-blue-600 hover:text-blue-800"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  toggleSection(section.id);
+                                }}
+                              >
+                                Show More
+                              </Button>
+                            )}
+                          </div>
+                        </div>
+                        <div className="ml-4 flex-shrink-0">
+                          {isOpen ? (
+                            <ChevronUp className="w-5 h-5 text-gray-400" />
+                          ) : (
+                            <ChevronDown className="w-5 h-5 text-gray-400" />
                           )}
                         </div>
-                      </div>
-                      <div className="ml-4 flex-shrink-0">
-                        {isOpen ? (
-                          <ChevronUp className="w-5 h-5 text-gray-400" />
-                        ) : (
-                          <ChevronDown className="w-5 h-5 text-gray-400" />
-                        )}
                       </div>
                     </div>
-                  </CardHeader>
-                </CollapsibleTrigger>
+                  </CollapsibleTrigger>
+                  
+                  {/* Enhanced button moved outside collapsible trigger */}
+                  {hasIssues && (
+                    <div className="pt-4 border-t border-gray-100">
+                      <Button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleEnhanceSection({ profileSection: section, baseJobRequirementMatches: matches });
+                        }}
+                        className="w-full sm:w-auto"
+                        variant="default"
+                      >
+                        <Sparkles className="w-4 h-4 mr-2" />
+                        Enhance This Section
+                      </Button>
+                    </div>
+                  )}
+                </CardHeader>
 
                 <CollapsibleContent>
                   <CardContent className="pt-0">
@@ -222,7 +242,7 @@ const MatchedProfileSections: React.FC = () => {
                                       className="text-xs"
                                     >
                                       {getConfidenceIcon(m.confidence)}
-                                      <span className="ml-1">{m.confidence}</span>
+                                      <span className="ml-1">{m.confidence}%</span>
                                     </Badge>
                                   ) : (
                                     <span className="text-sm text-gray-500">N/A</span>
@@ -253,19 +273,6 @@ const MatchedProfileSections: React.FC = () => {
                           ))}
                         </div>
                       </div>
-                      
-                      {hasIssues && (
-                        <div className="border-t pt-4">
-                          <Button
-                            onClick={() => handleEnhanceSection({ profileSection: section, baseJobRequirementMatches: matches })}
-                            className="w-full sm:w-auto"
-                            variant="default"
-                          >
-                            <Sparkles className="w-4 h-4 mr-2" />
-                            Enhance This Section
-                          </Button>
-                        </div>
-                      )}
                     </div>
                   </CardContent>
                 </CollapsibleContent>

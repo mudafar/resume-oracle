@@ -5,7 +5,7 @@ interface Match {
   requirement_id: string;
   requirement: string;
   profile_section_id: string;
-  confidence: string;
+  confidence: number;
   gap_description: string;
   recommendation: string;
 }

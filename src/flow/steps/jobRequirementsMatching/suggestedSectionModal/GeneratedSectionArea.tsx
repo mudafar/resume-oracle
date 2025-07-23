@@ -75,7 +75,7 @@ export const GeneratedSectionArea: React.FC<GeneratedSectionAreaProps> = ({
           id="section-content"
           value={content}
           onChange={(e) => setContent(e.target.value)}
-          className="h-80 text-base leading-relaxed resize-none"
+          className="h- text-base leading-relaxed resize-none"
           placeholder="Section content will appear here..."
         />
       </div>

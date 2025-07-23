@@ -22,7 +22,7 @@ export const ProfileSectionsActionBar: React.FC<ProfileSectionsActionBarProps> =
   disabledDeleteAll = false,
 }) => {
   return (
-    <div className="flex flex-row gap-2 mb-4">
+    <div className="flex flex-row gap-2 mb-4 justify-between">
       <Button onClick={onNewSection} className="flex items-center gap-2 bg-primary">
         <Plus className="h-4 w-4" />
         New Profile Section
@@ -32,7 +32,7 @@ export const ProfileSectionsActionBar: React.FC<ProfileSectionsActionBarProps> =
         <Sparkles className="w-4 text-blue-500" />
         Import With AI
       </Button> */}
-      
+      <div className="flex flex-row gap-2" >
       <Button variant="outline" onClick={onImportFile} className="flex items-center gap-2">
         <FileText className="h-4 w-4" />
         Import from File
@@ -57,6 +57,7 @@ export const ProfileSectionsActionBar: React.FC<ProfileSectionsActionBarProps> =
         <Trash2 className="h-4 w-4" />
         Delete All
       </Button>
+    </div>
     </div>
   );
 };
