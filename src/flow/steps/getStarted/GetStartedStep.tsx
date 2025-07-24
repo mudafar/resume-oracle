@@ -1,21 +1,17 @@
 import React, { useState, useEffect } from 'react';
 import {
   FileText,
-  Sparkles,
   Zap,
   ArrowRight,
-  Settings,
   Key,
   ChevronRight,
-  Ticket,
-  User,
   CheckCircle,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { useDispatch, useSelector } from 'react-redux';
-import { RootState } from '@/store/store';
+// import { RootState } from '@/store/store';
 import { openConfigModal } from '@/store/slices/llmConfigSlice';
 import { setCurrentStep } from '@/store/slices/stepSlice';
 import { createStep } from '@/utils/createStep';
@@ -24,7 +20,7 @@ import { addSection } from '@/store/slices/profileSectionsSlice';
 
 const GetStarted: React.FC = () => {
   const dispatch = useDispatch();
-  const config = useSelector((state: RootState) => state.llmConfig);
+  // const config = useSelector((state: RootState) => state.llmConfig);
   const [importAIModalOpen, setImportAIModalOpen] = useState(false);
   const [showTooltip, setShowTooltip] = useState(false);
 
@@ -47,29 +43,29 @@ const GetStarted: React.FC = () => {
   };
   const openSettings = () => dispatch(openConfigModal());
 
-  const hasInvite = Boolean(config.invitationCode);
-  const hasKey = Boolean(config.apiKey);
-  const accessText = hasKey
-    ? 'Premium AI Active'
-    : hasInvite
-      ? 'Invitation Code Active'
-      : 'Guest • 5 calls/hr';
-  const accessStyle = hasKey
-    ? 'bg-purple-50 text-purple-700 border-purple-200'
-    : hasInvite
-      ? 'bg-blue-50 text-blue-700 border-blue-200'
-      : 'bg-gray-100 text-gray-700 border-gray-200';
+  // const hasInvite = Boolean(config.invitationCode);
+  // const hasKey = Boolean(config.apiKey);
+  // const accessText = hasKey
+  //   ? 'Premium AI Active'
+  //   : hasInvite
+  //     ? 'Invitation Code Active'
+  //     : 'Guest • 5 calls/hr';
+  // const accessStyle = hasKey
+  //   ? 'bg-purple-50 text-purple-700 border-purple-200'
+  //   : hasInvite
+  //     ? 'bg-blue-50 text-blue-700 border-blue-200'
+  //     : 'bg-gray-100 text-gray-700 border-gray-200';
 
   return (
     <div className="relative p-6 min-h-[600px] flex flex-col items-center text-center animate-fade-in">
       {/* Access Badge */}
       {/* TODO: move to the left side bar? */}
-      <button
+      {/* <button
         onClick={openSettings}
         className={`absolute top-4 right-4 flex items-center gap-1 text-xs font-medium px-2 py-0.5 border rounded-full hover:bg-opacity-80 transition ${accessStyle}`}
       >
         {hasKey ? <User className="w-4 h-4" /> : <Key className="w-4 h-4" />} {accessText}
-      </button>
+      </button> */}
 
       {/* Illustration */}
       <div className="w-32 h-32 mb-4 bg-gradient-to-br from-blue-100 to-indigo-100 rounded-3xl flex items-center justify-center shadow-lg">
@@ -117,7 +113,6 @@ const GetStarted: React.FC = () => {
 
 
       {/* Premium AI Benefits */}
-      {!hasInvite && !hasKey && (
         <Card
           className="relative m-4 bg-white/80 backdrop-blur-sm border-slate-200/50 shadow-sm hover:shadow-md transition-all duration-200">
           <CardContent className="p-4">
@@ -169,7 +164,6 @@ const GetStarted: React.FC = () => {
             </div>
           </CardContent>
         </Card>
-      )}
 
 
 

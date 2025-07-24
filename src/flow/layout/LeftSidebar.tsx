@@ -8,6 +8,7 @@ import {
   Settings,
   Bell,
   User,
+  Key,
 } from "lucide-react";
 
 import {
@@ -24,8 +25,9 @@ import {
   useSidebar,
 } from "@/components/ui/sidebar";
 
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { openConfigModal } from "@/store/slices/llmConfigSlice";
+import { RootState } from "@/store/store";
 
 
 export function LeftSidebar({ steps, currentStep, onStepChange, appName, appIcon }: {
@@ -38,6 +40,20 @@ export function LeftSidebar({ steps, currentStep, onStepChange, appName, appIcon
   const { state } = useSidebar();
   const isCollapsed = state === "collapsed";
   const dispatch = useDispatch();
+
+  const config = useSelector((state: RootState) => state.llmConfig);
+  const hasInvite = Boolean(config.invitationCode);
+  const hasKey = Boolean(config.apiKey);
+  const accessText = hasKey
+    ? 'Premium AI Active'
+    : hasInvite
+      ? 'Invitation Code Active'
+      : 'Guest • 5 calls/min';
+  const accessStyle = hasKey
+    ? 'bg-purple-50 text-purple-700 border-purple-200'
+    : hasInvite
+      ? 'bg-blue-50 text-blue-700 border-blue-200'
+      : 'bg-gray-100 text-gray-700 border-gray-200';
 
   return (
     <Sidebar variant="inset">
@@ -111,7 +127,7 @@ export function LeftSidebar({ steps, currentStep, onStepChange, appName, appIcon
       <SidebarFooter>
  <SidebarMenu>
    <SidebarMenuItem>
-     <div className="flex items-center justify-between w-full px-2 gap-2">
+     <div className="flex items-center w-full px-2 gap-1">
        <Button
          variant="ghost"
          size="icon"
@@ -121,6 +137,16 @@ export function LeftSidebar({ steps, currentStep, onStepChange, appName, appIcon
        >
          <Settings className="w-8! h-8!" />
        </Button>
+
+      {/* Access Badge */}
+      {/* TODO: move to the left side bar? */}
+      <Button
+        onClick={() => dispatch(openConfigModal())}
+        className={`top-4 right-4 flex items-center gap-1 text-xs font-medium px-2 py-0.5 border rounded-full hover:bg-opacity-80 transition ${accessStyle}`}
+      >
+        {hasKey ? <User className="w-4 h-4" /> : <Key className="w-4 h-4" />} {accessText}
+      </Button>
+       
      </div>
    </SidebarMenuItem>
  </SidebarMenu>

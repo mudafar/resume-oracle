@@ -38,7 +38,7 @@ const ProfileSections: React.FC = () => {
   const [importError, setImportError] = useState<string | null>(null);
   const [importSuccess, setImportSuccess] = useState<string | null>(null);
   const fileInputRef = React.useRef<HTMLInputElement>(null);
-  const [showPrompt, setShowPrompt] = useState(llmConfig.provider === "free" && llmConfig.variant === "default");
+  const [showPrompt, setShowPrompt] = useState(llmConfig.provider === "free");
   // const [importAIModalOpen, setImportAIModalOpen] = useState(false);
   const [importJSONModalOpen, setImportJSONModalOpen] = useState(false);
   // const [heroSkipped, setHeroSkipped] = useState(false);
