@@ -9,7 +9,7 @@ export interface LLMConfigState {
   apiKey: string | null;
   endpointUrl: string | null;
   showConfigModal: boolean;
-  hasSeenConfigModal: boolean;
+  // hasSeenConfigModal: boolean;
   invitationCode: string | null;
 }
 
@@ -19,7 +19,7 @@ const initialState: LLMConfigState = {
   apiKey: null,
   endpointUrl: null,
   showConfigModal: false,
-  hasSeenConfigModal: false,
+  // hasSeenConfigModal: false,
   invitationCode: null,
 };
 
@@ -27,10 +27,10 @@ const llmConfigSlice = createSlice({
   name: "llmConfig",
   initialState,
   reducers: {
-    setLLMConfig(state, action: PayloadAction<Omit<LLMConfigState, 'showConfigModal' | 'hasSeenConfigModal'>>) {
-      return { ...action.payload, showConfigModal: false, hasSeenConfigModal: state.hasSeenConfigModal };
+    setLLMConfig(state, action: PayloadAction<Omit<LLMConfigState, 'showConfigModal'>>) {
+      return { ...action.payload, showConfigModal: false };
     },
-    updateLLMConfig(state, action: PayloadAction<Partial<Omit<LLMConfigState, 'showConfigModal' | 'hasSeenConfigModal'>>>) {
+    updateLLMConfig(state, action: PayloadAction<Partial<Omit<LLMConfigState, 'showConfigModal'>>>) {
       return { ...state, ...action.payload };
     },
     resetLLMConfig() {
@@ -42,14 +42,14 @@ const llmConfigSlice = createSlice({
     closeConfigModal(state) {
       state.showConfigModal = false;
     },
-    setHasSeenConfigModal(state, action: PayloadAction<boolean>) {
-      state.hasSeenConfigModal = action.payload;
-    },
-    resetHasSeenConfigModal(state) {
-      state.hasSeenConfigModal = false;
-    },
+    // setHasSeenConfigModal(state, action: PayloadAction<boolean>) {
+    //   state.hasSeenConfigModal = action.payload;
+    // },
+    // resetHasSeenConfigModal(state) {
+    //   state.hasSeenConfigModal = false;
+    // },
   },
 });
 
-export const { setLLMConfig, updateLLMConfig, resetLLMConfig, openConfigModal, closeConfigModal, setHasSeenConfigModal, resetHasSeenConfigModal } = llmConfigSlice.actions;
+export const { setLLMConfig, updateLLMConfig, resetLLMConfig, openConfigModal, closeConfigModal } = llmConfigSlice.actions;
 export default llmConfigSlice.reducer; 

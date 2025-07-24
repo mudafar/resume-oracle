@@ -1,24 +1,16 @@
-import React, { useEffect } from "react";
-import { useSelector, useDispatch } from "react-redux";
+import React from "react";
+import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "@/store/store";
 import { SettingsModal } from "../steps/SettingsModal";
-import { openConfigModal, closeConfigModal, setHasSeenConfigModal } from "@/store/slices/llmConfigSlice";
+import { closeConfigModal } from "@/store/slices/llmConfigSlice";
 
 export const SettingsLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const dispatch = useDispatch();
   const showModelConfig = useSelector((state: RootState) => state.llmConfig.showConfigModal);
-  const hasSeenConfigModal = useSelector((state: RootState) => state.llmConfig.hasSeenConfigModal);
+  const dispatch = useDispatch();
 
-  // Show modal on first visit
-  useEffect(() => {
-    if (!hasSeenConfigModal) {
-      dispatch(openConfigModal());
-    }
-  }, [hasSeenConfigModal, dispatch]);
 
   const handleClose = () => {
     dispatch(closeConfigModal());
-    dispatch(setHasSeenConfigModal(true));
   };
 
   return (
