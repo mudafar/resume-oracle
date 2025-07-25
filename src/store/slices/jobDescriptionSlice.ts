@@ -2,12 +2,12 @@ import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
 interface JobDescriptionState {
   job_description: string;
-  company_context: string | null;
+  company_context: string;
 }
 
 const initialState: JobDescriptionState = {
   job_description: "",
-  company_context: null,
+  company_context: "",
 };
 
 const jobDescriptionSlice = createSlice({
@@ -17,7 +17,7 @@ const jobDescriptionSlice = createSlice({
     setJobDescription(state, action: PayloadAction<string>) {
       state.job_description = action.payload;
     },
-    setCompanyContext(state, action: PayloadAction<string | null>) {
+    setCompanyContext(state, action: PayloadAction<string>) {
       state.company_context = action.payload;
     },
   },

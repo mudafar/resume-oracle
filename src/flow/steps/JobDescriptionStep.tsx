@@ -12,7 +12,7 @@ import { Building2, FileText } from "lucide-react";
 const JobDescription: React.FC = () => {
   const dispatch = useDispatch();
   const job_description = useSelector((state: RootState) => state.jobContext.job_description);
-  const company_context = useSelector((state: RootState) => state.jobContext.company_context) || "";
+  const company_context = useSelector((state: RootState) => state.jobContext.company_context);
 
   const wordCount = job_description.trim().split(/\s+/).filter(Boolean).length;
   const charCount = job_description.length;

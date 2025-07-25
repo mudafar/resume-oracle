@@ -1,5 +1,7 @@
 "use client";
 import React from "react";
+// Utility to get profile sections referenced by matches
+import { ProfileSection } from "@/store/slices/profileSectionsSlice";
 import { createStep } from "@/utils/createStep";
 import { SuggestedSectionModal } from "./suggestedSectionModal";
 import { RematchBanner, MatchCard, useJobMatching } from ".";
@@ -7,6 +9,13 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { AlertCircle, FileWarning } from 'lucide-react';
+import { Match } from "@/store/slices/matchesSlice";
+
+
+function getMatchedProfileSections(matches: Match[], profileSections: ProfileSection[]): ProfileSection[] {
+  const matchedIds = new Set(matches.map((m) => m.profile_section_id).filter(Boolean));
+  return profileSections.filter((ps) => matchedIds.has(ps.id));
+}
 
 const LoadingState = () => (
   <div className="space-y-6">
@@ -92,7 +101,7 @@ export const JobRequirementsMatching: React.FC = () => {
       <SuggestedSectionModal
         requirement={modalRequirement || ""}
         open={modalOpen}
-        profileSections={profileSections}
+        profileSections={getMatchedProfileSections(matches, profileSections)}
         onClose={() => setModalOpen(false)}
         onSaveAndMatch={handleSaveAndMatch}
         onSaveOnly={handleSaveOnly}

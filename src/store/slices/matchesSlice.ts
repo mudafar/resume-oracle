@@ -51,4 +51,5 @@ export const {
   clearMatches,
 } = matchesSlice.actions;
 
-export default matchesSlice.reducer; 
+export default matchesSlice.reducer;
+export type { Match } 

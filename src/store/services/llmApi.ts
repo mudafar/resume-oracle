@@ -151,7 +151,7 @@ export const llmApi = createApi({
       }),
     }),
     // Match endpoint
-    match: builder.mutation<any, { job_description: string; company_context: string|null; profile_sections: any[] }>({
+    match: builder.mutation<any, { job_description: string; company_context: string; profile_sections: any[] }>({
       query: (body) => ({
         url: 'match-job-to-profile/',
         method: 'POST',

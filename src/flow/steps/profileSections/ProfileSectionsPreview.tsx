@@ -47,7 +47,7 @@ export const ProfileSectionsPreview: React.FC<{
         </Button>
       </div>
 
-      <div className="max-h-64 overflow-y-auto space-y-2">
+      <div className="max-h-64 space-y-2">
         {sections.map((section) => (
           <div
             key={section.id}
