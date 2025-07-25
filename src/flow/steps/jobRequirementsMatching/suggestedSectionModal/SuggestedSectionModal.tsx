@@ -63,7 +63,7 @@ export const SuggestedSectionModal: React.FC<SuggestedSectionModalProps> = ({
   const [isSummaryOpen, setIsSummaryOpen] = useState(true);
 
   const skip = !open;
-  const { isLoading, error, data } = useSuggestProfileSectionQuery(
+  const { isFetching, error, data } = useSuggestProfileSectionQuery(
     { requirement, profile_sections: profileSections },
     { skip }
   );
@@ -117,7 +117,7 @@ export const SuggestedSectionModal: React.FC<SuggestedSectionModalProps> = ({
         </DialogHeader>
 
         <div className="flex-1 flex flex-col min-h-0 overflow-auto">
-          {isLoading ? (
+          {isFetching ? (
             <LoadingState />
           ) : error ? (
             <Alert variant="destructive">
@@ -160,7 +160,7 @@ export const SuggestedSectionModal: React.FC<SuggestedSectionModalProps> = ({
 
         <DialogFooter className="mt-4 flex-shrink-0 flex items-center gap-3">
           <ModalFooter
-            isLoading={isLoading}
+            isLoading={isFetching}
             onSkip={onSkip}
             isEditing={isEditing}
             baseId={baseId}
@@ -170,7 +170,7 @@ export const SuggestedSectionModal: React.FC<SuggestedSectionModalProps> = ({
             content={content}
             onlyBtnLabel={onlyBtnLabel}
             matchBtnLabel={matchBtnLabel}
-            disabled={isLoading || !content.trim()}
+            disabled={isFetching || !content.trim()}
           />
         </DialogFooter>
       </DialogContent>
