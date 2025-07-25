@@ -2,9 +2,10 @@
 import { useEffect, useMemo, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { RootState } from "@/store/store";
-import { setMatches, setLastInputsHash, updateMatch } from "@/store/slices/matchesSlice";
+import { setMatches, setLastInputsHash, setLastJobDescription, updateMatch } from "@/store/slices/matchesSlice";
 import { useMatchMutation } from "@/store/services/llmApi";
 import sha1 from "sha1";
+import { compareTwoStrings } from "string-similarity";
 import { addProfileSectionReturnId } from "../createProfileSection";
 import { editSection } from "@/store/slices/profileSectionsSlice";
 
@@ -12,6 +13,7 @@ export const useJobMatching = () => {
   const dispatch = useDispatch();
   const matches = useSelector((state: RootState) => state.matches.data);
   const lastInputsHash = useSelector((state: RootState) => state.matches.lastInputsHash);
+  const lastJobDescription = useSelector((state: RootState) => state.matches.lastJobDescription);
   const profileSections = useSelector((state: RootState) => state.profileSections.sections);
   const job_description = useSelector((state: RootState) => state.jobContext.job_description);
   const company_context = useSelector((state: RootState) => state.jobContext.company_context);
@@ -27,36 +29,23 @@ export const useJobMatching = () => {
     [job_description, company_context, profileSections]
   );
 
+  // Validation: Check if main inputs are present
+  const hasValidInputs = useMemo(() => {
+    return !!(job_description?.trim() && profileSections?.length > 0);
+  }, [job_description, profileSections]);
+
+  // Calculate JD similarity using string-similarity package
+  const jdSimilarity = useMemo(() => {
+    if (!lastJobDescription || !job_description) return 0;
+    return compareTwoStrings(lastJobDescription, job_description);
+  }, [lastJobDescription, job_description]);
+
   const inputsChanged = inputsHash !== lastInputsHash;
+  const isMajorJdChange = jdSimilarity < 0.7; // Threshold for major change
 
-  useEffect(() => {
-    if (!matches.length) {
-      triggerMatch({ job_description, company_context, profile_sections: profileSections })
-        .unwrap()
-        .then((data) => {
-          dispatch(setMatches((data.job_requirement_matches || []).map((m: any, i: number) => ({
-            id: String(i),
-            requirement_id: String(i),
-            requirement: m.requirement || "",
-            profile_section_id: String(m.profile_section_id ?? ''),
-            confidence: m.confidence != null ? String(m.confidence) : "",
-            gap_description: m.gap_description || "",
-            recommendation: m.recommendation || "",
-          }))));
-          dispatch(setLastInputsHash(inputsHash));
-        });
-    }
-    // eslint-disable-next-line
-  }, []);
+  const performMatch = async () => {
+    if (!hasValidInputs) return;
 
-  useEffect(() => {
-    if (matches.length && inputsChanged) {
-      setShowRematchBanner(true);
-    }
-  }, [inputsChanged, matches.length]);
-
-  const onRematch = async () => {
-    setShowRematchBanner(false);
     await triggerMatch({ job_description, company_context, profile_sections: profileSections })
       .unwrap()
       .then((data) => {
@@ -70,7 +59,41 @@ export const useJobMatching = () => {
           recommendation: m.recommendation || "",
         }))));
         dispatch(setLastInputsHash(inputsHash));
+        dispatch(setLastJobDescription(job_description));
       });
+  };
+
+  // Initial load effect
+  useEffect(() => {
+    if (!matches.length && hasValidInputs) {
+      performMatch();
+    }
+    // eslint-disable-next-line
+  }, []);
+
+  // Handle input changes
+  useEffect(() => {
+    if (!hasValidInputs) {
+      setShowRematchBanner(false);
+      return;
+    }
+
+    if (matches.length && inputsChanged) {
+      // Check for major JD change
+      if (isMajorJdChange) {
+        // Auto-trigger for major JD changes
+        performMatch();
+        setShowRematchBanner(false);
+      } else {
+        // Show banner for minor changes
+        setShowRematchBanner(true);
+      }
+    }
+  }, [inputsChanged, matches.length, hasValidInputs, isMajorJdChange]);
+
+  const onRematch = async () => {
+    setShowRematchBanner(false);
+    await performMatch();
   };
 
   const handleSeeSuggestions = (requirement: string, matchId: string) => {

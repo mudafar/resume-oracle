@@ -13,11 +13,13 @@ interface Match {
 interface MatchesState {
   data: Match[];
   lastInputsHash: string | null;
+  lastJobDescription: string | null;
 }
 
 const initialState: MatchesState = {
   data: [],
   lastInputsHash: null,
+  lastJobDescription: null,
 };
 
 export const matchesSlice = createSlice({
@@ -30,6 +32,9 @@ export const matchesSlice = createSlice({
     setLastInputsHash: (state, action: PayloadAction<string>) => {
       state.lastInputsHash = action.payload;
     },
+    setLastJobDescription: (state, action: PayloadAction<string>) => {
+      state.lastJobDescription = action.payload;
+    },
     updateMatch: (state, action: PayloadAction<{ id: string; match: Partial<Match> }>) => {
       const { id, match } = action.payload;
       const index = state.data.findIndex(m => m.id === id);
@@ -40,6 +45,7 @@ export const matchesSlice = createSlice({
     clearMatches: (state) => {
       state.data = [];
       state.lastInputsHash = null;
+      state.lastJobDescription = null;
     },
   },
 });
@@ -47,9 +53,10 @@ export const matchesSlice = createSlice({
 export const {
   setMatches,
   setLastInputsHash,
+  setLastJobDescription,
   updateMatch,
   clearMatches,
 } = matchesSlice.actions;
 
 export default matchesSlice.reducer;
-export type { Match } 
+export type { Match }
