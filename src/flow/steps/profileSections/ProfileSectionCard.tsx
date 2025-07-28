@@ -180,9 +180,9 @@ export const ProfileSectionCard: React.FC<ProfileSectionCardProps> = ({
                   onChange={(e) => setEditType(e.target.value as SectionTypeEnum)}
                   className="w-full px-4 py-3 border border-gray-300 bg-white rounded-lg shadow-sm text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 appearance-none cursor-pointer"
                 >
-                  {Object.entries(sectionTypes).map(([key, label]) => (
-                    <option key={key} value={key}>
-                      {label}
+                  {sectionTypes.map((sectionType) => (
+                    <option key={sectionType} value={sectionType}>
+                      {sectionType}
                     </option>
                   ))}
                 </select>

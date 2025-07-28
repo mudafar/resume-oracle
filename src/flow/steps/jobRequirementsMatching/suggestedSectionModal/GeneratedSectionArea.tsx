@@ -61,9 +61,9 @@ export const GeneratedSectionArea: React.FC<GeneratedSectionAreaProps> = ({
             <SelectValue placeholder="Select a section type" />
           </SelectTrigger>
           <SelectContent>
-            {Object.entries(sectionTypes).map(([key, label]) => (
-              <SelectItem key={key} value={key}>
-                {label}
+            {sectionTypes.map((sectionType) => (
+              <SelectItem key={sectionType} value={sectionType}>
+                {sectionType}
               </SelectItem>
             ))}
           </SelectContent>
