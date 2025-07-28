@@ -13,8 +13,18 @@ import { Match } from "@/store/slices/matchesSlice";
 
 
 function getMatchedProfileSections(matches: Match[], profileSections: ProfileSection[]): ProfileSection[] {
-  const matchedIds = new Set(matches.map((m) => m.profile_section_id).filter(Boolean));
-  return profileSections.filter((ps) => matchedIds.has(ps.id));
+  // Count matches per profile section
+  const matchCounts = new Map<string, number>();
+  matches.forEach((match) => {
+    if (match.profile_section_id) {
+      matchCounts.set(match.profile_section_id, (matchCounts.get(match.profile_section_id) || 0) + 1);
+    }
+  });
+
+  // Filter and sort profile sections by match count (descending)
+  return profileSections
+    .filter((ps) => matchCounts.has(ps.id))
+    .sort((a, b) => (matchCounts.get(b.id) || 0) - (matchCounts.get(a.id) || 0));
 }
 
 const LoadingState = () => (
