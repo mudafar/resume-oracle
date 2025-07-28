@@ -22,10 +22,10 @@ export const useJobMatching = () => {
   const [modalMatchId, setModalMatchId] = useState<string | null>(null);
   const [showRematchBanner, setShowRematchBanner] = useState(false);
 
-  const [triggerMatch, { isLoading, error }] = useMatchMutation();
+  const [triggerMatch, {isLoading, error}] = useMatchMutation();
 
   const inputsHash = useMemo(
-    () => sha1(JSON.stringify({ job_description, company_context, profileSections })),
+    () => sha1(JSON.stringify({job_description, company_context, profileSections})),
     [job_description, company_context, profileSections]
   );
 
@@ -46,7 +46,7 @@ export const useJobMatching = () => {
   const performMatch = async () => {
     if (!hasValidInputs) return;
 
-    await triggerMatch({ job_description, company_context, profile_sections: profileSections })
+    await triggerMatch({job_description, company_context, profile_sections: profileSections})
       .unwrap()
       .then((data) => {
         dispatch(setMatches((data.job_requirement_matches || []).map((m: any, i: number) => ({
@@ -102,24 +102,27 @@ export const useJobMatching = () => {
     setModalMatchId(matchId);
   };
 
-  const handleSaveAndMatch = ({ type, content, baseId }: { type: string, content: string, baseId?: string }) => {
+  const handleSaveAndMatch = ({type, content, baseId}: { type: string, content: string, baseId?: string }) => {
     let id = baseId;
     if (!baseId) {
       id = addProfileSectionReturnId(dispatch, type, content);
     } else {
-      dispatch(editSection({ id: baseId, type, content }));
+      dispatch(editSection({id: baseId, type, content}));
     }
     if (modalMatchId && id) {
-      dispatch(updateMatch({ id: modalMatchId, match: { profile_section_id: id, confidence: 100 } }));
+      dispatch(updateMatch({
+        id: modalMatchId,
+        match: {profile_section_id: id, confidence: 100, gap_description: '', recommendation: ''}
+      }));
     }
     setModalOpen(false);
   };
 
-  const handleSaveOnly = ({ type, content, baseId }: { type: string, content: string, baseId?: string }) => {
+  const handleSaveOnly = ({type, content, baseId}: { type: string, content: string, baseId?: string }) => {
     if (!baseId) {
       addProfileSectionReturnId(dispatch, type, content);
     } else {
-      dispatch(editSection({ id: baseId, type, content }));
+      dispatch(editSection({id: baseId, type, content}));
     }
     setModalOpen(false);
   };
