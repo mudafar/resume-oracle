@@ -62,7 +62,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
         <CollapsibleContent>
           <Card className="mt-2">
             <CardContent className="p-3">
-              <ScrollArea className="max-h-32">
+              <ScrollArea className="">
                 <div className="text-sm text-gray-700 leading-relaxed">
                   {summaryOfChanges}
                 </div>

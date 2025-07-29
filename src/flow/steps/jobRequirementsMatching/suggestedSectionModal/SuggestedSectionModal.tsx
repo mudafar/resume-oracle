@@ -139,7 +139,7 @@ export const SuggestedSectionModal: React.FC<SuggestedSectionModalProps> = ({
               </div>
               {/* Right Sidebar */}
               <div className="lg:w-1/3 flex flex-col mt-6 lg:mt-0 lg:ml-6">
-                <div className="flex-1 space-y-4 py-1 min-h-0 overflow-auto">
+                <div className="flex-1 space-y-4 py-1 min-h-0">
                   <Sidebar
                     requirement={requirement}
                     type={type}
