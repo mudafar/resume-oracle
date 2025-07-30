@@ -67,7 +67,7 @@ export const JobRequirementsMatching: React.FC = () => {
     error,
     showRematchBanner,
     modalOpen,
-    modalRequirement,
+    modalMatchId,
     onRematch,
     setShowRematchBanner,
     handleSeeSuggestions,
@@ -75,6 +75,9 @@ export const JobRequirementsMatching: React.FC = () => {
     handleSaveAndMatch,
     handleSaveOnly,
   } = useJobMatching();
+
+  // Find the current match for the modal
+  const currentMatch = modalMatchId ? matches.find(m => m.id === modalMatchId) : null;
 
   if (!job_description.trim() || profileSections.length === 0) {
     return <div className="text-gray-500">Please complete previous steps to see job requirements matching.</div>;
@@ -108,15 +111,17 @@ export const JobRequirementsMatching: React.FC = () => {
           />
         ))}
       </div>
-      <SuggestedSectionModal
-        requirement={modalRequirement || ""}
-        open={modalOpen}
-        profileSections={getMatchedProfileSections(matches, profileSections)}
-        onClose={() => setModalOpen(false)}
-        onSaveAndMatch={handleSaveAndMatch}
-        onSaveOnly={handleSaveOnly}
-        onSkip={() => setModalOpen(false)}
-      />
+      {currentMatch && (
+        <SuggestedSectionModal
+          match={currentMatch}
+          open={modalOpen}
+          profileSections={getMatchedProfileSections(matches, profileSections)}
+          onClose={() => setModalOpen(false)}
+          onSaveAndMatch={handleSaveAndMatch}
+          onSaveOnly={handleSaveOnly}
+          onSkip={() => setModalOpen(false)}
+        />
+      )}
     </div>
   );
 };

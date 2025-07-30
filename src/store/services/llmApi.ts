@@ -158,7 +158,7 @@ export const llmApi = createApi({
         body,
       }),
     }),
-    suggestProfileSection: builder.query<ProfileSectionSuggestion, SuggestProfileSectionRequest>({
+    suggestProfileSection: builder.mutation<ProfileSectionSuggestion, SuggestProfileSectionRequest>({
       query: (body) => ({
         url: 'suggest-profile-section/',
         method: 'POST',
@@ -184,7 +184,7 @@ export const {
   useGenerateResumeMutation,
   useGenerateCoverLetterMutation,
   useMatchMutation,
-  useSuggestProfileSectionQuery,
+  useSuggestProfileSectionMutation,
   useParseProfileSectionsMutation,
   useEnhanceMatchedProfileSectionMutation,
 } = llmApi;

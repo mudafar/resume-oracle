@@ -18,7 +18,6 @@ export const useJobMatching = () => {
   const job_description = useSelector((state: RootState) => state.jobContext.job_description);
   const company_context = useSelector((state: RootState) => state.jobContext.company_context);
   const [modalOpen, setModalOpen] = useState(false);
-  const [modalRequirement, setModalRequirement] = useState<string | null>(null);
   const [modalMatchId, setModalMatchId] = useState<string | null>(null);
   const [showRematchBanner, setShowRematchBanner] = useState(false);
 
@@ -98,7 +97,6 @@ export const useJobMatching = () => {
 
   const handleSeeSuggestions = (requirement: string, matchId: string) => {
     setModalOpen(true);
-    setModalRequirement(requirement);
     setModalMatchId(matchId);
   };
 
@@ -135,7 +133,7 @@ export const useJobMatching = () => {
     error,
     showRematchBanner,
     modalOpen,
-    modalRequirement,
+    modalMatchId,
     onRematch,
     setShowRematchBanner,
     handleSeeSuggestions,

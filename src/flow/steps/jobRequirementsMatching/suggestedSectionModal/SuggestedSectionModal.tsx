@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useSuggestProfileSectionQuery } from "@/store/services/llmApi";
+import { useSuggestProfileSectionMutation } from "@/store/services/llmApi";
 import {
   Dialog,
   DialogContent,
@@ -19,6 +19,7 @@ import { LoadingState } from "./LoadingState";
 import { Sidebar } from "./Sidebar";
 import { ModalFooter } from "./ModalFooter";
 import { sectionTypes, SectionTypeEnum } from "@/store/slices/profileSectionsSlice";
+import { Match } from "@/store/slices/matchesSlice";
 
 interface ProfileSection {
   id: string;
@@ -27,7 +28,7 @@ interface ProfileSection {
 }
 
 interface SuggestedSectionModalProps {
-  requirement: string;
+  match: Match;
   open: boolean;
   profileSections: ProfileSection[];
   onClose: () => void;
@@ -47,7 +48,7 @@ interface SuggestedSectionModalProps {
 
 
 export const SuggestedSectionModal: React.FC<SuggestedSectionModalProps> = ({
-  requirement,
+  match,
   open,
   profileSections,
   onClose,
@@ -61,28 +62,92 @@ export const SuggestedSectionModal: React.FC<SuggestedSectionModalProps> = ({
   const [summaryOfChanges, setSummaryOfChanges] = useState<string>("");
   const [isBaseSectionOpen, setIsBaseSectionOpen] = useState(false);
   const [isSummaryOpen, setIsSummaryOpen] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  const skip = !open;
-  const { isFetching, error, data } = useSuggestProfileSectionQuery(
-    { requirement, profile_sections: profileSections },
-    { skip }
-  );
+  // Advanced features state
+  const [useAutoSelection, setUseAutoSelection] = useState(true);
+  const [selectedProfileSectionId, setSelectedProfileSectionId] = useState<string | null>(null);
+  const [customHint, setCustomHint] = useState("");
 
+  // Use mutation similar to triggerEnhance pattern
+  const [triggerSuggest, { data, isLoading, isError, error: apiError, isSuccess, reset }] = useSuggestProfileSectionMutation();
+
+  // Helper function to prepare query payload
+  const prepareQueryPayload = () => ({
+    requirement: match.requirement,
+    profile_sections: useAutoSelection
+      ? profileSections
+      : selectedProfileSectionId
+        ? profileSections.filter(ps => ps.id === selectedProfileSectionId)
+        : [],
+    gap_description: match.gap_description,
+    custom_hint: customHint || undefined
+  });
+
+  // Trigger suggestion when modal opens
   useEffect(() => {
-    if (data) {
-      setBaseId(data.base_profile_section_id);
-      setType((data.suggested_profile_section.type as SectionTypeEnum) || sectionTypes[0]);
-      setContent(data.suggested_profile_section.content || "");
-      setSummaryOfChanges(data.summary_of_changes || "");
-    } else if (!open) {
+    if (open) {
+      setContent("");
+      setBaseId(null);
+      setSummaryOfChanges("");
+      setError(null);
+
+      const queryPayload = prepareQueryPayload();
+
+      // Only trigger if we have valid data
+      if (queryPayload.profile_sections.length > 0) {
+        triggerSuggest(queryPayload);
+      }
+    } else {
+      reset();
       setType(sectionTypes[0]);
       setContent("");
       setBaseId(null);
       setSummaryOfChanges("");
       setIsBaseSectionOpen(false);
       setIsSummaryOpen(true);
+      setUseAutoSelection(true);
+      setSelectedProfileSectionId(null);
+      setCustomHint("");
+      setError(null);
     }
-  }, [data, open]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [open, profileSections, match]);
+
+  // Update state when data is received
+  useEffect(() => {
+    if (data) {
+      setBaseId(data.base_profile_section_id);
+      setType((data.suggested_profile_section.type as SectionTypeEnum) || sectionTypes[0]);
+      setContent(data.suggested_profile_section.content || "");
+      setSummaryOfChanges(data.summary_of_changes || "");
+    }
+  }, [data]);
+
+  // Handle error
+  useEffect(() => {
+    if (isError && apiError && 'message' in apiError) {
+      setError((apiError as any).message || 'Failed to generate suggestion');
+    } else if (isError) {
+      setError('Failed to generate suggestion');
+    }
+  }, [isError, apiError]);
+
+  // Reset selected base when switching to auto mode
+  useEffect(() => {
+    if (useAutoSelection) {
+      setSelectedProfileSectionId(null);
+    }
+  }, [useAutoSelection]);
+
+  const handleRegenerateClick = () => {
+    const queryPayload = prepareQueryPayload();
+
+    if (queryPayload.profile_sections.length > 0) {
+      setError(null);
+      triggerSuggest(queryPayload);
+    }
+  };
 
   function getErrorMessage(error: any): string {
     if (!error) return "";
@@ -117,7 +182,7 @@ export const SuggestedSectionModal: React.FC<SuggestedSectionModalProps> = ({
         </DialogHeader>
 
         <div className="flex-1 flex flex-col min-h-0 overflow-auto">
-          {isFetching ? (
+          {isLoading ? (
             <LoadingState />
           ) : error ? (
             <Alert variant="destructive">
@@ -141,7 +206,7 @@ export const SuggestedSectionModal: React.FC<SuggestedSectionModalProps> = ({
               <div className="lg:w-1/3 flex flex-col mt-6 lg:mt-0 lg:ml-6">
                 <div className="flex-1 space-y-4 py-1 min-h-0">
                   <Sidebar
-                    requirement={requirement}
+                    requirement={match.requirement}
                     type={type}
                     setType={setType}
                     isEditing={isEditing}
@@ -151,6 +216,15 @@ export const SuggestedSectionModal: React.FC<SuggestedSectionModalProps> = ({
                     baseSection={baseSection}
                     isBaseSectionOpen={isBaseSectionOpen}
                     setIsBaseSectionOpen={setIsBaseSectionOpen}
+                    profileSections={profileSections}
+                    useAutoSelection={useAutoSelection}
+                    setUseAutoSelection={setUseAutoSelection}
+                    selectedProfileSectionId={selectedProfileSectionId}
+                    setSelectedProfileSectionId={setSelectedProfileSectionId}
+                    customHint={customHint}
+                    setCustomHint={setCustomHint}
+                    onRegenerateClick={handleRegenerateClick}
+                    isLoading={isLoading}
                   />
                 </div>
               </div>
@@ -160,7 +234,7 @@ export const SuggestedSectionModal: React.FC<SuggestedSectionModalProps> = ({
 
         <DialogFooter className="mt-4 flex-shrink-0 flex items-center gap-3">
           <ModalFooter
-            isLoading={isFetching}
+            isLoading={isLoading}
             onSkip={onSkip}
             isEditing={isEditing}
             baseId={baseId}
@@ -170,7 +244,7 @@ export const SuggestedSectionModal: React.FC<SuggestedSectionModalProps> = ({
             content={content}
             onlyBtnLabel={onlyBtnLabel}
             matchBtnLabel={matchBtnLabel}
-            disabled={isFetching || !content.trim()}
+            disabled={isLoading || !content.trim()}
           />
         </DialogFooter>
       </DialogContent>
