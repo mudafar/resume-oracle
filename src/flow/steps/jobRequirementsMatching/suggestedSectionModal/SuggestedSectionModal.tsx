@@ -81,7 +81,8 @@ export const SuggestedSectionModal: React.FC<SuggestedSectionModalProps> = ({
         ? profileSections.filter(ps => ps.id === selectedProfileSectionId)
         : [],
     gap_description: match.gap_description,
-    custom_hint: customHint || undefined
+    custom_hint: customHint || undefined,
+    recommendation: match.recommendation,
   });
 
   // Trigger suggestion when modal opens

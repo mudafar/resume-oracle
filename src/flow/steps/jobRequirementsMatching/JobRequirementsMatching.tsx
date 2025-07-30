@@ -12,7 +12,7 @@ import { AlertCircle, FileWarning } from 'lucide-react';
 import { Match } from "@/store/slices/matchesSlice";
 
 
-function getMatchedProfileSections(matches: Match[], profileSections: ProfileSection[]): ProfileSection[] {
+function getTopMatchedProfileSections(matches: Match[], profileSections: ProfileSection[], max=5): ProfileSection[] {
   // Count matches per profile section
   const matchCounts = new Map<string, number>();
   matches.forEach((match) => {
@@ -24,7 +24,8 @@ function getMatchedProfileSections(matches: Match[], profileSections: ProfileSec
   // Filter and sort profile sections by match count (descending)
   return profileSections
     .filter((ps) => matchCounts.has(ps.id))
-    .sort((a, b) => (matchCounts.get(b.id) || 0) - (matchCounts.get(a.id) || 0));
+    .sort((a, b) => (matchCounts.get(b.id) || 0) - (matchCounts.get(a.id) || 0))
+    .slice(0, max); // Limit to top 4 sections
 }
 
 const LoadingState = () => (
@@ -115,7 +116,7 @@ export const JobRequirementsMatching: React.FC = () => {
         <SuggestedSectionModal
           match={currentMatch}
           open={modalOpen}
-          profileSections={getMatchedProfileSections(matches, profileSections)}
+          profileSections={getTopMatchedProfileSections(matches, profileSections)}
           onClose={() => setModalOpen(false)}
           onSaveAndMatch={handleSaveAndMatch}
           onSaveOnly={handleSaveOnly}

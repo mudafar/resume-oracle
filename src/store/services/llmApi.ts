@@ -8,7 +8,7 @@ export interface EnhancementResponse {
   original_profile_section: ProfileSection;
   enhanced_profile_section: ProfileSection;
   enhancements_made: string[];
-  reasoning: string;
+  reasoning: string[];
 }
 
 export interface BaseJobRequirementMatch {

@@ -56,7 +56,7 @@ export const EnhanceProfileSectionModal: React.FC<EnhanceProfileSectionModalProp
 }) => {
   const [enhancedContent, setEnhancedContent] = useState("");
   const [enhancementsMade, setEnhancementsMade] = useState<string[]>([]);
-  const [reasoning, setReasoning] = useState("");
+  const [reasoning, setReasoning] = useState<string[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [triggerEnhance, { data, isLoading, isError, error: apiError, isSuccess, reset }] = useEnhanceMatchedProfileSectionMutation();
 
@@ -65,7 +65,7 @@ export const EnhanceProfileSectionModal: React.FC<EnhanceProfileSectionModalProp
     if (open) {
       setEnhancedContent("");
       setEnhancementsMade([]);
-      setReasoning("");
+      setReasoning([]);
       setError(null);
       triggerEnhance({
         profile_section: profileSection,
@@ -75,7 +75,7 @@ export const EnhanceProfileSectionModal: React.FC<EnhanceProfileSectionModalProp
       reset();
       setEnhancedContent("");
       setEnhancementsMade([]);
-      setReasoning("");
+      setReasoning([]);
       setError(null);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -179,7 +179,7 @@ export const EnhanceProfileSectionModal: React.FC<EnhanceProfileSectionModalProp
 
 
                   {/* Reasoning Section */}
-                  {reasoning && (
+                  {reasoning.length > 0 && (
                     <Card>
                       <CardHeader>
                         <CardTitle className="flex items-center gap-2">
@@ -191,9 +191,16 @@ export const EnhanceProfileSectionModal: React.FC<EnhanceProfileSectionModalProp
                         </CardDescription>
                       </CardHeader>
                       <CardContent>
-                        <div className="bg-amber-50 border border-amber-200 rounded-lg p-4">
-                          <div className="text-sm text-amber-900 leading-relaxed">
-                            {reasoning}
+                        <div className=" rounded-lg">
+                          <div className="space-y-3">
+                            {reasoning.map((reasonPoint, index) => (
+                              <div key={index} className="flex items-start gap-2 bg-amber-50 border border-amber-200 rounded-lg p-4">
+                                <Lightbulb className="w-4 h-4 text-amber-600 mt-0.5 flex-shrink-0" />
+                                <span className="text-sm text-amber-900 leading-relaxed">
+                                  {reasonPoint}
+                                </span>
+                              </div>
+                            ))}
                           </div>
                         </div>
                       </CardContent>

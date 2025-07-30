@@ -57,15 +57,15 @@ const GenerateEditResume: React.FC = () => {
   const convertToMarkdown = (data: any) => {
     const resume = data.data.resume;
     let md = "";
-    if (resume.summary) md += `## Summary\n${resume.summary}\n\n---\n\n`;
-    if (resume.experience) md += `## Experience\n${resume.experience}\n\n---\n\n`;
-    if (resume.skills) md += `## Skills\n${resume.skills}\n\n---\n\n`;
-    if (resume.education) md += `## Education\n${resume.education}\n\n---\n\n`;
-    if (resume.certifications) md += `## Certifications\n${resume.certifications}\n\n---\n\n`;
-    if (resume.projects) md += `## Projects\n${resume.projects}\n\n---\n\n`;
-    if (resume.achievements) md += `## Achievements\n${resume.achievements}\n\n---\n\n`;
-    if (resume.volunteering) md += `## Volunteering\n${resume.volunteering}\n\n---\n\n`;
-    if (resume.language) md += `## Language\n${resume.language}\n\n---\n\n`;
+    if (resume.summary) md += `${resume.summary}\n\n---\n\n`;
+    if (resume.experience) md += `${resume.experience}\n\n---\n\n`;
+    if (resume.skills) md += `${resume.skills}\n\n---\n\n`;
+    if (resume.education) md += `${resume.education}\n\n---\n\n`;
+    if (resume.certifications) md += `${resume.certifications}\n\n---\n\n`;
+    if (resume.projects) md += `${resume.projects}\n\n---\n\n`;
+    if (resume.achievements) md += `${resume.achievements}\n\n---\n\n`;
+    if (resume.volunteering) md += `${resume.volunteering}\n\n---\n\n`;
+    if (resume.language) md += `${resume.language}\n\n---\n\n`;
     return md.trim();
   };
 
