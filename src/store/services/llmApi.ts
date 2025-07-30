@@ -28,16 +28,20 @@ export interface ResumeSection {
 }
 
 export interface GenerateResumeSectionsRequest {
-  matched_profile_sections: Array<{
+  profile_sections_with_requirements: Array<{
     profile_section: {
       id: string;
       type: string;
       content: string;
     };
-    base_job_requirement_matches: Array<{
-      requirement: string;
-    }>;
+    requirements: string[];
   }>;
+}
+
+export interface GenerateResumeSectionsResponse {
+  data: ResumeSection[];
+  success: boolean;
+  message?: string;
 }
 
 export interface GenerateResumeRequest {
@@ -129,7 +133,7 @@ export const llmApi = createApi({
       }),
     }),
     // Resume endpoints
-    generateResumeSections: builder.mutation<ResumeSection[], GenerateResumeSectionsRequest>({
+    generateResumeSections: builder.mutation<GenerateResumeSectionsResponse, GenerateResumeSectionsRequest>({
       query: (body) => ({
         url: 'generate-resume-sections/',
         method: 'POST',

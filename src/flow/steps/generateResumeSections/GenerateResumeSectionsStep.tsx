@@ -39,7 +39,7 @@ const GenerateResumeSections: React.FC = () => {
   const matchedProfileSections: MatchedProfileSection[] = groupMatchesByProfileSection(matches, profileSections);
   const apiPayload = matchedProfileSections.map(({ profileSection, baseJobRequirementMatches }) => ({
     profile_section: profileSection,
-    base_job_requirement_matches: baseJobRequirementMatches,
+    requirements: baseJobRequirementMatches.map(match => match.requirement),
   }));
 
   // Compute hash of current inputs
@@ -52,9 +52,9 @@ const GenerateResumeSections: React.FC = () => {
   // On first entry, auto-generate if no resume sections
   useEffect(() => {
     if (!resumeSections.length) {
-      triggerGenerateResumeSections({ matched_profile_sections: apiPayload })
+      triggerGenerateResumeSections({ profile_sections_with_requirements: apiPayload })
         .unwrap()
-        .then((data: ResumeSection[]) => {
+        .then(({ data } ) => {
           setEditedContent(Object.fromEntries(data.map(s => [s.profile_section_id, s.content])));
           dispatch(setResumeSections(data));
           dispatch(setLastInputsHash(inputsHash));
@@ -73,9 +73,9 @@ const GenerateResumeSections: React.FC = () => {
   // Regenerate handler
   const onRegenerate = async () => {
     setShowRegenerateBanner(false);
-    await triggerGenerateResumeSections({ matched_profile_sections: apiPayload })
+    await triggerGenerateResumeSections({ profile_sections_with_requirements: apiPayload })
       .unwrap()
-      .then((data: ResumeSection[]) => {
+      .then(({ data }) => {
         setEditedContent(Object.fromEntries(data.map(s => [s.profile_section_id, s.content])));
         dispatch(setResumeSections(data));
         dispatch(setLastInputsHash(inputsHash));
