@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { RootState } from "@/store/store";
-import { groupMatchesByProfileSection } from "../groupMatchesByProfileSection";
+import { getMatchedProfileSectionWithRequirements } from "../shared/getMatchedProfileSectionWithRequirements";
 import sha1 from "sha1";
 import {
   setCoverLetter,
@@ -38,19 +38,18 @@ const GenerateCoverLetter: React.FC = () => {
 
   const [triggerGenerateCoverLetter, { isLoading, error }] = useGenerateCoverLetterMutation();
 
-  // Prepare payload using groupMatchesByProfileSection
-  const grouped = groupMatchesByProfileSection(matches, profileSections).map(g => ({
-    profile_section: g.profileSection,
-    base_job_requirement_matches: g.baseJobRequirementMatches.map(m => ({ requirement: m.requirement }))
-  }));
+  // Prepare payload using the shared utility - memoize to prevent unnecessary re-computations
+  const apiPayload = useMemo(() => {
+    return getMatchedProfileSectionWithRequirements(matches || [], profileSections || []);
+  }, [matches, profileSections]);
 
   // Use first 2-3 sentences of job description for tone_guidance
-  let toneGuidance = "";
-  if (jobDescription) {
+  const toneGuidance = useMemo(() => {
+    if (!jobDescription) return "";
     const sentences = jobDescription.match(/[^.!?]+[.!?]+/g) || [];
-    toneGuidance = sentences.slice(0, 3).join(" ").trim();
-    if (!toneGuidance) toneGuidance = jobDescription.slice(0, 300);
-  }
+    const guidanceText = sentences.slice(0, 3).join(" ").trim();
+    return guidanceText || jobDescription.slice(0, 300);
+  }, [jobDescription]);
 
   // Compute hash of current inputs
   const inputsHash = useMemo(
@@ -60,9 +59,9 @@ const GenerateCoverLetter: React.FC = () => {
   const inputsChanged = inputsHash !== lastCoverLetterInputsHash;
 
   useEffect(() => {
-    if (!coverLetter && grouped.length > 0) {
+    if (!coverLetter && apiPayload.profile_sections_with_requirements.length > 0) {
       triggerGenerateCoverLetter({
-        matched_profile_sections: grouped,
+        profile_sections_with_requirements: apiPayload.profile_sections_with_requirements,
         company_context: companyContext || undefined,
         tone_guidance: toneGuidance
       })
@@ -84,7 +83,7 @@ const GenerateCoverLetter: React.FC = () => {
   const onRegenerate = async () => {
     setShowRegenerateBanner(false);
     await triggerGenerateCoverLetter({
-      matched_profile_sections: grouped,
+      profile_sections_with_requirements: apiPayload.profile_sections_with_requirements,
       company_context: companyContext || undefined,
       tone_guidance: toneGuidance
     })

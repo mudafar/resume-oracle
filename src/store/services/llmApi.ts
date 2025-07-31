@@ -29,11 +29,7 @@ export interface ResumeSection {
 
 export interface GenerateResumeSectionsRequest {
   profile_sections_with_requirements: Array<{
-    profile_section: {
-      id: string;
-      type: string;
-      content: string;
-    };
+    profile_section: ProfileSection;
     requirements: string[];
   }>;
 }
@@ -75,9 +71,7 @@ export interface GenerateCoverLetterRequest {
       type: string;
       content: string;
     };
-    base_job_requirement_matches: Array<{
-      requirement: string;
-    }>;
+    requirements: string[];
   }>;
   company_context?: string;
   tone_guidance?: string;

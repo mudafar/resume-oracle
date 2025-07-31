@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { RootState } from "@/store/store";
+import { getMatchedProfileSectionWithRequirements } from "../shared/getMatchedProfileSectionWithRequirements";
 import { groupMatchesByProfileSection, MatchedProfileSection } from "../groupMatchesByProfileSection";
 import { RegenerateBanner } from "../shared/RegenerateBanner";
 import { ResumeSectionCard } from "./ResumeSectionCard"
@@ -35,29 +36,30 @@ const GenerateResumeSections: React.FC = () => {
   // RTK Query mutation
   const [triggerGenerateResumeSections, { isLoading, error }] = useGenerateResumeSectionsMutation();
 
-  // Prepare payload for API
-  const matchedProfileSections: MatchedProfileSection[] = groupMatchesByProfileSection(matches, profileSections);
-  const apiPayload = matchedProfileSections.map(({ profileSection, baseJobRequirementMatches }) => ({
-    profile_section: profileSection,
-    requirements: baseJobRequirementMatches.map(match => match.requirement),
-  }));
+  // Prepare payload for API - memoize to prevent unnecessary re-computations
+  const apiPayload = useMemo(() => {
+    return getMatchedProfileSectionWithRequirements(matches, profileSections);
+  }, [matches, profileSections]);
 
   // Compute hash of current inputs
   const inputsHash = useMemo(
-    () => sha1(JSON.stringify({ matchedProfileSections })),
-    [matchedProfileSections]
+    () => sha1(JSON.stringify(apiPayload)),
+    [apiPayload]
   );
   const inputsChanged = inputsHash !== lastInputsHash;
 
   // On first entry, auto-generate if no resume sections
   useEffect(() => {
-    if (!resumeSections.length) {
-      triggerGenerateResumeSections({ profile_sections_with_requirements: apiPayload })
+    if (!resumeSections.length && apiPayload.profile_sections_with_requirements.length > 0) {
+      triggerGenerateResumeSections(apiPayload)
         .unwrap()
         .then(({ data } ) => {
           setEditedContent(Object.fromEntries(data.map(s => [s.profile_section_id, s.content])));
           dispatch(setResumeSections(data));
           dispatch(setLastInputsHash(inputsHash));
+        })
+        .catch((error) => {
+          console.error('Failed to generate resume sections:', error);
         });
     }
     // eslint-disable-next-line
@@ -73,7 +75,7 @@ const GenerateResumeSections: React.FC = () => {
   // Regenerate handler
   const onRegenerate = async () => {
     setShowRegenerateBanner(false);
-    await triggerGenerateResumeSections({ profile_sections_with_requirements: apiPayload })
+    await triggerGenerateResumeSections(apiPayload)
       .unwrap()
       .then(({ data }) => {
         setEditedContent(Object.fromEntries(data.map(s => [s.profile_section_id, s.content])));
@@ -82,15 +84,17 @@ const GenerateResumeSections: React.FC = () => {
       });
   };
 
-  // Reference requirements for each section
-  const referenceMap: { [id: string]: { requirement: string }[] } = {};
-  matchedProfileSections.forEach(({ profileSection, baseJobRequirementMatches }) => {
-    referenceMap[profileSection.id] = baseJobRequirementMatches.map(m => ({
-      requirement: m.requirement,
-    }));
-  });
-
-
+  // Reference requirements for each section - memoize to prevent unnecessary re-computations
+  const referenceMap = useMemo(() => {
+    const matchedProfileSections: MatchedProfileSection[] = groupMatchesByProfileSection(matches, profileSections);
+    const map: { [id: string]: { requirement: string }[] } = {};
+    matchedProfileSections.forEach(({ profileSection, baseJobRequirementMatches }) => {
+      map[profileSection.id] = baseJobRequirementMatches.map(m => ({
+        requirement: m.requirement,
+      }));
+    });
+    return map;
+  }, [matches, profileSections]);
 
   return (
     <div className="max-w-5xl mx-auto py-8 px-4 space-y-6">
