@@ -64,7 +64,7 @@ const PROVIDER_VARIANTS: Record<LLMProvider, { value: LLMVariant; label: string 
     { value: "default", label: "Default (small, cost‑efficient)" },
   ],
   google_genai: [
-    { value: "gemini-2.5-flash-lite-preview-06-17", label: "Gemini 2.5 Flash Light" },
+    { value: "gemini-2.5-flash-lite", label: "Gemini 2.5 Flash Light" },
     { value: "gemini-2.5-flash", label: "Gemini 2.5 Flash" },
     { value: "gemini-2.5-pro", label: "Gemini 2.5 PRO" },
   ],

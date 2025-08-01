@@ -84,7 +84,7 @@ export const ProfileSectionImportAIModal: React.FC<AIImportModalProps> = ({
       }
       const withIds = result.profile_sections.map((section: any) => ({
         ...section,
-        id: section.id || nanoid(8),
+        id: nanoid(8),
       }));
       setSections(withIds);
       onToast(`Successfully analyzed and found ${result.profile_sections.length} sections!`);
