@@ -56,6 +56,7 @@ export const GeneratedSectionArea: React.FC<GeneratedSectionAreaProps> = ({
 
       <div className="space-y-2">
         <Label htmlFor="section-type" className="font-semibold">Section Type</Label>
+        {/*  // TODO: type is not visible in the dropdown, need to fix this, Summary vs summary maybe */}
         <Select value={type} onValueChange={v => setType(v as SectionTypeEnum)}>
           <SelectTrigger id="section-type">
             <SelectValue placeholder="Select a section type" />

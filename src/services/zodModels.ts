@@ -121,4 +121,5 @@ export type BaseJobRequirementMatch = z.infer<typeof BaseJobRequirementMatchSche
 export type JobRequirementMatch = z.infer<typeof JobRequirementMatchSchema>;
 export type MatchedProfileSection = z.infer<typeof MatchedProfileSectionSchema>;
 export type ProfileSectionWithRequirements = z.infer<typeof ProfileSectionWithRequirementsSchema>;
+export type ProfileSectionSuggestion = z.infer<typeof ProfileSectionSuggestionSchema>;
 // ...add more as needed for other schemas

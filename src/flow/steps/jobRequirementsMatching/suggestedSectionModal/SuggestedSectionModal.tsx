@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from "react";
-import { useSuggestProfileSectionMutation } from "@/store/services/llmApi";
+import { useLlmService } from "@/hooks/useLlmService";
+import { profileSectionSuggestionService } from "@/services/profileSectionSuggestionService";
+import { ProfileSectionSuggestion } from "@/services/zodModels";
 import {
   Dialog,
   DialogContent,
@@ -69,19 +71,21 @@ export const SuggestedSectionModal: React.FC<SuggestedSectionModalProps> = ({
   const [selectedProfileSectionId, setSelectedProfileSectionId] = useState<string | null>(null);
   const [customHint, setCustomHint] = useState("");
 
-  // Use mutation similar to triggerEnhance pattern
-  const [triggerSuggest, { data, isLoading, isError, error: apiError, isSuccess, reset }] = useSuggestProfileSectionMutation();
+  // Use LLM service hook for suggestion
+  const [triggerSuggest, { data, isLoading, isError, error: apiError, isSuccess, reset }] = useLlmService<ProfileSectionSuggestion>(
+    profileSectionSuggestionService.suggestProfileSection
+  );
 
   // Helper function to prepare query payload
   const prepareQueryPayload = () => ({
     requirement: match.requirement,
-    profile_sections: useAutoSelection
-      ? orderedMatchedProfileSections.slice(0, 3) // Top 3 for API optimization
+    profileSections: useAutoSelection
+      ? orderedMatchedProfileSections.slice(0, 3)
       : selectedProfileSectionId
         ? orderedMatchedProfileSections.filter(ps => ps.id === selectedProfileSectionId)
         : [],
-    gap_description: match.gap_description,
-    custom_hint: customHint || undefined,
+    gapDescription: match.gap_description,
+    customHint: customHint || undefined,
     recommendation: match.recommendation,
   });
 
@@ -96,8 +100,14 @@ export const SuggestedSectionModal: React.FC<SuggestedSectionModalProps> = ({
       const queryPayload = prepareQueryPayload();
 
       // Only trigger if we have valid data
-      if (queryPayload.profile_sections.length > 0) {
-        triggerSuggest(queryPayload);
+      if (queryPayload.profileSections.length > 0) {
+        triggerSuggest(
+          queryPayload.requirement,
+          queryPayload.profileSections,
+          queryPayload.gapDescription,
+          queryPayload.recommendation,
+          queryPayload.customHint
+        );
       }
     } else {
       reset();
@@ -144,9 +154,15 @@ export const SuggestedSectionModal: React.FC<SuggestedSectionModalProps> = ({
   const handleRegenerateClick = () => {
     const queryPayload = prepareQueryPayload();
 
-    if (queryPayload.profile_sections.length > 0) {
+    if (queryPayload.profileSections.length > 0) {
       setError(null);
-      triggerSuggest(queryPayload);
+      triggerSuggest(
+        queryPayload.requirement,
+        queryPayload.profileSections,
+        queryPayload.gapDescription,
+        queryPayload.recommendation,
+        queryPayload.customHint
+      );
     }
   };
 
