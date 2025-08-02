@@ -9,7 +9,9 @@ import {
   setLastCoverLetterInputsHash,
   updateCoverLetter
 } from "@/store/slices/coverLetterSlice";
-import { useGenerateCoverLetterMutation } from "@/store/services/llmApi";
+import { useLlmService } from "@/hooks/useLlmService";
+import { coverLetterGeneratorService } from "@/services/coverLetterGeneratorService";
+import { GeneratedCoverLetterResult } from "@/services/zodModels";
 import { createStep } from "@/utils/createStep";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -36,12 +38,9 @@ const GenerateCoverLetter: React.FC = () => {
   const [showRegenerateBanner, setShowRegenerateBanner] = useState(false);
   const [copied, setCopied] = useState(false);
 
-  const [triggerGenerateCoverLetter, { isLoading, error }] = useGenerateCoverLetterMutation();
-
-  // Prepare payload using the shared utility - memoize to prevent unnecessary re-computations
-  const apiPayload = useMemo(() => {
-    return getMatchedProfileSectionWithRequirements(matches || [], profileSections || []);
-  }, [matches, profileSections]);
+  const [generateCoverLetter, { isLoading, error, data, reset }] = useLlmService<GeneratedCoverLetterResult>(
+    coverLetterGeneratorService.generateCoverLetter
+  );
 
   // Use first 2-3 sentences of job description for tone_guidance
   const toneGuidance = useMemo(() => {
@@ -51,6 +50,15 @@ const GenerateCoverLetter: React.FC = () => {
     return guidanceText || jobDescription.slice(0, 300);
   }, [jobDescription]);
 
+  // Prepare payload using the shared utility - memoize to prevent unnecessary re-computations
+  const apiPayload = useMemo(() => {
+    return {
+      profileSectionsWithRequirements: getMatchedProfileSectionWithRequirements(matches || [], profileSections || []),
+      companyContext: companyContext || "",
+      toneGuidance: toneGuidance
+    };
+  }, [matches, profileSections, companyContext, toneGuidance]);
+
   // Compute hash of current inputs
   const inputsHash = useMemo(
     () => sha1(JSON.stringify({ profileSections, matches, companyContext, jobDescription })),
@@ -59,18 +67,17 @@ const GenerateCoverLetter: React.FC = () => {
   const inputsChanged = inputsHash !== lastCoverLetterInputsHash;
 
   useEffect(() => {
-    if (!coverLetter && apiPayload.profile_sections_with_requirements.length > 0) {
-      triggerGenerateCoverLetter({
-        profile_sections_with_requirements: apiPayload.profile_sections_with_requirements,
-        company_context: companyContext || undefined,
-        tone_guidance: toneGuidance
-      })
-        .unwrap()
-        .then((data) => {
-          dispatch(setCoverLetter(data.data.cover_letter_markdown || ""));
-          dispatch(setOptimizationSummary(data.data.optimization_summary || null));
-          dispatch(setLastCoverLetterInputsHash(inputsHash));
-        });
+    if (!coverLetter && apiPayload.profileSectionsWithRequirements.length > 0) {
+      generateCoverLetter(
+        apiPayload.profileSectionsWithRequirements,
+        apiPayload.companyContext,
+        apiPayload.toneGuidance
+      ).then((data) => {
+        if (!data) return;
+        dispatch(setCoverLetter(data.cover_letter_markdown || ""));
+        dispatch(setOptimizationSummary(data.optimization_summary || null));
+        dispatch(setLastCoverLetterInputsHash(inputsHash));
+      });
     }
   }, []);
 
@@ -82,17 +89,16 @@ const GenerateCoverLetter: React.FC = () => {
 
   const onRegenerate = async () => {
     setShowRegenerateBanner(false);
-    await triggerGenerateCoverLetter({
-      profile_sections_with_requirements: apiPayload.profile_sections_with_requirements,
-      company_context: companyContext || undefined,
-      tone_guidance: toneGuidance
-    })
-      .unwrap()
-      .then((data) => {
-        dispatch(setCoverLetter(data.data.cover_letter_markdown || ""));
-        dispatch(setOptimizationSummary(data.data.optimization_summary || null));
-        dispatch(setLastCoverLetterInputsHash(inputsHash));
-      });
+    const data = await generateCoverLetter(
+      apiPayload.profileSectionsWithRequirements,
+      apiPayload.companyContext,
+      apiPayload.toneGuidance
+    );
+    if (data) {
+      dispatch(setCoverLetter(data.cover_letter_markdown || ""));
+      dispatch(setOptimizationSummary(data.optimization_summary || null));
+      dispatch(setLastCoverLetterInputsHash(inputsHash));
+    }
   };
 
   const copyToClipboard = async () => {

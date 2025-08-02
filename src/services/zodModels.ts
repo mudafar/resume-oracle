@@ -126,4 +126,5 @@ export type EnhancedMatchedProfileSection = z.infer<typeof EnhancedMatchedProfil
 export type GeneratedResumeSectionResult = z.infer<typeof GeneratedResumeSectionResultSchema>;
 export type ResumeOutput = z.infer<typeof ResumeOutputSchema>;
 export type ResumeSection = z.infer<typeof ResumeSectionSchema>;
+export type GeneratedCoverLetterResult = z.infer<typeof GeneratedCoverLetterResultSchema>;
 // ...add more as needed for other schemas
