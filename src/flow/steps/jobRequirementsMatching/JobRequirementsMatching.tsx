@@ -12,7 +12,7 @@ import { AlertCircle, FileWarning } from 'lucide-react';
 import { Match } from "@/store/slices/matchesSlice";
 
 
-function getTopMatchedProfileSections(matches: Match[], profileSections: ProfileSection[], max=5): ProfileSection[] {
+function getOrderedMatchedProfileSections(matches: Match[], profileSections: ProfileSection[]): ProfileSection[] {
   // Count matches per profile section
   const matchCounts = new Map<string, number>();
   matches.forEach((match) => {
@@ -24,8 +24,7 @@ function getTopMatchedProfileSections(matches: Match[], profileSections: Profile
   // Filter and sort profile sections by match count (descending)
   return profileSections
     .filter((ps) => matchCounts.has(ps.id))
-    .sort((a, b) => (matchCounts.get(b.id) || 0) - (matchCounts.get(a.id) || 0))
-    .slice(0, max); // Limit to top 4 sections
+    .sort((a, b) => (matchCounts.get(b.id) || 0) - (matchCounts.get(a.id) || 0));
 }
 
 const LoadingState = () => (
@@ -98,7 +97,7 @@ export const JobRequirementsMatching: React.FC = () => {
 
   return (
     <div className="space-y-6">
-      {showRematchBanner && <RematchBanner onRematch={onRematch} onDismiss={() => setShowRematchBanner(false)} />}
+      {<RematchBanner onRematch={onRematch} onDismiss={() => setShowRematchBanner(false)} />}
       <div className="space-y-4">
         {[
           ...matches.filter(m => !m.profile_section_id),
@@ -116,7 +115,7 @@ export const JobRequirementsMatching: React.FC = () => {
         <SuggestedSectionModal
           match={currentMatch}
           open={modalOpen}
-          profileSections={getTopMatchedProfileSections(matches, profileSections)}
+          orderedMatchedProfileSections={getOrderedMatchedProfileSections(matches, profileSections)}
           onClose={() => setModalOpen(false)}
           onSaveAndMatch={handleSaveAndMatch}
           onSaveOnly={handleSaveOnly}

@@ -30,7 +30,7 @@ interface ProfileSection {
 interface SuggestedSectionModalProps {
   match: Match;
   open: boolean;
-  profileSections: ProfileSection[];
+  orderedMatchedProfileSections: ProfileSection[];
   onClose: () => void;
   onSaveAndMatch: (section: {
     type: SectionTypeEnum;
@@ -50,7 +50,7 @@ interface SuggestedSectionModalProps {
 export const SuggestedSectionModal: React.FC<SuggestedSectionModalProps> = ({
   match,
   open,
-  profileSections,
+  orderedMatchedProfileSections,
   onClose,
   onSaveAndMatch,
   onSaveOnly,
@@ -76,9 +76,9 @@ export const SuggestedSectionModal: React.FC<SuggestedSectionModalProps> = ({
   const prepareQueryPayload = () => ({
     requirement: match.requirement,
     profile_sections: useAutoSelection
-      ? profileSections
+      ? orderedMatchedProfileSections.slice(0, 3) // Top 3 for API optimization
       : selectedProfileSectionId
-        ? profileSections.filter(ps => ps.id === selectedProfileSectionId)
+        ? orderedMatchedProfileSections.filter(ps => ps.id === selectedProfileSectionId)
         : [],
     gap_description: match.gap_description,
     custom_hint: customHint || undefined,
@@ -113,7 +113,7 @@ export const SuggestedSectionModal: React.FC<SuggestedSectionModalProps> = ({
       setError(null);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [open, profileSections, match]);
+  }, [open, orderedMatchedProfileSections, match]);
 
   // Update state when data is received
   useEffect(() => {
@@ -160,7 +160,7 @@ export const SuggestedSectionModal: React.FC<SuggestedSectionModalProps> = ({
   }
 
   const baseSection = baseId
-    ? profileSections.find((s) => s.id === baseId)
+    ? orderedMatchedProfileSections.find((s) => s.id === baseId)
     : null;
 
   const isEditing = !!baseSection;
@@ -217,7 +217,7 @@ export const SuggestedSectionModal: React.FC<SuggestedSectionModalProps> = ({
                     baseSection={baseSection}
                     isBaseSectionOpen={isBaseSectionOpen}
                     setIsBaseSectionOpen={setIsBaseSectionOpen}
-                    profileSections={profileSections}
+                    profileSections={orderedMatchedProfileSections}
                     useAutoSelection={useAutoSelection}
                     setUseAutoSelection={setUseAutoSelection}
                     selectedProfileSectionId={selectedProfileSectionId}
