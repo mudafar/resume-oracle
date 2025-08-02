@@ -124,4 +124,6 @@ export type ProfileSectionWithRequirements = z.infer<typeof ProfileSectionWithRe
 export type ProfileSectionSuggestion = z.infer<typeof ProfileSectionSuggestionSchema>;
 export type EnhancedMatchedProfileSection = z.infer<typeof EnhancedMatchedProfileSectionSchema>;
 export type GeneratedResumeSectionResult = z.infer<typeof GeneratedResumeSectionResultSchema>;
+export type ResumeOutput = z.infer<typeof ResumeOutputSchema>;
+export type ResumeSection = z.infer<typeof ResumeSectionSchema>;
 // ...add more as needed for other schemas

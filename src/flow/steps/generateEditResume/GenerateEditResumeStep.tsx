@@ -8,7 +8,9 @@ import {
   setLastResumeInputsHash,
   updateResume
 } from "@/store/slices/resumeSlice";
-import { useGenerateResumeMutation } from "@/store/services/llmApi";
+import { ResumeOutput, ResumeSection } from "@/services/zodModels";
+import { useLlmService } from "@/hooks/useLlmService";
+import { resumeGeneratorService } from "@/services/resumeGeneratorService";
 import jsPDF from "jspdf";
 import sha1 from "sha1";
 import { createStep } from "@/utils/createStep";
@@ -44,9 +46,11 @@ const GenerateEditResume: React.FC = () => {
   const [editedResume, setEditedResume] = useState("");
 
   const markdownContentRef = useRef<HTMLDivElement>(null);
-  const [triggerGenerateResume, { isLoading, error }] = useGenerateResumeMutation();
+  const [triggerGenerateResume, { isLoading, error, data, reset }] = useLlmService<ResumeOutput>(
+    resumeGeneratorService.buildResume
+  );
 
-  const apiPayload = resumeSections.map(s => ({ type: s.type, content: s.content }));
+  const apiPayload: ResumeSection[] = resumeSections.map(s => ({ type: s.type, content: s.content }));
 
   const inputsHash = useMemo(
     () => sha1(JSON.stringify({ resumeSections })),
@@ -54,8 +58,8 @@ const GenerateEditResume: React.FC = () => {
   );
   const inputsChanged = inputsHash !== lastResumeInputsHash;
 
-  const convertToMarkdown = (data: any) => {
-    const resume = data.data.resume;
+  const convertToMarkdown = (data: ResumeOutput) => {
+    const resume = data.resume;
     let md = "";
     if (resume.summary) md += `${resume.summary}\n\n---\n\n`;
     if (resume.experience) md += `${resume.experience}\n\n---\n\n`;
@@ -65,19 +69,19 @@ const GenerateEditResume: React.FC = () => {
     if (resume.projects) md += `${resume.projects}\n\n---\n\n`;
     if (resume.achievements) md += `${resume.achievements}\n\n---\n\n`;
     if (resume.volunteering) md += `${resume.volunteering}\n\n---\n\n`;
-    if (resume.language) md += `${resume.language}\n\n---\n\n`;
+    if (resume.languages) md += `${resume.languages}\n\n---\n\n`;
     return md.trim();
   };
 
   useEffect(() => {
     if (!resume && resumeSections.length > 0) {
-      triggerGenerateResume({ sections: apiPayload })
-        .unwrap()
+      triggerGenerateResume(apiPayload)
         .then((data) => {
+          if (!data) return;
           const markdown = convertToMarkdown(data);
           dispatch(setResume(markdown));
           setEditedResume(markdown);
-          dispatch(setOptimizationSummary(data.data.optimization_summary || null));
+          dispatch(setOptimizationSummary(data.optimization_summary || null));
           dispatch(setLastResumeInputsHash(inputsHash));
         });
     }
@@ -97,15 +101,14 @@ const GenerateEditResume: React.FC = () => {
 
   const onRegenerate = async () => {
     setShowRegenerateBanner(false);
-    await triggerGenerateResume({ sections: apiPayload })
-      .unwrap()
-      .then((data) => {
-        const markdown = convertToMarkdown(data);
-        dispatch(setResume(markdown));
-        setEditedResume(markdown);
-        dispatch(setOptimizationSummary(data.data.optimization_summary || null));
-        dispatch(setLastResumeInputsHash(inputsHash));
-      });
+    const data = await triggerGenerateResume(apiPayload);
+    if (data) {
+      const markdown = convertToMarkdown(data);
+      dispatch(setResume(markdown));
+      setEditedResume(markdown);
+      dispatch(setOptimizationSummary(data.optimization_summary || null));
+      dispatch(setLastResumeInputsHash(inputsHash));
+    }
   };
 
   const saveDraft = () => {
