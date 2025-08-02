@@ -55,13 +55,13 @@ export class MatchedProfileSectionEnhancerService {
         - If gap requires adding new skills/technologies not present in original content
         - If recommendation would create artificial or forced language
         - If enhancement would make the content obviously modified or unnatural
-    `);
+        `);
     try {
       const result = await llmService.invokeWithStructuredOutput(
         prompt,
         EnhancedMatchedProfileSectionSchema,
         {
-          original_profile_section: matchedProfileSection.profile_section,
+          original_profile_section: `type: ${matchedProfileSection.profile_section.type}, content: ${matchedProfileSection.profile_section.content}`,
           requirements_context,
         },
         llmConfig

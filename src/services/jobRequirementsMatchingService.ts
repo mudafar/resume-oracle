@@ -1,7 +1,7 @@
 import { ChatPromptTemplate } from "@langchain/core/prompts";
 import { llmService } from "./llmService";
 import { ProfileSection } from "@/store/slices/profileSectionsSlice";
-import { JobRequirementMatch, JobRequirementMatchList, JobRequirementMatchListSchema } from "./zodModels";
+import { JobRequirementMatch, JobRequirementMatchListSchema } from "./zodModels";
 
 export class JobRequirementsMatchingService {
   /**
@@ -24,7 +24,10 @@ export class JobRequirementsMatchingService {
     const requirements_list = jobRequirements.map(r => `- ${r}`).join("\n");
     const profile_sections_list = profileSections.map(e => `- id: ${e.id}, text: ${e.type} ${e.content}`).join("\n");
     const company_context_section = companyContext.trim() ? `**COMPANY CONTEXT**: ${companyContext}` : "";
-    const context_alignment_section = "";
+    let context_alignment_section = "";
+    if (companyContext.trim()) {
+      context_alignment_section = `\n**Company Context Considerations**:\nUse the company context to understand cultural fit and values alignment when evaluating matches.`;
+    }
     const prompt = ChatPromptTemplate.fromTemplate(`
             You are a Senior Technical Architect and Career Development Expert with deep expertise in evaluating technical competencies and guiding professional growth in the technology sector.
 
@@ -38,7 +41,7 @@ export class JobRequirementsMatchingService {
             ## Input Data
             **JOB REQUIREMENTS**: Specific technical and professional requirements for a target role
             **PROFILE SECTIONS**: Candidate's professional experiences, projects, and achievements, each with a unique identifier
-            ${company_context_section}
+            {company_context_section}
     
             ## Assessment Framework
             
@@ -72,21 +75,26 @@ export class JobRequirementsMatchingService {
             - **Recent experience**: within 2-5 years is preferred
             - **Context relevance**: similar company size, industry, or project scope
             
-            ${context_alignment_section}
+            {context_alignment_section}
             
             REQUIREMENTS:
-            ${requirements_list}
+            {requirements_list}
     
             PROFILE SECTIONS:
-            ${profile_sections_list}
+            {profile_sections_list}
     
             Analyze each requirement against the profile sections and return matches with confidence scores, gap analysis, and recommendations.
-    `);
+            `);
     try {
       const result = await llmService.invokeWithStructuredOutput(
         prompt,
         JobRequirementMatchListSchema,
-        {},
+        {
+          requirements_list,
+          profile_sections_list,
+          company_context_section,
+          context_alignment_section,
+        },
         llmConfig
       );
       return result.job_requirement_matches;
