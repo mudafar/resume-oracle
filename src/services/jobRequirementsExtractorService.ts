@@ -1,10 +1,6 @@
 import { ChatPromptTemplate } from "@langchain/core/prompts";
-import { z } from "zod";
+import { JobRequirementListSchema } from "./zodModels";
 import { llmService } from "./llmService";
-
-const JobRequirementListSchema = z.object({
-  job_requirements: z.array(z.string()),
-});
 
 export class JobRequirementsExtractorService {
   /**
@@ -22,6 +18,12 @@ export class JobRequirementsExtractorService {
      * @param llmConfig - Optional LLM config dict
      * @returns List of extracted requirements
      */
+    // Prepare optional sections for the prompt
+    const company_context_section = companyContext.trim() ? `\n**COMPANY CONTEXT**: ${companyContext}` : "";
+    let context_integration_section = "";
+    if (companyContext.trim()) {
+      context_integration_section = `\n### Company Context Integration\nUse the provided company context to:\n- Identify implied cultural and values requirements\n- Understand role context and expectations  \n- Extract company-specific criteria and preferences\n- Infer additional requirements based on company stage, size, or industry`;
+    }
     const prompt = ChatPromptTemplate.fromTemplate(`
             You are a Senior Technical Architect and Career Development Expert with deep expertise in evaluating technical competencies and guiding professional growth in the technology sector.
 
@@ -73,10 +75,8 @@ export class JobRequirementsExtractorService {
             - Any other hiring-relevant criteria
             
             {context_integration_section}
-    `);
+            `);
     try {
-      const company_context_section = companyContext.trim() ? `\n**COMPANY CONTEXT**: ${companyContext}` : "";
-      const context_integration_section = "";
       const result = await llmService.invokeWithStructuredOutput(
         prompt,
         JobRequirementListSchema,
