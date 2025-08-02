@@ -10,6 +10,8 @@
   },
   "dependencies": {
     "@hookform/resolvers": "^5.1.1",
+    "@langchain/core": "^0.3.66",
+    "@langchain/google-genai": "^0.2.16",
     "@radix-ui/react-collapsible": "^1.1.11",
     "@radix-ui/react-dialog": "^1.1.14",
     "@radix-ui/react-label": "^2.1.7",
@@ -25,6 +27,7 @@
     "clsx": "^2.1.1",
     "html2canvas-pro": "^1.5.11",
     "jspdf": "^3.0.1",
+    "langchain": "^0.3.30",
     "lucide-react": "^0.525.0",
     "nanoid": "^5.1.5",
     "next": "15.3.5",

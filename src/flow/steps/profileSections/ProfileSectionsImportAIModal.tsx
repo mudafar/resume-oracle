@@ -8,6 +8,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { RootState } from "@/store/store";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
@@ -23,7 +24,8 @@ import {
 } from "lucide-react";
 import { nanoid } from "nanoid";
 import { ProfileSectionsPreview } from "./ProfileSectionsPreview";
-import { useParseProfileSectionsMutation } from '@/store/services/llmApi';
+import { useLlmService } from '@/hooks/useLlmService';
+import { profileParserService } from "@/services/profileSectionsParserService";
 
 // Mock types - replace with your actual types
 interface ProfileSection {
@@ -52,11 +54,8 @@ export const ProfileSectionImportAIModal: React.FC<AIImportModalProps> = ({
   const [step, setStep] = useState<Step>("input");
   const [contentType, setContentType] = useState<"resume" | "linkedin">("resume");
   const [text, setText] = useState("");
-  const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [sections, setSections] = useState<ProfileSection[]>([]);
-  const [triggerParseProfileSections] = useParseProfileSectionsMutation();
   const textareaRef = useRef<HTMLTextAreaElement>(null);
-
   // Auto-expand textarea
   useEffect(() => {
     if (textareaRef.current) {
@@ -73,26 +72,25 @@ export const ProfileSectionImportAIModal: React.FC<AIImportModalProps> = ({
   const charCount = text.length;
   const isReady = charCount >= 50;
 
+  // Use isLoading from the hook directly, rename isAnalyzing to isLoading in usage
+  const [triggerParseProfileSections, { isLoading }] = useLlmService(profileParserService.parseProfileSections);
+
   const handleAnalyze = async () => {
     if (!isReady) return;
-
-    setIsAnalyzing(true);
     try {
-      const result = await triggerParseProfileSections({ text, type: contentType }).unwrap();
-      if (!result || !Array.isArray(result.profile_sections)) {
+      const profile_sections = await triggerParseProfileSections( text, contentType);
+      if (!Array.isArray(profile_sections)) {
         throw new Error("No sections returned from AI");
       }
-      const withIds = result.profile_sections.map((section: any) => ({
+      const withIds = profile_sections.map((section: any) => ({
         ...section,
         id: nanoid(8),
       }));
       setSections(withIds);
-      onToast(`Successfully analyzed and found ${result.profile_sections.length} sections!`);
+      onToast(`Successfully analyzed and found ${profile_sections.length} sections!`);
       setStep("preview");
     } catch (error) {
       onToast("Failed to analyze content. Please try again.", "error");
-    } finally {
-      setIsAnalyzing(false);
     }
   };
 
@@ -124,7 +122,6 @@ export const ProfileSectionImportAIModal: React.FC<AIImportModalProps> = ({
   const resetAndClose = () => {
     setText("");
     setSections([]);
-    setIsAnalyzing(false);
     setContentType("resume");
     setStep("input");
     onClose();
@@ -305,11 +302,11 @@ export const ProfileSectionImportAIModal: React.FC<AIImportModalProps> = ({
 
                 <Button
                   onClick={handleAnalyze}
-                  disabled={!isReady || isAnalyzing}
+                  disabled={!isReady || isLoading}
                   className="text-base font-medium"
                   size="lg"
                 >
-                  {isAnalyzing ? (
+                  {isLoading ? (
                     <>
                       <Loader2 className="w-5 h-5 animate-spin mr-2" />
                       Analyzing...

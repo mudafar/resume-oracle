@@ -13,6 +13,7 @@ export interface LLMConfigState {
   invitationCode: string | null;
 }
 
+//  TODO unify type with service
 const initialState: LLMConfigState = {
   provider: "free",
   variant: "default",
@@ -49,7 +50,12 @@ const llmConfigSlice = createSlice({
     //   state.hasSeenConfigModal = false;
     // },
   },
+  selectors: {
+    selectLlmConfig: (sliceState) => sliceState,
+  },
 });
 
 export const { setLLMConfig, updateLLMConfig, resetLLMConfig, openConfigModal, closeConfigModal } = llmConfigSlice.actions;
-export default llmConfigSlice.reducer; 
+export default llmConfigSlice.reducer;
+
+export const { selectLlmConfig } = llmConfigSlice.selectors;

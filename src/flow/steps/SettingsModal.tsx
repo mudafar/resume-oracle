@@ -43,7 +43,7 @@ const PROVIDERS: { value: LLMProvider; label: string; icon: React.ReactNode }[] 
     icon: <Zap className="w-4 h-4 text-amber-500" />
   },
   { 
-    value: "google_genai", 
+    value: "google-genai",
     label: "Google AI", 
     icon: <Globe className="w-4 h-4 text-blue-500" />
   },
@@ -63,7 +63,7 @@ const PROVIDER_VARIANTS: Record<LLMProvider, { value: LLMVariant; label: string 
   free: [
     { value: "default", label: "Default (small, cost‑efficient)" },
   ],
-  google_genai: [
+  ['google-genai']: [
     { value: "gemini-2.5-flash-lite", label: "Gemini 2.5 Flash Light" },
     { value: "gemini-2.5-flash", label: "Gemini 2.5 Flash" },
     { value: "gemini-2.5-pro", label: "Gemini 2.5 PRO" },
