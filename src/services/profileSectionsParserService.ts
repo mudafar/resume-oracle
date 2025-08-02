@@ -1,27 +1,10 @@
 import { ChatPromptTemplate } from "@langchain/core/prompts";
 import { z } from "zod";
 import { llmService } from "./llmService";
+import { ProfileSectionSchema, ProfileSectionListSchema } from "./zodModels";
+import { LLMConfig } from "@/store/slices/llmConfigSlice";
 
-// LLM Config interface to match Redux store structure
-interface LLMConfig {
-  provider?: string;
-  variant?: string;
-  apiKey?: string;
-  endpointUrl?: string;
-  temperature?: number;
-  topP?: number;
-}
-
-// Zod schemas for structured output
-const ProfileSectionSchema = z.object({
-  id: z.string(),
-  type: z.string(),
-  content: z.string(),
-});
-
-const ProfileSectionListSchema = z.object({
-  profile_sections: z.array(ProfileSectionSchema),
-});
+// Removed local LLMConfig interface, now using imported LLMConfig type
 
 type ProfileSection = z.infer<typeof ProfileSectionSchema>;
 type ProfileType = "linkedin" | "resume";

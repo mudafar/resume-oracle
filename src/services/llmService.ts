@@ -1,15 +1,16 @@
 import { initChatModel } from "langchain/chat_models/universal";
 import { ChatPromptTemplate } from "@langchain/core/prompts";
 import { z } from "zod";
+import { LLMConfig } from "@/store/slices/llmConfigSlice";
 
-interface LLMConfig {
-  provider?: string;
-  variant?: string;
-  apiKey?: string;
-  endpointUrl?: string;
-  temperature?: number;
-  topP?: number;
-}
+// interface LLMConfig {
+//   provider?: string;
+//   variant?: string;
+//   apiKey?: string;
+//   endpointUrl?: string;
+//   temperature?: number;
+//   topP?: number;
+// }
 
 export class LLMService {
   /**

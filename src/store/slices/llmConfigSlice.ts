@@ -3,35 +3,37 @@ import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 export type LLMProvider = "free" | "google" | "groq" | "openrouter" | "custom";
 export type LLMVariant = "default" | "balanced" | "high-accuracy";
 
-export interface LLMConfigState {
+export interface LLMConfig {
   provider: LLMProvider;
   variant: LLMVariant;
   apiKey: string | null;
   endpointUrl: string | null;
   showConfigModal: boolean;
-  // hasSeenConfigModal: boolean;
   invitationCode: string | null;
+  temperature?: number;
+  topP?: number;
 }
 
 //  TODO unify type with service
-const initialState: LLMConfigState = {
+const initialState: LLMConfig = {
   provider: "free",
   variant: "default",
   apiKey: null,
   endpointUrl: null,
   showConfigModal: false,
-  // hasSeenConfigModal: false,
   invitationCode: null,
+  temperature: undefined,
+  topP: undefined,
 };
 
 const llmConfigSlice = createSlice({
   name: "llmConfig",
   initialState,
   reducers: {
-    setLLMConfig(state, action: PayloadAction<Omit<LLMConfigState, 'showConfigModal'>>) {
+    setLLMConfig(state, action: PayloadAction<Omit<LLMConfig, 'showConfigModal'>>) {
       return { ...action.payload, showConfigModal: false };
     },
-    updateLLMConfig(state, action: PayloadAction<Partial<Omit<LLMConfigState, 'showConfigModal'>>>) {
+    updateLLMConfig(state, action: PayloadAction<Partial<Omit<LLMConfig, 'showConfigModal'>>>) {
       return { ...state, ...action.payload };
     },
     resetLLMConfig() {
@@ -43,12 +45,6 @@ const llmConfigSlice = createSlice({
     closeConfigModal(state) {
       state.showConfigModal = false;
     },
-    // setHasSeenConfigModal(state, action: PayloadAction<boolean>) {
-    //   state.hasSeenConfigModal = action.payload;
-    // },
-    // resetHasSeenConfigModal(state) {
-    //   state.hasSeenConfigModal = false;
-    // },
   },
   selectors: {
     selectLlmConfig: (sliceState) => sliceState,

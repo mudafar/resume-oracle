@@ -46,6 +46,23 @@
   - Feature-specific modals/components live in their step folder (e.g., `profileSections/`, `jobRequirementsMatching/`).
   - UI primitives (Button, Card, etc.) are in `src/app/components/ui/` and should be reused.
 
+## Migration Notes
+- The project is migrating from RTK Query (RTQ) API calls to direct usage of LLM service classes via a custom React hook (`useLlmService`). This hook provides an interface similar to RTK Query hooks, including properties like `isLoading`, `error`, `data`, and a `reset` function.
+- The `useLlmService` hook is standardized to always inject the current `llmConfig` from the Redux store into the service function, so consumers of the hook do not need to select or pass `llmConfig` manually.
+- The return value of `useLlmService` is refactored to match the tuple style of RTK Query hooks: `[trigger, { isLoading, error, data, reset }]`.
+- There is a focus on DRYing up the logic for LLM service calls, so that all LLM-related features (cover letter, resume, profile section parsing, etc.) use the same hook and interface.
+- The project is moving towards using selectors defined inside Redux slices (e.g., `llmConfigSlice`) for accessing state, and these selectors can be accessed via the slice's default export.
+- There is an emphasis on type safety and correct typing for the custom hook, especially to avoid TypeScript errors when destructuring or calling the returned values.
+- The type returned from LLM services should match the type of the corresponding Redux store slice. This ensures consistency between the service layer and the Redux state, making it easier to update the store with the results of LLM service calls.
+
+## Types and Type Safety
+- All types and interfaces used across Redux slices, services, and components should be defined in a single location whenever possible (e.g., in the relevant slice or a shared types file).
+- Do not redefine types or interfaces in multiple places. Always import the type from its source of truth.
+- The type returned from LLM services must match the type of the corresponding Redux store slice. This ensures consistency and prevents type drift.
+- When updating or extending a type, update it in its source location and refactor all usages to import from there.
+- Use Zod schemas from `src/services/zodModels.ts` for runtime validation and type inference. Do not redefine Zod schemas in service files unless a schema does not exist yet. If a schema is missing, list the missing schemas and ask before creating new ones.
+- Prefer using `z.infer<typeof SchemaName>` for deriving TypeScript types from Zod schemas to ensure type alignment between validation and usage.
+
 ## Examples
 - To add a new step: create a component in `src/flow/steps/`, register it in `stepComponents.ts`, and add any state to Redux as needed.
 - To add a new API call: add an endpoint to `llmApi.ts` and use the generated hook in your component.
