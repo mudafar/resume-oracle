@@ -15,7 +15,7 @@ interface LLMConfig {
 // Zod schemas for structured output
 const ProfileSectionSchema = z.object({
   id: z.string(),
-  section_type: z.string(),
+  type: z.string(),
   content: z.string(),
 });
 

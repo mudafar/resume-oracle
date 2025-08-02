@@ -73,21 +73,21 @@ export const ProfileSectionImportAIModal: React.FC<AIImportModalProps> = ({
   const isReady = charCount >= 50;
 
   // Use isLoading from the hook directly, rename isAnalyzing to isLoading in usage
-  const [triggerParseProfileSections, { isLoading }] = useLlmService(profileParserService.parseProfileSections);
+  const [triggerParseProfileSections, { isLoading }] = useLlmService<ProfileSection[]>(profileParserService.parseProfileSections);
 
   const handleAnalyze = async () => {
     if (!isReady) return;
     try {
-      const profile_sections = await triggerParseProfileSections( text, contentType);
-      if (!Array.isArray(profile_sections)) {
+      const profileSections = await triggerParseProfileSections( text, contentType);
+      if (!Array.isArray(profileSections)) {
         throw new Error("No sections returned from AI");
       }
-      const withIds = profile_sections.map((section: any) => ({
+      const withIds = profileSections.map((section: any) => ({
         ...section,
         id: nanoid(8),
       }));
       setSections(withIds);
-      onToast(`Successfully analyzed and found ${profile_sections.length} sections!`);
+      onToast(`Successfully analyzed and found ${profileSections.length} sections!`);
       setStep("preview");
     } catch (error) {
       onToast("Failed to analyze content. Please try again.", "error");

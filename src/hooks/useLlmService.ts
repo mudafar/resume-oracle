@@ -7,14 +7,26 @@ import { selectLlmConfig } from "@/store/slices/llmConfigSlice";
  * @param serviceFn - The LLM service function to call (should return a Promise)
  * @returns [trigger, { isLoading, error, data, reset }]
  */
-export function useLlmService(serviceFn) {
+type UseLlmServiceReturn<T> = [
+  trigger: (...params: any[]) => Promise<T>,
+  state: {
+    isLoading: boolean;
+    error: any;
+    data: T | null;
+    reset: () => void;
+  }
+];
+
+type ServiceFunction<T> = (...params: any[]) => Promise<T>;
+
+export function useLlmService<T = any, U = any>(serviceFn: ServiceFunction<U>): UseLlmServiceReturn<T> {
   const llmConfig = useSelector(selectLlmConfig);
   const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState(null);
-  const [data, setData] = useState(null);
+  const [error, setError] = useState<any>(null);
+  const [data, setData] = useState<T | null>(null);
 
   const trigger = useCallback(
-    async (...params) => {
+    async (...params: any[]) => {
       setIsLoading(true);
       setError(null);
       setData(null);
