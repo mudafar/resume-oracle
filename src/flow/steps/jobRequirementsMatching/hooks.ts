@@ -3,11 +3,17 @@ import { useEffect, useMemo, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { RootState } from "@/store/store";
 import { setMatches, setLastInputsHash, setLastJobDescription, updateMatch } from "@/store/slices/matchesSlice";
-import { useMatchMutation } from "@/store/services/llmApi";
+import { useLlmService } from "@/hooks/useLlmService";
+import { jobRequirementsMatchingService } from "@/services/jobRequirementsMatchingService";
+import { jobRequirementsExtractorService } from "@/services/jobRequirementsExtractorService";
 import sha1 from "sha1";
 import { compareTwoStrings } from "string-similarity";
 import { addProfileSectionReturnId } from "../createProfileSection";
 import { editSection } from "@/store/slices/profileSectionsSlice";
+import {
+  JobRequirement,
+  JobRequirementMatch,
+} from "@/services/zodModels";
 
 export const useJobMatching = () => {
   const dispatch = useDispatch();
@@ -21,7 +27,12 @@ export const useJobMatching = () => {
   const [modalMatchId, setModalMatchId] = useState<string | null>(null);
   const [showRematchBanner, setShowRematchBanner] = useState(false);
 
-  const [triggerMatch, {isLoading, error}] = useMatchMutation();
+  const [triggerExtractRequirements, { isLoading: isExtracting, error: extractError }] = useLlmService<JobRequirement[]>(
+    jobRequirementsExtractorService.extractJobRequirements
+  );
+  const [triggerMatch, { isLoading, error }] = useLlmService<JobRequirementMatch[]>(
+    jobRequirementsMatchingService.matchJobRequirementsToProfileSections
+  );
 
   const inputsHash = useMemo(
     () => sha1(JSON.stringify({job_description, company_context, profileSections})),
@@ -44,22 +55,21 @@ export const useJobMatching = () => {
 
   const performMatch = async () => {
     if (!hasValidInputs) return;
-
-    await triggerMatch({job_description, company_context, profile_sections: profileSections})
-      .unwrap()
-      .then((data) => {
-        dispatch(setMatches((data.job_requirement_matches || []).map((m: any, i: number) => ({
-          id: String(i),
-          requirement_id: String(i),
-          requirement: m.requirement || "",
-          profile_section_id: String(m.profile_section_id ?? ''),
-          confidence: m.confidence != null ? String(m.confidence) : "",
-          gap_description: m.gap_description || "",
-          recommendation: m.recommendation || "",
-        }))));
-        dispatch(setLastInputsHash(inputsHash));
-        dispatch(setLastJobDescription(job_description));
-      });
+    // Step 1: Extract requirements from job description using LLM service
+    const requirements = await triggerExtractRequirements(job_description, company_context || "");
+    // Step 2: Match requirements to profile sections using LLM service
+    const result = await triggerMatch(requirements, profileSections, company_context || "");
+    dispatch(setMatches((result || []).map((m: any, i: number) => ({
+      id: String(i),
+      requirement_id: String(i),
+      requirement: m.requirement || "",
+      profile_section_id: String(m.profile_section_id ?? ''),
+      confidence: m.confidence || 0,
+      gap_description: m.gap_description || "",
+      recommendation: m.recommendation || "",
+    }))));
+    dispatch(setLastInputsHash(inputsHash));
+    dispatch(setLastJobDescription(job_description));
   };
 
   // Initial load effect

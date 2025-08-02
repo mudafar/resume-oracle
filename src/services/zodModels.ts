@@ -113,3 +113,12 @@ export const ResumeOutputSchema = z.object({
   resume: ResumeStructureSchema.describe("Structured resume sections organized in professional format"),
   optimization_summary: z.string().describe("Summary of structural organization decisions made: which sections were combined, ordering applied, headers added, and any content consolidation performed. Focus on organizational changes, not content modifications."),
 });
+
+// Inferred types from Zod schemas (centralized here for reuse)
+export type ProfileSection = z.infer<typeof ProfileSectionSchema>;
+export type JobRequirement = z.infer<typeof JobRequirementSchema>;
+export type BaseJobRequirementMatch = z.infer<typeof BaseJobRequirementMatchSchema>;
+export type JobRequirementMatch = z.infer<typeof JobRequirementMatchSchema>;
+export type MatchedProfileSection = z.infer<typeof MatchedProfileSectionSchema>;
+export type ProfileSectionWithRequirements = z.infer<typeof ProfileSectionWithRequirementsSchema>;
+// ...add more as needed for other schemas

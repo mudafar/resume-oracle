@@ -55,6 +55,13 @@
 - There is an emphasis on type safety and correct typing for the custom hook, especially to avoid TypeScript errors when destructuring or calling the returned values.
 - The type returned from LLM services should match the type of the corresponding Redux store slice. This ensures consistency between the service layer and the Redux state, making it easier to update the store with the results of LLM service calls.
 
+## Generics and Type Inference for LLM Service Hooks
+- Always use the generic form of `useLlmService<DATA_TYPE>()` to enforce the expected return type from the LLM service. This ensures that the hook and its consumers are type-safe and aligned with the Zod-inferred types.
+- The `DATA_TYPE` should be imported from the centralized Zod-inferred types in `src/services/zodModels.ts`.
+- Example: `const [trigger, { data }] = useLlmService<JobRequirementMatchList>(...)`.
+- This pattern should be applied to all usages of `useLlmService` in the codebase, including but not limited to `triggerParseProfileSections`, `triggerExtractRequirements`, and `triggerMatch`.
+- If a service returns a union or array, use the most specific type possible (e.g., `JobRequirementMatch[]`).
+
 ## Types and Type Safety
 - All types and interfaces used across Redux slices, services, and components should be defined in a single location whenever possible (e.g., in the relevant slice or a shared types file).
 - Do not redefine types or interfaces in multiple places. Always import the type from its source of truth.
@@ -62,6 +69,11 @@
 - When updating or extending a type, update it in its source location and refactor all usages to import from there.
 - Use Zod schemas from `src/services/zodModels.ts` for runtime validation and type inference. Do not redefine Zod schemas in service files unless a schema does not exist yet. If a schema is missing, list the missing schemas and ask before creating new ones.
 - Prefer using `z.infer<typeof SchemaName>` for deriving TypeScript types from Zod schemas to ensure type alignment between validation and usage.
+
+## LLM Service Schema Usage
+- When calling `invokeWithStructuredOutput`, always pass the Zod schema object (e.g., `JobRequirementMatchListSchema`), not the inferred TypeScript type. This ensures runtime validation and type safety.
+- Never pass the inferred type (e.g., `JobRequirementMatchList`) to `invokeWithStructuredOutput`—only the Zod schema should be used for validation.
+- Use the inferred type (e.g., `JobRequirementMatchList`) only for static typing in TypeScript, not for runtime validation.
 
 ## Examples
 - To add a new step: create a component in `src/flow/steps/`, register it in `stepComponents.ts`, and add any state to Redux as needed.
