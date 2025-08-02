@@ -6,7 +6,9 @@ import { groupMatchesByProfileSection, MatchedProfileSection } from "../groupMat
 import { RegenerateBanner } from "../shared/RegenerateBanner";
 import { ResumeSectionCard } from "./ResumeSectionCard"
 import { setResumeSections, updateResumeSection, setLastInputsHash } from "@/store/slices/resumeSectionsSlice";
-import { useGenerateResumeSectionsMutation } from "@/store/services/llmApi";
+import { useLlmService } from "@/hooks/useLlmService";
+import { resumeSectionsGeneratorService } from "@/services/resumeSectionsGeneratorService";
+import { ProfileSectionWithRequirements, GeneratedResumeSectionResult } from "@/services/zodModels";
 import sha1 from "sha1";
 import { createStep } from "@/utils/createStep";
 import { 
@@ -33,8 +35,10 @@ const GenerateResumeSections: React.FC = () => {
   const [editedContent, setEditedContent] = useState<{ [id: string]: string }>({});
   const [showRegenerateBanner, setShowRegenerateBanner] = useState(false);
 
-  // RTK Query mutation
-  const [triggerGenerateResumeSections, { isLoading, error }] = useGenerateResumeSectionsMutation();
+  // LLM service trigger
+  const [triggerGenerate, { data, isLoading, error, reset }] = useLlmService<GeneratedResumeSectionResult[]>(
+    resumeSectionsGeneratorService.generateResumeSection
+  );
 
   // Prepare payload for API - memoize to prevent unnecessary re-computations
   const apiPayload = useMemo(() => {
@@ -50,17 +54,8 @@ const GenerateResumeSections: React.FC = () => {
 
   // On first entry, auto-generate if no resume sections
   useEffect(() => {
-    if (!resumeSections.length && apiPayload.profile_sections_with_requirements.length > 0) {
-      triggerGenerateResumeSections(apiPayload)
-        .unwrap()
-        .then(({ data } ) => {
-          setEditedContent(Object.fromEntries(data.map(s => [s.profile_section_id, s.content])));
-          dispatch(setResumeSections(data));
-          dispatch(setLastInputsHash(inputsHash));
-        })
-        .catch((error) => {
-          console.error('Failed to generate resume sections:', error);
-        });
+    if (!resumeSections.length && apiPayload.length > 0) {
+      triggerGenerate(apiPayload);
     }
     // eslint-disable-next-line
   }, []);
@@ -75,13 +70,7 @@ const GenerateResumeSections: React.FC = () => {
   // Regenerate handler
   const onRegenerate = async () => {
     setShowRegenerateBanner(false);
-    await triggerGenerateResumeSections(apiPayload)
-      .unwrap()
-      .then(({ data }) => {
-        setEditedContent(Object.fromEntries(data.map(s => [s.profile_section_id, s.content])));
-        dispatch(setResumeSections(data));
-        dispatch(setLastInputsHash(inputsHash));
-      });
+    await triggerGenerate(apiPayload);
   };
 
   // Reference requirements for each section - memoize to prevent unnecessary re-computations
@@ -95,6 +84,24 @@ const GenerateResumeSections: React.FC = () => {
     });
     return map;
   }, [matches, profileSections]);
+
+
+  // Trigger generation when needed (e.g., on mount or when matches/profileSections change)
+  useEffect(() => {
+    if (matches.length && profileSections.length) {
+      if (apiPayload) {
+        triggerGenerate(apiPayload);
+      }
+    }
+    // eslint-disable-next-line
+  }, [matches, profileSections, apiPayload]);
+
+  // Handle result
+  useEffect(() => {
+    if (data) {
+      dispatch(setResumeSections(data));
+    }
+  }, [data, dispatch]);
 
   return (
     <div className="max-w-5xl mx-auto py-8 px-4 space-y-6">
