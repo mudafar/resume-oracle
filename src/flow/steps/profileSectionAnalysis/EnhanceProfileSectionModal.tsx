@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { ProfileSection } from "@/store/slices/profileSectionsSlice";
-import { useEnhanceMatchedProfileSectionMutation, EnhancementResponse, BaseJobRequirementMatch } from "@/store/services/llmApi";
+import { useLlmService } from "@/hooks/useLlmService";
+import { matchedProfileSectionEnhancerService } from "@/services/matchedProfileSectionEnhancerService";
+import { EnhancedMatchedProfileSection } from "@/services/zodModels";
 import {
   Dialog,
   DialogContent,
@@ -58,7 +60,9 @@ export const EnhanceProfileSectionModal: React.FC<EnhanceProfileSectionModalProp
   const [enhancementsMade, setEnhancementsMade] = useState<string[]>([]);
   const [reasoning, setReasoning] = useState<string[]>([]);
   const [error, setError] = useState<string | null>(null);
-  const [triggerEnhance, { data, isLoading, isError, error: apiError, isSuccess, reset }] = useEnhanceMatchedProfileSectionMutation();
+  const [triggerEnhance, { data, isLoading, isError, error: apiError, isSuccess, reset }] = useLlmService<EnhancedMatchedProfileSection>(
+    matchedProfileSectionEnhancerService.enhanceMatchedProfileSection
+  );
 
   // Fetch enhancement when modal opens
   useEffect(() => {
