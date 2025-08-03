@@ -108,6 +108,9 @@ import { Button } from '@/components/ui/Button';
 - Display user-friendly error messages
 <!-- - Log errors to monitoring service in production -->
 
+
+
+
 # Naming Conventions
 
 ## Files and Folders
@@ -134,6 +137,12 @@ import { Button } from '@/components/ui/Button';
 - Redux actions: UPPER_SNAKE_CASE (FETCH_TASKS_SUCCESS)
 - Redux slice names: camelCase (taskSlice, authSlice)
 
+
+# Styling Standards  
+- Use Tailwind CSS utility classes
+- Follow mobile-first responsive design
+- Maintain consistent spacing using design tokens
+- Ensure proper focus states and accessibility
 
 
 # Testing Strategy

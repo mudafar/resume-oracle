@@ -12,5 +12,14 @@
     },
     "[javascript]": {
         "editor.tabSize": 2
-    }
+    },
+    "chat.promptFiles": true,
+    "github.copilot.chat.reviewSelection.instructions": [
+        {
+            "file": "."
+        }
+    ],
+    "github.copilot.chat.codeGeneration.useInstructionFiles": true,
+    "github.copilot.nextEditSuggestions.enabled": true,
+    "github.copilot.chat.agent.thinkingTool": true,
 }
