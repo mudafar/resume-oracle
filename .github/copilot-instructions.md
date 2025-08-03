@@ -1,85 +1,153 @@
 # Copilot Instructions for resume-oracle-ui
 
-## Project Overview
-- This is a Next.js (React) monorepo for a resume and job-matching UI, using Redux Toolkit for state management and RTK Query for API calls.
-- The main user flow is a multi-step wizard, with each step as a React component in `src/flow/steps/`.
-- State is managed globally via Redux slices in `src/store/slices/`. API calls are handled via `src/store/services/llmApi.ts`.
-- The app is designed for extensibility: new steps, modals, and UI flows can be added with minimal boilerplate.
 
-## Key Architectural Patterns
-- **Multi-Step Flow:**
-  - Steps are registered in `src/flow/steps/stepComponents.ts` and rendered by `src/flow/MultiStepFlow.tsx`.
-  - Each step is a React component created with `createStep` from `src/utils/createStep.ts`.
-- **State Management:**
-  - Use Redux Toolkit slices for all persistent state. Example: `profileSectionsSlice`, `matchesSlice`, `stepSlice`.
-  - Use RTK Query (`llmApi.ts`) for most async API calls. Prefer mutations/queries over manual fetch.
-  - **LLM Services:** All LLM-related backend logic is implemented in langchain-js services (see `src/services/`).
-  - `src/hooks/useLlmService.ts` There is a custom React hook for LLM services that provides an interface similar to RTK Query, making it easy to swap between RTK and direct service calls.
-  - **Migration Note:** All LLM API calls are being migrated to use these LLM services directly, bypassing RTK Query for LLM endpoints. Prefer the custom LLM hook for new LLM features.
-- **Data Flow:**
-  - Most data is passed via Redux, not props drilling. Use selectors/hooks from `src/store/store.ts`.
-  - Cross-step communication (e.g., advancing steps, updating sections) should use Redux actions.
-- **UI Components:**
-  - Shared UI primitives are in `src/app/components/ui/`.
-  - Modals and dialogs are colocated with their feature in `src/flow/steps/<feature>/`.
+# Project Context
+- Match user's experience to job requirements using a multi-step wizard UI
+- Create tailored resumes and cover letters for a specific job applications
+- Help users highlight and discover their skills and experience to improve probability of getting interviews
 
-## Developer Workflows
-- **Development:**
-  - Start with `npm run dev` (see README for alternatives).
-  - Hot reload is enabled for all files in `src/`.
-- **Testing:**
-  - No formal test suite is present; manual testing is the norm.
-- **Debugging:**
-  - Use Redux DevTools and React DevTools for state/UI inspection.
-  - API errors are surfaced via RTK Query error states and UI alerts.
+## Steps
+  1. Import and parse user profile sections from linkedIn or resume
+  2. Extract job requirements from job descriptions
+  3. Match user profile sections to job requirements
+    - Highlight missing requirements or gaps in user profile
+    - Provide recommendations to fill gaps
+    - Allow users to select which profile sections to enhance
+    - Suggeste profile enhancements for missing requirements using recommendations
+  4. List matched profile sections
+    - Highlight matched job requirements
+    - Provide a gap analysis and recommendations for each job requirement
+    - Allow users to select which profile sections to enhance
+    - Suggest profile enhancements for missing requirements using recommendations
+  4. Generate resumes formatted sections based on matched profile sections
+    - Provide a preview of the generated resume
+    - Allow users to copy the resume to clipboard
+    - Allow users to download the resume as a Markdown file
+  5. Generate cover letters based on matched profile sections
+    - Provide a preview of the generated cover letter
+    - Allow users to copy the cover letter to clipboard
+    - Allow users to download the cover letter as a Markdown file 
 
-## Project-Specific Conventions
-- **Step Navigation:**
-  - The current step is managed in Redux (`stepSlice`). Use `setCurrentStep` to advance or jump steps.
-- **Profile Section Matching:**
-  - Use utility functions (e.g., `groupMatchesByProfileSection`, `getOrderedMatchedProfileSections`) to map matches to profile sections.
-  - Always prefer selectors/utilities over duplicating mapping/filtering logic inline.
-- **API Integration:**
-  - All backend calls go through `llmApi.ts` (RTK Query). Define new endpoints there and use the generated hooks.
-  - API types (e.g., `EnhancementResponse`, `BaseJobRequirementMatch`) are colocated with the API slice for discoverability.
-- **Component Structure:**
-  - Feature-specific modals/components live in their step folder (e.g., `profileSections/`, `jobRequirementsMatching/`).
-  - UI primitives (Button, Card, etc.) are in `src/app/components/ui/` and should be reused.
 
-## Migration Notes
-- The project is migrating from RTK Query (RTQ) API calls to direct usage of LLM service classes via a custom React hook (`useLlmService`). This hook provides an interface similar to RTK Query hooks, including properties like `isLoading`, `error`, `data`, and a `reset` function.
-- The `useLlmService` hook is standardized to always inject the current `llmConfig` from the Redux store into the service function, so consumers of the hook do not need to select or pass `llmConfig` manually.
-- The return value of `useLlmService` is refactored to match the tuple style of RTK Query hooks: `[trigger, { isLoading, error, data, reset }]`.
-- There is a focus on DRYing up the logic for LLM service calls, so that all LLM-related features (cover letter, resume, profile section parsing, etc.) use the same hook and interface.
-- The project is moving towards using selectors defined inside Redux slices (e.g., `llmConfigSlice`) for accessing state, and these selectors can be accessed via the slice's default export.
-- There is an emphasis on type safety and correct typing for the custom hook, especially to avoid TypeScript errors when destructuring or calling the returned values.
-- The type returned from LLM services should match the type of the corresponding Redux store slice. This ensures consistency between the service layer and the Redux state, making it easier to update the store with the results of LLM service calls.
 
-## Generics and Type Inference for LLM Service Hooks
-- Always use the generic form of `useLlmService<DATA_TYPE>()` to enforce the expected return type from the LLM service. This ensures that the hook and its consumers are type-safe and aligned with the Zod-inferred types.
-- The `DATA_TYPE` should be imported from the centralized Zod-inferred types in `src/services/zodModels.ts`.
-- Example: `const [trigger, { data }] = useLlmService<JobRequirementMatchList>(...)`.
-- This pattern should be applied to all usages of `useLlmService` in the codebase, including but not limited to `triggerParseProfileSections`, `triggerExtractRequirements`, and `triggerMatch`.
-- If a service returns a union or array, use the most specific type possible (e.g., `JobRequirementMatch[]`).
 
-## Types and Type Safety
-- All types and interfaces used across Redux slices, services, and components should be defined in a single location whenever possible (e.g., in the relevant slice or a shared types file).
-- Do not redefine types or interfaces in multiple places. Always import the type from its source of truth.
-- The type returned from LLM services must match the type of the corresponding Redux store slice. This ensures consistency and prevents type drift.
-- When updating or extending a type, update it in its source location and refactor all usages to import from there.
-- Use Zod schemas from `src/services/zodModels.ts` for runtime validation and type inference. Do not redefine Zod schemas in service files unless a schema does not exist yet. If a schema is missing, list the missing schemas and ask before creating new ones.
-- Prefer using `z.infer<typeof SchemaName>` for deriving TypeScript types from Zod schemas to ensure type alignment between validation and usage.
+# Tech Stack
+- Framework and version: Next.js v15.3 React v18+
+- Language: TypeScript
+- State management: Redux Toolkit + RTK Query
+- Styling: Tailwind CSS v4 and Shadcn UI v2.10
+- Testing: Jest and React Testing Library
+- LLM Services: langchain-js v0.3 and zod v4 schemas 
 
-## LLM Service Schema Usage
-- When calling `invokeWithStructuredOutput`, always pass the Zod schema object (e.g., `JobRequirementMatchListSchema`), not the inferred TypeScript type. This ensures runtime validation and type safety.
-- Never pass the inferred type (e.g., `JobRequirementMatchList`) to `invokeWithStructuredOutput`—only the Zod schema should be used for validation.
-- Use the inferred type (e.g., `JobRequirementMatchList`) only for static typing in TypeScript, not for runtime validation.
+# Architecture Patterns
+## Folder Structure
+src/
+  ├── app/                  # Next.js app directory
+  ├── components/           # Shared UI components
+  ├── flow/                 # Multi-step flow components
+  │   ├── steps/            # Individual step components
+  │   └── MultiStepFlow.tsx # Main flow component
+  ├── hooks/                # Custom React hooks
+  ├── services/             # LLM services
+  ├── store/                # Redux store setup and slices
+  ├── utils/                # Utility functions and helpers
+  └── types/                # TypeScript types and interfaces
 
-## Examples
-- To add a new step: create a component in `src/flow/steps/`, register it in `stepComponents.ts`, and add any state to Redux as needed.
-- To add a new API call: add an endpoint to `llmApi.ts` and use the generated hook in your component.
-- To map matches to profile sections: use or extend `groupMatchesByProfileSection` or similar utilities.
+## Component Architecture
+- Use compound components for complex UI elements (e.g., step, modals, wizards)
+- Implement container/presentational pattern for complex features
+- Co-locate feature-specific components with their feature modules
+- Keep shared UI components generic and reusable
 
----
+## State Management Strategy
+- Use Redux Toolkit slices for global application and persistent state
+- Local useState for simple component-specific state
+- Use RTK Query for server state management and caching
+- Use RTK persistence middleware for local storage persistence
 
-If any conventions or flows are unclear, please ask for clarification or propose updates to this file.
+## LLM Services Architecture
+- Use langchain-js for LLM service integration
+- Define Zod schemas for output validation
+- Use a custom React hook (`useLlmService`) to provide a consistent interface for LLM service calls
+- Use `invokeWithStructuredOutput` for structured output from LLM services
+
+
+
+# Code Standards
+## TypeScript Requirements
+- Use strict mode with no implicit any
+- Define interfaces for all props, API responses, and complex objects
+- Use type unions instead of enums where appropriate
+- Prefer `interface` over `type` for object shapes
+- Use generic types for reusable components and hooks
+
+## React Patterns
+- Use functional components with hooks exclusively
+- Prefer named exports over default exports
+- Implement proper error boundaries for feature modules
+- Use React.memo() for expensive components
+- Always include dependency arrays in useEffect and useCallback
+
+## Import Organization
+```typescript
+// 1. React and external libraries
+import React from 'react';
+import { useDispatch } from 'react-redux';
+
+// 2. Internal utilities and types
+import { formatDate } from '@/utils/date';
+import type { Task } from '@/types/task';
+
+// 3. Component imports
+import { Button } from '@/components/ui/Button';
+```
+
+## Error Handling
+- Use error boundaries for component-level error catching
+- Implement proper try-catch blocks for async operations
+- Display user-friendly error messages
+<!-- - Log errors to monitoring service in production -->
+
+# Naming Conventions
+
+## Files and Folders
+- Components: PascalCase (TaskCard.tsx, ProjectList.tsx)
+- Hooks: camelCase starting with 'use' (useTaskFilters.ts)
+- Utilities: camelCase (formatCurrency.ts, validateEmail.ts)
+- Types: camelCase with .types.ts suffix (task.types.ts)
+- Constants: UPPER_SNAKE_CASE (API_ENDPOINTS.ts)
+
+## Variables and Functions
+- React components: PascalCase (TaskCard, ProjectHeader)
+- Functions and variables: camelCase (handleSubmit, isLoading)
+- Constants: UPPER_SNAKE_CASE (MAX_FILE_SIZE, DEFAULT_PAGINATION)
+- Boolean variables: Use is/has/can prefix (isVisible, hasPermission, canEdit)
+
+## CSS Classes (Tailwind)
+- Use semantic class names in templates
+- Group related styles together
+- Mobile-first responsive design approach
+
+## API and Data
+- API endpoints: kebab-case (/api/projects/{id}/tasks)
+- Database fields: snake_case (created_at, user_id)
+- Redux actions: UPPER_SNAKE_CASE (FETCH_TASKS_SUCCESS)
+- Redux slice names: camelCase (taskSlice, authSlice)
+
+
+
+# Testing Strategy
+[What and how to test]
+
+# Performance Guidelines
+[Optimization requirements]
+
+# Security Requirements
+[Security practices]
+
+# Common Patterns
+[Team-specific patterns]
+
+# Anti-Patterns
+[What to avoid]
+
