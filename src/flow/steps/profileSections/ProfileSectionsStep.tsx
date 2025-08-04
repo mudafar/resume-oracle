@@ -21,9 +21,7 @@ import { DeleteAllProfileSectionsModal } from "./DeleteAllProfileSectionsModal";
 import { ModelConfigPrompt } from "./ModelConfigPrompt";
 import { Toast } from "./Toast";
 import { createStep } from "@/utils/createStep";
-// import { ProfileSectionImportAIModal } from "./ProfileSectionsImportAIModal";
 import { ProfileSectionsImportJSONModal } from "./ProfileSectionsImportJSONModal";
-// import { NoProfileSections } from "./NoProfileSections";
 
 const ProfileSections: React.FC = () => {
   const sections = useSelector((state: RootState) => state.profileSections.sections);
@@ -163,18 +161,6 @@ const ProfileSections: React.FC = () => {
         disabledExport={sections.length === 0}
         disabledDeleteAll={sections.length === 0}
       />
-      {/* Hero Panel (Empty State, below Action Bar) */}
-      {/* {sections.length === 0 && !importAIModalOpen && !heroSkipped && (
-        <NoProfileSections
-          onImportWithAI={() => setImportAIModalOpen(true)}
-          onImportFromJSON={() => setImportJSONModalOpen(true)}
-          onStartManually={handleSkipHero}
-        />
-        // <ProfileSectionsHeroPanel
-        //   onPasteExtract={() => setImportAIModalOpen(true)}
-        //   onSkip={handleSkipHero}
-        // />
-      )} */}
       <ProfileSectionsExportModal
         open={exportModalOpen}
         onClose={() => setExportModalOpen(false)}

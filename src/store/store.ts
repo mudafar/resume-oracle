@@ -11,7 +11,6 @@ import resumeReducer from "./slices/resumeSlice";
 import coverLetterReducer from "./slices/coverLetterSlice";
 import llmConfigReducer from "./slices/llmConfigSlice";
 import stepReducer from "./slices/stepSlice";
-import { llmApi } from "./services/llmApi";
 
 const rootReducer = combineReducers({
   counter: counterReducer,
@@ -23,7 +22,6 @@ const rootReducer = combineReducers({
   coverLetter: coverLetterReducer,
   llmConfig: llmConfigReducer,
   step: stepReducer,
-  [llmApi.reducerPath]: llmApi.reducer,
 });
 
 const persistConfig = {
@@ -38,10 +36,10 @@ export const store = configureStore({
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({
       serializableCheck: false,
-    }).concat(llmApi.middleware),
+    }),
 });
 
 export const persistor = persistStore(store);
 
 export type RootState = ReturnType<typeof store.getState>;
-export type AppDispatch = typeof store.dispatch; 
+export type AppDispatch = typeof store.dispatch;
