@@ -9,7 +9,6 @@ export interface LLMConfig {
   apiKey: string | null;
   endpointUrl: string | null;
   showConfigModal: boolean;
-  invitationCode: string | null;
   temperature?: number;
   topP?: number;
 }
@@ -21,7 +20,6 @@ const initialState: LLMConfig = {
   apiKey: null,
   endpointUrl: null,
   showConfigModal: false,
-  invitationCode: null,
   temperature: undefined,
   topP: undefined,
 };

@@ -20,23 +20,35 @@ export class LLMService {
   private defaultProvider = "google-genai";
   private defaultModel = "gemini-2.5-flash-lite";
 
-  private async initGoogleLLM(config?: LLMConfig) {
+  private async iniLLM(config?: LLMConfig) {
     /**
      * Initialize Google's Gemini LLM
+     * If config is not provided or provider is 'free', use environment API key
      */
     try {
+      const isFreeProvider = !config || config.provider === 'free';
+      const apiKey = isFreeProvider 
+        ? process.env.NEXT_PUBLIC_GEMINI_API_KEY 
+        : config?.apiKey;
+      const modelProvider = isFreeProvider 
+        ? this.defaultProvider 
+        : config?.provider || this.defaultProvider;
+      const variant = isFreeProvider 
+        ? this.defaultModel 
+        : config?.variant || this.defaultModel;    
+      
       return initChatModel(
-        config?.variant || this.defaultModel,
+        variant,
         {
-          modelProvider: config?.provider || this.defaultProvider,
+          modelProvider: modelProvider,
           topP: config?.topP || 0.90,
           temperature: config?.temperature || 0,
-          apiKey: config?.apiKey,
+          apiKey: apiKey,
           ...(config?.endpointUrl && { baseUrl: config.endpointUrl })
         }
       );
     } catch (error) {
-      console.error("[ERROR] Failed to initialize Google LLM:", error);
+      console.error("[ERROR] Failed to initialize LLM:", error);
       throw new Error(`Failed to initialize LLM: ${error}`);
     }
   }
@@ -45,7 +57,7 @@ export class LLMService {
     /**
      * Get LLM instance
      */
-    return await this.initGoogleLLM(config);
+    return await this.iniLLM(config);
   }
 
   async withStructuredOutput<T extends z.ZodType>(

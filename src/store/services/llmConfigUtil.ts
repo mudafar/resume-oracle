@@ -1,23 +1,17 @@
 import { RootState } from "@/store/store";
 
 export function getLLMConfigHeadersOrParams(state: RootState) {
-  const { provider, variant, apiKey, endpointUrl, invitationCode } = state.llmConfig;
+  const { provider, variant, apiKey, endpointUrl } = state.llmConfig;
 
-  // Always include invitation code if present, even for free tier
-  const headers: Record<string, string> = {};
-  
-  if (invitationCode) {
-    headers["X-Invite-Code"] = invitationCode;
-  }
-
-  // For free provider, only return invitation code (if any)
+  // For free provider, return undefined (no headers needed)
   if (provider === "free" && variant === "default") {
-    return Object.keys(headers).length > 0 ? headers : undefined;
+    return undefined;
   }
 
   // For paid providers, ensure we have all required fields
   // API requires: if x-llm-provider is set, both x-llm-variant and x-llm-api-key must be provided
   if (provider && provider !== "free" && variant && apiKey?.trim()) {
+    const headers: Record<string, string> = {};
     headers["x-llm-provider"] = provider;
     headers["x-llm-variant"] = variant;
     headers["x-llm-api-key"] = apiKey.trim();
@@ -29,7 +23,6 @@ export function getLLMConfigHeadersOrParams(state: RootState) {
     return headers;
   }
 
-  // If we don't have all required fields for paid provider, 
-  // fall back to free tier behavior (only invitation code if present)
-  return Object.keys(headers).length > 0 ? headers : undefined;
+  // If we don't have all required fields for paid provider, fall back to free tier
+  return undefined;
 }

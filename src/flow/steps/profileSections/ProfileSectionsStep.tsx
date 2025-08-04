@@ -21,9 +21,9 @@ import { DeleteAllProfileSectionsModal } from "./DeleteAllProfileSectionsModal";
 import { ModelConfigPrompt } from "./ModelConfigPrompt";
 import { Toast } from "./Toast";
 import { createStep } from "@/utils/createStep";
-import { ProfileSectionImportAIModal } from "./ProfileSectionsImportAIModal";
+// import { ProfileSectionImportAIModal } from "./ProfileSectionsImportAIModal";
 import { ProfileSectionsImportJSONModal } from "./ProfileSectionsImportJSONModal";
-import { NoProfileSections } from "./NoProfileSections";
+// import { NoProfileSections } from "./NoProfileSections";
 
 const ProfileSections: React.FC = () => {
   const sections = useSelector((state: RootState) => state.profileSections.sections);

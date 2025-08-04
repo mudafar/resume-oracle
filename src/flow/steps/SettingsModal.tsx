@@ -30,7 +30,6 @@ import {
   Save,
   AlertCircle,
   CheckCircle2,
-  Ticket,
   Info,
   ChevronDown,
   ChevronRight
@@ -97,7 +96,6 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
   const [variant, setVariant] = useState<LLMVariant>(config.variant);
   const [apiKey, setApiKey] = useState<string>(config.apiKey || "");
   const [endpointUrl, setEndpointUrl] = useState<string>(config.endpointUrl || "");
-  const [invitationCode, setInvitationCode] = useState<string>(config.invitationCode || "");
   const [showAdvanced, setShowAdvanced] = useState<boolean>(!!config.endpointUrl);
   const [touched, setTouched] = useState(false);
   const [saving, setSaving] = useState(false);
@@ -129,7 +127,6 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
       variant,
       apiKey: needsApiKey ? apiKey : null,
       endpointUrl: needsApiKey && endpointUrl ? endpointUrl : null,
-      invitationCode: invitationCode || null,
     }));
     setSaving(false);
     onClose();
@@ -140,7 +137,6 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
     setVariant("default");
     setApiKey("");
     setEndpointUrl("");
-    setInvitationCode("");
     setShowAdvanced(false);
     setEndpointUrlError(null);
     dispatch(resetLLMConfig());
@@ -157,7 +153,6 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
       setVariant(config.variant);
       setApiKey(config.apiKey || "");
       setEndpointUrl(config.endpointUrl || "");
-      setInvitationCode(config.invitationCode || "");
       setShowAdvanced(!!config.endpointUrl);
       setTouched(false);
       setEndpointUrlError(null);
@@ -196,8 +191,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
             <Info className="w-4 h-4 text-blue-600" />
             <div className="text-sm text-blue-800">
               <strong>Tip:</strong> <br/>
-              Use an <em>invitation code</em> to unlock higher request limits.<br/> 
-              Provide your own <em>API key</em> to use more powerful models.
+              Select <em>Free limited model</em> for basic usage, or provide your own <em>API key</em> to use more powerful models.
             </div>
           </Alert>
 
@@ -336,30 +330,6 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
               )}
             </div>
           )}
-
-          {/* 4. Invitation Code - Always Visible */}
-          <div className="space-y-2 bg-gradient-to-r from-purple-50 to-blue-50 p-4 rounded-lg border border-purple-100">
-            <Label className="text-sm font-medium text-gray-700 flex items-center gap-2">
-              <Ticket className="w-4 h-4 text-purple-600" />
-              Invitation Code
-            </Label>
-            <div className="relative">
-              <Input
-                type="text"
-                value={invitationCode}
-                onChange={e => setInvitationCode(e.target.value)}
-                placeholder="Enter invitation code if you have one"
-                className="bg-white/80 border-purple-200 focus:border-purple-300"
-                autoComplete="off"
-              />
-              {invitationCode && (
-                <CheckCircle2 className="absolute right-3 top-2.5 w-4 h-4 text-green-500" />
-              )}
-            </div>
-            <p className="text-xs text-purple-700">
-              Boosts your free-tier rate limit — no registration needed
-            </p>
-          </div>
         </div>
 
         {/* Action Row - Sticky on scroll */}

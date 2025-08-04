@@ -3,9 +3,9 @@ import {
   FileText,
   Zap,
   ArrowRight,
-  Key,
   ChevronRight,
   CheckCircle,
+  Key,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
@@ -86,6 +86,7 @@ const GetStarted: React.FC = () => {
           <Zap className="w-5 h-5 mr-2 animate-pulse" /> Import with AI
           <ArrowRight className="w-5 h-5 ml-2 transform group-hover:translate-x-1 transition" />
         </Button>
+        
         {/* {showTooltip && (
           <div className="absolute -top-12 left-1/2 transform -translate-x-1/2 bg-gray-900 text-white text-sm px-3 py-2 rounded-lg whitespace-nowrap animate-fade-in">
             Click to get started—no registration needed!
@@ -99,6 +100,8 @@ const GetStarted: React.FC = () => {
       </div>
 
 
+
+
       {/* Progress Strip */}
       <div className="m-8 flex items-center gap-2 text-sm text-gray-500">
         <span className="font-medium text-blue-600"> • Extract</span>
@@ -110,61 +113,20 @@ const GetStarted: React.FC = () => {
         <span> • Export</span>
       </div>
 
-
-
-      {/* Premium AI Benefits */}
-        <Card
-          className="relative m-4 bg-white/80 backdrop-blur-sm border-slate-200/50 shadow-sm hover:shadow-md transition-all duration-200">
-          <CardContent className="p-4">
-            <div className="text-center">
-              <div className="flex items-center justify-center gap-2 mb-2">
-                <Zap className="w-4 h-4 text-amber-500" />
-                <span
-                  className="text-sm font-medium text-slate-700">Unlock more access</span>
-              </div>
-
-              <div
-                className="flex flex-col sm:flex-row items-center justify-center gap-3 text-sm">
-                <button
-                  onClick={openSettings}
-                  className="group flex items-center gap-2 text-blue-600 hover:text-blue-700 transition-colors"
-                  aria-label="Enter invitation code to unlock twenty calls per minute"
-                >
-                  <div className="flex items-center gap-1.5">
-                    <Key
-                      className="w-3.5 h-3.5 group-hover:scale-110 transition-transform" />
-                    <span className="font-medium">Invitation code</span>
-                    <ChevronRight className="w-3 h-3 opacity-60" />
-                  </div>
-                  <span
-                    className="px-2 py-0.5 bg-green-100 text-green-700 rounded-full text-xs font-semibold">
-                    20x faster
-                  </span>
-                </button>
-
-                <div className="hidden sm:block w-1 h-1 bg-slate-300 rounded-full"></div>
-
-                <button
-                  onClick={openSettings}
-                  className="group flex items-center gap-2 text-purple-600 hover:text-purple-700 transition-colors"
-                  aria-label="Provide your API key for better AI performance"
-                >
-                  <div className="flex items-center gap-1.5">
-                    <Zap
-                      className="w-3.5 h-3.5 group-hover:scale-110 transition-transform" />
-                    <span className="font-medium">Custom API key</span>
-                    <ChevronRight className="w-3 h-3 opacity-60" />
-                  </div>
-                  <span
-                    className="px-2 py-0.5 bg-purple-100 text-purple-700 rounded-full text-xs font-semibold">
-                    Premium AI
-                  </span>
-                </button>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
+      <div className="m-4 text-sm text-slate-600 bg-purple-50 border border-purple-200 px-4 py-2 rounded-md flex items-center justify-between">
+        <span>
+          FREE mode — 5 requests/hour.{" "}
+          <Button
+            variant="link"
+            size="sm"
+            className="text-purple-700"
+            onClick={openSettings}
+          >
+            <Key className="w-4 h-4 inline-block mr-1" />
+            Use your own API key for premium AI
+          </Button>
+        </span>
+      </div>
 
 
       {/* Checklist */}
@@ -201,6 +163,13 @@ const GetStarted: React.FC = () => {
           console.log(msg, type);
         }}
       />
+      <style jsx>{`    
+        @keyframes fade-in {
+          from { opacity: 0; transform: translateY(20px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
+        .animate-fade-in { animation: fade-in 0.6s ease-out; }
+      `}</style>
     </div>
   );
 };
@@ -211,11 +180,4 @@ export const GetStartedStep = createStep({
   description: 'Start your journey to a stronger, job-focused resume and cover letter.'
 })(GetStarted);
 
-// Animations
-<style jsx>{`    
-  @keyframes fade-in {
-    from { opacity: 0; transform: translateY(20px); }
-    to { opacity: 1; transform: translateY(0); }
-  }
-  .animate-fade-in { animation: fade-in 0.6s ease-out; }
-`}</style>
+

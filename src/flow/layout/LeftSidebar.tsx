@@ -42,18 +42,13 @@ export function LeftSidebar({ steps, currentStep, onStepChange, appName, appIcon
   const dispatch = useDispatch();
 
   const config = useSelector((state: RootState) => state.llmConfig);
-  const hasInvite = Boolean(config.invitationCode);
   const hasKey = Boolean(config.apiKey);
   const accessText = hasKey
     ? 'Premium AI Active'
-    : hasInvite
-      ? 'Invitation Code Active'
-      : 'Guest • 5 calls/min';
+      : 'Free • 5 calls/min';
   const accessStyle = hasKey
     ? 'bg-purple-50 text-purple-700 border-purple-200'
-    : hasInvite
-      ? 'bg-blue-50 text-blue-700 border-blue-200'
-      : 'bg-gray-100 text-gray-700 border-gray-200';
+    : 'bg-gray-50 text-gray-700 border-gray-200';
 
   return (
     <Sidebar variant="inset">
