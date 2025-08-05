@@ -1,20 +1,30 @@
 import { ProfileSection } from "@/store/slices/profileSectionsSlice";
-import { ProfileSectionWithRequirements } from "@/services/zodModels";
+import { ProfileSectionWithRequirements, SelectedSection } from "@/services/zodModels";
 /**
  * Prepares matched profile sections payload for API calls
  * Used by both GenerateResumeSectionsStep and GenerateCoverLetterStep
  */
 export const getMatchedProfileSectionWithRequirements = (
-  selectedSections: { section_id: string; matched_clusters: { cluster_name: string }[] }[],
+  selectedSections: SelectedSection[],
   profileSections: ProfileSection[]
 ): ProfileSectionWithRequirements[] => {
   return selectedSections.map((section) => {
-    const profileSection = profileSections.find(ps => ps.id === section.section_id);
+    const profileSection = profileSections.find(ps => ps.id === section.profile_section_id);
     if (!profileSection) return null; // Skip if no matching profile section
+
+    // Extract all requirements from coverage arrays across all matched pairs
+    const allRequirements = section.matched_scored_pairs.flatMap(pair => [
+      ...pair.coverage,
+    ]);
+    
+    // Remove duplicates while preserving order
+    const uniqueRequirements = allRequirements.filter((requirement, index, arr) => 
+      arr.indexOf(requirement) === index
+    );
 
     return {
       profile_section: profileSection,
-      requirements: section.matched_clusters.map(cluster => cluster.cluster_name),
+      requirements: uniqueRequirements,
     };
   }).filter(Boolean) as ProfileSectionWithRequirements[]; // Remove null values and cast to correct type
 };
