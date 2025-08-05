@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
-import { CheckCircle, ChevronDown, ChevronUp, Star } from 'lucide-react';
+import { CheckCircle, ChevronDown, ChevronUp, Star, Sparkles } from 'lucide-react';
 import { SelectedSection } from "@/services/zodModels";
 import { ProfileSection } from "@/store/slices/profileSectionsSlice";
 import { generateTextPreview } from "@/utils/textPreview";
@@ -13,11 +13,13 @@ import { generateTextPreview } from "@/utils/textPreview";
 interface SelectedSectionCardProps {
   selectedSection: SelectedSection;
   profileSections: ProfileSection[];
+  onEnhanceSection?: (selectedSection: SelectedSection) => void;
 }
 
 export const SelectedSectionCard: React.FC<SelectedSectionCardProps> = ({ 
   selectedSection, 
-  profileSections 
+  profileSections,
+  onEnhanceSection
 }) => {
   const [expanded, setExpanded] = useState(false);
   const [detailsExpanded, setDetailsExpanded] = useState(false);
@@ -29,6 +31,11 @@ export const SelectedSectionCard: React.FC<SelectedSectionCardProps> = ({
     : { preview: "", isExpandable: false };
 
   const totalWeightedScore = Math.round(selectedSection.total_weighted_score);
+
+  // Check if there are any missing requirements across all matched pairs
+  const hasMissingRequirements = selectedSection.matched_scored_pairs.some(pair => 
+    pair.missing && pair.missing.length > 0
+  );
 
   return (
     <Card className="border-l-4 border-green-500 bg-green-50">
@@ -81,6 +88,28 @@ export const SelectedSectionCard: React.FC<SelectedSectionCardProps> = ({
               </div>
             )}
           </div>
+
+          {/* Enhancement CTA */}
+          {hasMissingRequirements && onEnhanceSection && (
+            <div className="bg-orange-50 border border-orange-200 rounded-lg p-4">
+              <div className="flex items-center justify-between">
+                <div className="flex-1">
+                  <h5 className="font-medium text-orange-800 mb-1">Section Can Be Enhanced</h5>
+                  <p className="text-sm text-orange-700">
+                    This section has some missing requirements that could be addressed through enhancement.
+                  </p>
+                </div>
+                <Button 
+                  onClick={() => onEnhanceSection(selectedSection)}
+                  size="sm"
+                  className="bg-orange-600 hover:bg-orange-700 ml-4"
+                >
+                  <Sparkles className="mr-2 h-4 w-4" />
+                  Enhance Section
+                </Button>
+              </div>
+            </div>
+          )}
 
           {/* Selection Details - Grouped in Collapsible */}
           <Collapsible open={detailsExpanded} onOpenChange={setDetailsExpanded}>

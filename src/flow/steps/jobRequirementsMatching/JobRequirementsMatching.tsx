@@ -3,18 +3,19 @@ import React, { useState, useEffect } from "react";
 // Utility to get profile sections referenced by matches
 import { ProfileSection } from "@/store/slices/profileSectionsSlice";
 import { createStep } from "@/utils/createStep";
-import { SuggestedSectionModal } from "./suggestedSectionModal";
+// import { SuggestedSectionModal } from "./suggestedSectionModal";
 import { RematchBanner, MatchCard, useJobMatching } from ".";
 import { CoverageGapCard } from "./CoverageGapCard";
 import { SelectedSectionCard } from "./SelectedSectionCard";
-import { FillGapModal } from "./FillGapModal";
+import { FillGapModal } from "./fillGapModal/FillGapModal";
+import { EnhanceProfileSectionModal } from "./enhanceProfileSectionModal";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { AlertCircle, FileWarning } from 'lucide-react';
 import { useSelector, useDispatch } from "react-redux";
 import { RootState } from "@/store/store";
-import { HybridSelectionResult, CoverageGap } from "@/services/zodModels";
+import { HybridSelectionResult, CoverageGap, SelectedSection } from "@/services/zodModels";
 import { addProfileSectionReturnId } from "../createProfileSection";
 import { editSection } from "@/store/slices/profileSectionsSlice";
 import { markGapAsFilled } from "@/store/slices/matchesSlice";
@@ -25,8 +26,8 @@ function getOrderedMatchedProfileSections(
   profileSections: ProfileSection[]
 ): ProfileSection[] {
   const matchCounts = new Map<string, number>();
-  selectedSections.forEach((section: { section_id: string }) => {
-    matchCounts.set(section.section_id, (matchCounts.get(section.section_id) || 0) + 1);
+  selectedSections.forEach((section) => {
+    matchCounts.set(section.profile_section_id, (matchCounts.get(section.profile_section_id) || 0) + 1);
   });
 
   return profileSections
@@ -70,6 +71,8 @@ export const JobRequirementsMatching: React.FC = () => {
   const [fillGapModalOpen, setFillGapModalOpen] = useState(false);
   const [selectedGap, setSelectedGap] = useState<CoverageGap | null>(null);
   const [selectedGapId, setSelectedGapId] = useState<string>("");
+  const [enhanceModalOpen, setEnhanceModalOpen] = useState(false);
+  const [selectedSectionForEnhancement, setSelectedSectionForEnhancement] = useState<SelectedSection | null>(null);
 
   const { 
     profileSections,
@@ -77,14 +80,14 @@ export const JobRequirementsMatching: React.FC = () => {
     isLoading,
     error,
     showRematchBanner,
-    modalOpen,
+    // modalOpen,
     modalMatchId,
     onRematch,
     setShowRematchBanner,
     handleSeeSuggestions,
-    setModalOpen,
-    handleSaveAndMatch,
-    handleSaveOnly,
+    // setModalOpen,
+    // handleSaveAndMatch,
+    // handleSaveOnly,
   } = useJobMatching();
 
   // Use the flattened Redux state structure
@@ -102,6 +105,26 @@ export const JobRequirementsMatching: React.FC = () => {
     setSelectedGap(gap);
     setSelectedGapId(gap.id);
     setFillGapModalOpen(true);
+  };
+
+  const handleEnhanceSection = (selectedSection: SelectedSection) => {
+    setSelectedSectionForEnhancement(selectedSection);
+    setEnhanceModalOpen(true);
+  };
+
+  const handleSaveEnhancement = (sectionId: string, enhancedContent: string) => {
+    // Update the profile section with enhanced content
+    const profileSection = profileSections.find(ps => ps.id === sectionId);
+    if (profileSection) {
+      dispatch(editSection({
+        id: sectionId,
+        type: profileSection.type,
+        content: enhancedContent
+      }));
+    }
+    
+    setEnhanceModalOpen(false);
+    setSelectedSectionForEnhancement(null);
   };
 
   const handleSaveAndMarkCovered = (
@@ -215,12 +238,13 @@ export const JobRequirementsMatching: React.FC = () => {
               key={selectedSection.profile_section_id}
               selectedSection={selectedSection}
               profileSections={profileSections}
+              onEnhanceSection={handleEnhanceSection}
             />
           ))}
         </div>
       )}
 
-      {currentMatch && matchingResult && (
+      {/* {currentMatch && matchingResult && (
         <SuggestedSectionModal
           match={currentMatch}
           open={modalOpen}
@@ -230,7 +254,7 @@ export const JobRequirementsMatching: React.FC = () => {
           onSaveOnly={handleSaveOnly}
           onSkip={() => setModalOpen(false)}
         />
-      )}
+      )} */}
 
       {selectedGap && (
         <FillGapModal
@@ -239,6 +263,16 @@ export const JobRequirementsMatching: React.FC = () => {
           gap={selectedGap}
           profileSections={profileSections}
           onSaveAndMarkCovered={handleSaveAndMarkCovered}
+        />
+      )}
+
+      {selectedSectionForEnhancement && (
+        <EnhanceProfileSectionModal
+          open={enhanceModalOpen}
+          onClose={() => setEnhanceModalOpen(false)}
+          selectedSection={selectedSectionForEnhancement}
+          profileSections={profileSections}
+          onSaveEnhancement={handleSaveEnhancement}
         />
       )}
     </div>
