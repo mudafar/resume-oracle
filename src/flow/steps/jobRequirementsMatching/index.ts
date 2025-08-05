@@ -5,5 +5,5 @@ export * from './SelectedSectionCard';
 export * from './enhanceProfileSectionModal';
 
 export * from './fillGapModal/GapContextPanel';
-export * from './hooks';
+export * from './useJobMatching';
 export * from './JobRequirementsMatching';
