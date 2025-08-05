@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { RootState } from "@/store/store";
 import { editSection } from "@/store/slices/profileSectionsSlice";
-import { updateMatch } from "@/store/slices/matchesSlice";
+// import { updateMatch } from "@/store/slices/matchesSlice";
 import { EnhanceProfileSectionModal } from "./EnhanceProfileSectionModal";
 import { groupMatchesByProfileSection, MatchedProfileSection } from "../groupMatchesByProfileSection";
 import { generateTextPreview } from "@/utils/textPreview";
@@ -33,6 +33,7 @@ import {
   FileText,
   TrendingUp
 } from "lucide-react";
+import { ProfileSection } from "@/store/slices/profileSectionsSlice";
 
 function hasGapsOrRecommendations(matches: MatchedProfileSection["baseJobRequirementMatches"]): boolean {
   return matches.some(match => match.gap_description || match.recommendation);
@@ -59,13 +60,29 @@ function getConfidenceIcon(confidence: number | null) {
 
 const MatchedProfileSections: React.FC = () => {
   const dispatch = useDispatch();
-  const matches = useSelector((state: RootState) => state.matches.data);
   const profileSections = useSelector((state: RootState) => state.profileSections.sections);
+  const selectedSections = useSelector((state: RootState) => state.matches.data?.selected_sections || []);
   const [openSections, setOpenSections] = useState<{ [id: string]: boolean }>({});
   const [modalOpen, setModalOpen] = useState(false);
   const [selectedSection, setSelectedSection] = useState<MatchedProfileSection | null>(null);
 
-  const matchedProfileSections = groupMatchesByProfileSection(matches, profileSections);
+  // Filter out undefined `profileSection` values
+  const matchedProfileSections = selectedSections
+    .map((section) => {
+      const profileSection = profileSections.find(ps => ps.id === section.section_id);
+      if (!profileSection) return null; // Skip if no matching profile section
+
+      return {
+        profileSection,
+        baseJobRequirementMatches: section.matched_clusters.map(cluster => ({
+          requirement: cluster.cluster_name,
+          confidence: cluster.weighted_score,
+          gap_description: cluster.missing.join(", "),
+          recommendation: cluster.strength_indicators.join(", ")
+        }))
+      };
+    })
+    .filter((item): item is { profileSection: ProfileSection; baseJobRequirementMatches: any[] } => item !== null); // Type guard to remove null values
 
   // Sort by number of matches (descending)
   matchedProfileSections.sort((a, b) => b.baseJobRequirementMatches.length - a.baseJobRequirementMatches.length);
@@ -88,17 +105,19 @@ const MatchedProfileSections: React.FC = () => {
         content: enhancedContent
       }));
       // Remove gaps and recommendations from all matches for this profile section
-      matches.forEach((match) => {
-        if (match.profile_section_id === selectedSection.profileSection.id) {
-          dispatch(updateMatch({
-            id: match.id,
-            match: {
-              confidence: null,
-              gap_description: null,
-              recommendation: null
-            }
-          }));
-        }
+      selectedSections.forEach((section) => {
+        section.matched_clusters.forEach((match) => {
+          if (selectedSection?.profileSection.id === match.cluster_name) {
+            // dispatch(updateMatch({
+            //   id: match.id,
+            //   match: {
+            //     confidence: null,
+            //     gap_description: null,
+            //     recommendation: null
+            //   }
+            // }));
+          }
+        });
       });
     }
     setModalOpen(false);
@@ -135,7 +154,7 @@ const MatchedProfileSections: React.FC = () => {
   return (
     <div className="max-w-4xl mx-auto py-8 px-4">
       <main className="space-y-6">
-        {matchedProfileSections.map(({ profileSection: section, baseJobRequirementMatches: matches }) => {
+        {matchedProfileSections.map(({ profileSection: section, baseJobRequirementMatches: matches }: { profileSection: ProfileSection; baseJobRequirementMatches: any[] }) => {
           const { preview, isExpandable } = generateTextPreview(section.content);
           const isOpen = openSections[section.id];
           const hasIssues = hasGapsOrRecommendations(matches);

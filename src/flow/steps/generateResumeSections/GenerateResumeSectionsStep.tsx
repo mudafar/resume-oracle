@@ -27,7 +27,7 @@ interface ResumeSection {
 
 const GenerateResumeSections: React.FC = () => {
   const dispatch = useDispatch();
-  const matches = useSelector((state: RootState) => state.matches.data || []);
+  const selectedSections = useSelector((state: RootState) => state.matches.data?.selected_sections || []);
   const profileSections = useSelector((state: RootState) => state.profileSections.sections || []);
   const resumeSections = useSelector((state: RootState) => state.resumeSections.resumeSections || []);
   const lastInputsHash = useSelector((state: RootState) => state.resumeSections.lastInputsHash);
@@ -42,8 +42,8 @@ const GenerateResumeSections: React.FC = () => {
 
   // Prepare payload for API - memoize to prevent unnecessary re-computations
   const apiPayload = useMemo(() => {
-    return getMatchedProfileSectionWithRequirements(matches, profileSections);
-  }, [matches, profileSections]);
+    return getMatchedProfileSectionWithRequirements(selectedSections, profileSections);
+  }, [selectedSections, profileSections]);
 
   // Compute hash of current inputs
   const inputsHash = useMemo(
@@ -54,7 +54,8 @@ const GenerateResumeSections: React.FC = () => {
 
   // On first entry, auto-generate if no resume sections
   useEffect(() => {
-    if (!resumeSections.length && apiPayload.length > 0) {
+    // Adjust logic to check if `apiPayload` has entries
+    if (!resumeSections.length && Object.keys(apiPayload).length > 0) {
       triggerGenerate(apiPayload);
     }
     // eslint-disable-next-line
@@ -75,26 +76,25 @@ const GenerateResumeSections: React.FC = () => {
 
   // Reference requirements for each section - memoize to prevent unnecessary re-computations
   const referenceMap = useMemo(() => {
-    const matchedProfileSections: MatchedProfileSection[] = groupMatchesByProfileSection(matches, profileSections);
     const map: { [id: string]: { requirement: string }[] } = {};
-    matchedProfileSections.forEach(({ profileSection, baseJobRequirementMatches }) => {
-      map[profileSection.id] = baseJobRequirementMatches.map(m => ({
-        requirement: m.requirement,
+    selectedSections.forEach((section) => {
+      map[section.section_id] = section.matched_clusters.map(cluster => ({
+        requirement: cluster.cluster_name,
       }));
     });
     return map;
-  }, [matches, profileSections]);
+  }, [selectedSections]);
 
 
   // Trigger generation when needed (e.g., on mount or when matches/profileSections change)
   useEffect(() => {
-    if (matches.length && profileSections.length) {
+    if (selectedSections.length && profileSections.length) {
       if (apiPayload) {
         triggerGenerate(apiPayload);
       }
     }
     // eslint-disable-next-line
-  }, [matches, profileSections, apiPayload]);
+  }, [selectedSections, profileSections, apiPayload]);
 
   // Handle result
   useEffect(() => {

@@ -2,17 +2,19 @@
 import { useEffect, useMemo, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { RootState } from "@/store/store";
-import { setMatches, setLastInputsHash, setLastJobDescription, updateMatch } from "@/store/slices/matchesSlice";
+import { setMatches, setLastInputsHash, setLastJobDescription } from "@/store/slices/matchesSlice";
 import { useLlmService } from "@/hooks/useLlmService";
-import { jobRequirementsMatchingService } from "@/services/jobRequirementsMatchingService";
 import { jobRequirementsExtractorService } from "@/services/jobRequirementsExtractorService";
+import { jobRequirementsMatchingService } from "@/services/jobRequirementsMatchingService";
 import sha1 from "sha1";
 import { compareTwoStrings } from "string-similarity";
 import { addProfileSectionReturnId } from "../createProfileSection";
 import { editSection } from "@/store/slices/profileSectionsSlice";
 import {
+  HybridSelectionResult,
   JobRequirement,
   JobRequirementMatch,
+  RequirementCluster,
 } from "@/services/zodModels";
 
 export const useJobMatching = () => {
@@ -27,11 +29,11 @@ export const useJobMatching = () => {
   const [modalMatchId, setModalMatchId] = useState<string | null>(null);
   const [showRematchBanner, setShowRematchBanner] = useState(false);
 
-  const [triggerExtractRequirements, { isLoading: isExtracting, error: extractError }] = useLlmService<JobRequirement[]>(
+  const [triggerExtractRequirements, { isLoading: isExtracting, error: extractError }] = useLlmService<RequirementCluster[]>(
     jobRequirementsExtractorService.extractJobRequirements
   );
-  const [triggerMatch, { isLoading, error }] = useLlmService<JobRequirementMatch[]>(
-    jobRequirementsMatchingService.matchJobRequirementsToProfileSections
+  const [triggerMatch, { isLoading, error }] = useLlmService<HybridSelectionResult>(
+    jobRequirementsMatchingService.findOptimalMatches
   );
 
   const inputsHash = useMemo(
@@ -56,29 +58,23 @@ export const useJobMatching = () => {
   const performMatch = async () => {
     if (!hasValidInputs) return;
     // Step 1: Extract requirements from job description using LLM service
-    const requirements = await triggerExtractRequirements(job_description, company_context || "");
+    const requirementClusters = await triggerExtractRequirements(job_description, company_context || "");
     // Step 2: Match requirements to profile sections using LLM service
-    const result = await triggerMatch(requirements, profileSections, company_context || "");
-    dispatch(setMatches((result || []).map((m: any, i: number) => ({
-      id: String(i),
-      requirement_id: String(i),
-      requirement: m.requirement || "",
-      profile_section_id: String(m.profile_section_id ?? ''),
-      confidence: m.confidence || 0,
-      gap_description: m.gap_description || "",
-      recommendation: m.recommendation || "",
-    }))));
+    const result = await triggerMatch(requirementClusters, profileSections, company_context || "");
+    
+    // Store the full result in Redux
+    dispatch(setMatches(result));
     dispatch(setLastInputsHash(inputsHash));
     dispatch(setLastJobDescription(job_description));
   };
 
   // Initial load effect
   useEffect(() => {
-    if (!matches.length && hasValidInputs) {
+    if (!matches && hasValidInputs) {
       performMatch();
     }
     // eslint-disable-next-line
-  }, []);
+  }, [matches, hasValidInputs]);
 
   // Handle input changes
   useEffect(() => {
@@ -87,7 +83,7 @@ export const useJobMatching = () => {
       return;
     }
 
-    if (matches.length && inputsChanged) {
+    if (matches && inputsChanged) {
       // Check for major JD change
       if (isMajorJdChange) {
         // Auto-trigger for major JD changes
@@ -98,7 +94,7 @@ export const useJobMatching = () => {
         setShowRematchBanner(true);
       }
     }
-  }, [inputsChanged, matches.length, hasValidInputs, isMajorJdChange]);
+  }, [inputsChanged, matches, hasValidInputs, isMajorJdChange]);
 
   const onRematch = async () => {
     setShowRematchBanner(false);
@@ -117,12 +113,6 @@ export const useJobMatching = () => {
     } else {
       dispatch(editSection({id: baseId, type, content}));
     }
-    if (modalMatchId && id) {
-      dispatch(updateMatch({
-        id: modalMatchId,
-        match: {profile_section_id: id, confidence: 100, gap_description: '', recommendation: ''}
-      }));
-    }
     setModalOpen(false);
   };
 
@@ -136,7 +126,9 @@ export const useJobMatching = () => {
   };
 
   return {
+    // Legacy state for components that still use it
     matches,
+    // New state for updated components
     profileSections,
     job_description,
     isLoading,

@@ -1,4 +1,3 @@
-import { groupMatchesByProfileSection, MatchedProfileSection } from "../groupMatchesByProfileSection";
 import { ProfileSection } from "@/store/slices/profileSectionsSlice";
 import { ProfileSectionWithRequirements } from "@/services/zodModels";
 /**
@@ -6,12 +5,16 @@ import { ProfileSectionWithRequirements } from "@/services/zodModels";
  * Used by both GenerateResumeSectionsStep and GenerateCoverLetterStep
  */
 export const getMatchedProfileSectionWithRequirements = (
-  matches: any[],
+  selectedSections: { section_id: string; matched_clusters: { cluster_name: string }[] }[],
   profileSections: ProfileSection[]
-): ProfileSectionWithRequirements => {
-  const matchedProfileSections: MatchedProfileSection[] = groupMatchesByProfileSection(matches, profileSections);
-  return matchedProfileSections.map(({ profileSection, baseJobRequirementMatches }) => ({
-    profile_section: profileSection,
-    requirements: baseJobRequirementMatches.map(match => match.requirement),
-  }));
+): ProfileSectionWithRequirements[] => {
+  return selectedSections.map((section) => {
+    const profileSection = profileSections.find(ps => ps.id === section.section_id);
+    if (!profileSection) return null; // Skip if no matching profile section
+
+    return {
+      profile_section: profileSection,
+      requirements: section.matched_clusters.map(cluster => cluster.cluster_name),
+    };
+  }).filter(Boolean) as ProfileSectionWithRequirements[]; // Remove null values and cast to correct type
 };

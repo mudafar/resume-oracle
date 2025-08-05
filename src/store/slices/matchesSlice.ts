@@ -1,23 +1,16 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
+import { HybridSelectionResult } from "@/services/zodModels";
 
-interface Match {
-  id: string;
-  requirement_id: string;
-  requirement: string;
-  profile_section_id: string;
-  confidence: number;
-  gap_description: string;
-  recommendation: string;
-}
-
-interface MatchesState {
-  data: Match[];
+// Update MatchesState to store HybridSelectionResult
+type MatchesState = {
+  data: HybridSelectionResult | null;
   lastInputsHash: string | null;
   lastJobDescription: string | null;
-}
+};
 
+// Update initialState
 const initialState: MatchesState = {
-  data: [],
+  data: null,
   lastInputsHash: null,
   lastJobDescription: null,
 };
@@ -26,7 +19,7 @@ export const matchesSlice = createSlice({
   name: "matches",
   initialState,
   reducers: {
-    setMatches: (state, action: PayloadAction<Match[]>) => {
+    setMatches: (state, action: PayloadAction<HybridSelectionResult>) => {
       state.data = action.payload;
     },
     setLastInputsHash: (state, action: PayloadAction<string>) => {
@@ -35,15 +28,8 @@ export const matchesSlice = createSlice({
     setLastJobDescription: (state, action: PayloadAction<string>) => {
       state.lastJobDescription = action.payload;
     },
-    updateMatch: (state, action: PayloadAction<{ id: string; match: Partial<Match> }>) => {
-      const { id, match } = action.payload;
-      const index = state.data.findIndex(m => m.id === id);
-      if (index !== -1) {
-        state.data[index] = { ...state.data[index], ...match };
-      }
-    },
     clearMatches: (state) => {
-      state.data = [];
+      state.data = null;
       state.lastInputsHash = null;
       state.lastJobDescription = null;
     },
@@ -54,9 +40,7 @@ export const {
   setMatches,
   setLastInputsHash,
   setLastJobDescription,
-  updateMatch,
   clearMatches,
 } = matchesSlice.actions;
 
 export default matchesSlice.reducer;
-export type { Match }

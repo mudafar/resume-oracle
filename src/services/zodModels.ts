@@ -128,3 +128,100 @@ export type ResumeOutput = z.infer<typeof ResumeOutputSchema>;
 export type ResumeSection = z.infer<typeof ResumeSectionSchema>;
 export type GeneratedCoverLetterResult = z.infer<typeof GeneratedCoverLetterResultSchema>;
 // ...add more as needed for other schemas
+
+
+// Enhanced schema with prioritization and clustering
+export const RequirementClusterSchema = z.object({
+  cluster_name: z.string().describe("Descriptive name for this requirement cluster"),
+  priority_tier: z.enum(["critical", "important", "nice_to_have"]).describe("Priority level: critical (must-have), important (preferred), nice_to_have (bonus)"),
+  requirements: z.array(z.string()).describe("List of related requirements in this cluster"),
+  cluster_type: z.enum(["technical", "experience", "education", "soft_skills", "cultural", "role_specific"]).describe("Type of requirements in this cluster"),
+  rationale: z.string().describe("Brief explanation of why these requirements are clustered together and their priority level")
+});
+
+export const JobRequirementClustersSchema = z.object({
+  requirement_clusters: z.array(RequirementClusterSchema).describe("Grouped and prioritized job requirements")
+});
+
+export type RequirementCluster = z.infer<typeof RequirementClusterSchema>;
+
+
+
+
+const ScoredPairSchema = z.object({
+  section_id: z.string().describe("ID of the profile section"),
+  cluster_name: z.string().describe("Name of the requirement cluster"),
+  cluster_priority: z.enum(["critical", "important", "nice_to_have"]).describe("Priority of the requirement cluster"),
+  raw_score: z.number().min(0).max(100).describe("Raw matching score 0-100"),
+  coverage: z.array(z.string()).describe("Specific requirements from cluster that this section covers"),
+  missing: z.array(z.string()).describe("Requirements from cluster that this section does NOT cover"),
+  strength_indicators: z.array(z.string()).describe("Specific evidence that makes this a strong match"),
+  evidence: z.string().describe("Key evidence supporting the score"),
+  enhancement_suggestions: z.array(z.string()).describe("How to improve this match")
+});
+
+export const LLMScoringResultSchema = z.object({
+  scored_pairs: z.array(ScoredPairSchema),
+  selection_reasoning: z.string().describe("Why these specific pairs were chosen for scoring"),
+  estimated_coverage: z.string().describe("Overall assessment of profile vs requirements")
+});
+
+  export type LLMScoringResult = z.infer<typeof LLMScoringResultSchema>;
+
+  export type ScoredPair = z.infer<typeof ScoredPairSchema>;
+
+
+// Output schemas
+const SelectedSectionSchema = z.object({
+  section_id: z.string(),
+  section_title: z.string(),
+  section_type: z.string(),
+  matched_clusters: z.array(z.object({
+    cluster_name: z.string(),
+    priority: z.enum(["critical", "important", "nice_to_have"]),
+    raw_score: z.number(),
+    weighted_score: z.number(),
+    coverage: z.array(z.string()),
+    missing: z.array(z.string()),
+    strength_indicators: z.array(z.string())
+  })),
+  total_weighted_score: z.number(),
+  selection_rationale: z.string()
+});
+
+const CoverageGapSchema = z.object({
+  cluster_name: z.string(),
+  priority: z.enum(["critical", "important", "nice_to_have"]),
+  gap_type: z.enum(["no_match", "below_threshold", "covered"]),
+  best_available_score: z.number().nullable(),
+  threshold_needed: z.number(),
+  recommendations: z.string(),
+  requirements: z.array(z.string()).optional().describe("List of requirements in this cluster that were not met or partially met"),
+});
+
+export const HybridSelectionResultSchema = z.object({
+  selected_sections: z.array(SelectedSectionSchema),
+  coverage_gaps: z.array(CoverageGapSchema),
+  summary: z.object({
+    critical_clusters_covered: z.number(),
+    critical_clusters_total: z.number(),
+    important_clusters_covered: z.number(),
+    important_clusters_total: z.number(),
+    overall_coverage: z.string(),
+    profile_sections_used: z.number(),
+    critical_gaps: z.number()
+  })
+});
+
+// Types
+export type SelectedSection = z.infer<typeof SelectedSectionSchema>;
+export type CoverageGap = z.infer<typeof CoverageGapSchema>;
+export type HybridSelectionResult = z.infer<typeof HybridSelectionResultSchema>;
+
+export interface SelectionConstraints {
+  critical_threshold: number;
+  important_threshold: number;
+  nice_to_have_threshold: number;
+  max_sections: number;
+  force_critical_coverage: boolean;
+}

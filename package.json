@@ -52,6 +52,7 @@
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "@types/sha1": "^1.1.5",
+    "@types/string-similarity": "^4.0.2",
     "eslint": "^9",
     "eslint-config-next": "15.3.5",
     "tailwindcss": "^4",

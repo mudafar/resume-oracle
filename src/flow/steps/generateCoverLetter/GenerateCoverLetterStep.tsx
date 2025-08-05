@@ -28,7 +28,6 @@ import { CoverLetterEditorCard } from './CoverLetterEditorCard'
 const GenerateCoverLetter: React.FC = () => {
   const dispatch = useDispatch();
   const profileSections = useSelector((state: RootState) => state.profileSections.sections);
-  const matches = useSelector((state: RootState) => state.matches.data);
   const companyContext = useSelector((state: RootState) => state.jobContext.company_context);
   const jobDescription = useSelector((state: RootState) => state.jobContext.job_description);
   const coverLetter = useSelector((state: RootState) => state.coverLetter.coverLetter);
@@ -50,19 +49,22 @@ const GenerateCoverLetter: React.FC = () => {
     return guidanceText || jobDescription.slice(0, 300);
   }, [jobDescription]);
 
+  // Update `matches` selector to use `selected_sections` from `HybridSelectionResult`
+  const selectedSections = useSelector((state: RootState) => state.matches.data?.selected_sections || []);
+
   // Prepare payload using the shared utility - memoize to prevent unnecessary re-computations
   const apiPayload = useMemo(() => {
     return {
-      profileSectionsWithRequirements: getMatchedProfileSectionWithRequirements(matches || [], profileSections || []),
+      profileSectionsWithRequirements: getMatchedProfileSectionWithRequirements(selectedSections, profileSections || []),
       companyContext: companyContext || "",
       toneGuidance: toneGuidance
     };
-  }, [matches, profileSections, companyContext, toneGuidance]);
+  }, [selectedSections, profileSections, companyContext, toneGuidance]);
 
   // Compute hash of current inputs
   const inputsHash = useMemo(
-    () => sha1(JSON.stringify({ profileSections, matches, companyContext, jobDescription })),
-    [profileSections, matches, companyContext, jobDescription]
+    () => sha1(JSON.stringify({ profileSections, selectedSections, companyContext, jobDescription })),
+    [profileSections, selectedSections, companyContext, jobDescription]
   );
   const inputsChanged = inputsHash !== lastCoverLetterInputsHash;
 

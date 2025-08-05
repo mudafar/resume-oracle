@@ -5,23 +5,27 @@ import { ProfileSection } from "@/store/slices/profileSectionsSlice";
 import { createStep } from "@/utils/createStep";
 import { SuggestedSectionModal } from "./suggestedSectionModal";
 import { RematchBanner, MatchCard, useJobMatching } from ".";
+import { CoverageGapCard } from "./CoverageGapCard";
+import { SelectedSectionCard } from "./SelectedSectionCard";
+import { MatchingSummary } from "./MatchingSummary";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { AlertCircle, FileWarning } from 'lucide-react';
-import { Match } from "@/store/slices/matchesSlice";
+import { useSelector } from "react-redux";
+import { RootState } from "@/store/store";
+import { HybridSelectionResult } from "@/services/zodModels";
 
 
-function getOrderedMatchedProfileSections(matches: Match[], profileSections: ProfileSection[]): ProfileSection[] {
-  // Count matches per profile section
+function getOrderedMatchedProfileSections(
+  selectedSections: HybridSelectionResult["selected_sections"],
+  profileSections: ProfileSection[]
+): ProfileSection[] {
   const matchCounts = new Map<string, number>();
-  matches.forEach((match) => {
-    if (match.profile_section_id) {
-      matchCounts.set(match.profile_section_id, (matchCounts.get(match.profile_section_id) || 0) + 1);
-    }
+  selectedSections.forEach((section: { section_id: string }) => {
+    matchCounts.set(section.section_id, (matchCounts.get(section.section_id) || 0) + 1);
   });
 
-  // Filter and sort profile sections by match count (descending)
   return profileSections
     .filter((ps) => matchCounts.has(ps.id))
     .sort((a, b) => (matchCounts.get(b.id) || 0) - (matchCounts.get(a.id) || 0));
@@ -59,7 +63,7 @@ const ErrorState = ({ onRetry }: { onRetry: () => void }) => (
 );
 
 export const JobRequirementsMatching: React.FC = () => {
-  const {
+  const { 
     matches,
     profileSections,
     job_description,
@@ -76,8 +80,13 @@ export const JobRequirementsMatching: React.FC = () => {
     handleSaveOnly,
   } = useJobMatching();
 
-  // Find the current match for the modal
-  const currentMatch = modalMatchId ? matches.find(m => m.id === modalMatchId) : null;
+  // Replace `matchingResult` with the Redux state
+  const matchingResult = useSelector((state: RootState) => state.matches.data);
+
+  // Update `currentMatch` logic to work with `HybridSelectionResult`
+  const currentMatch = modalMatchId
+    ? matchingResult?.selected_sections.find(section => section.section_id === modalMatchId)
+    : null;
 
   if (!job_description.trim() || profileSections.length === 0) {
     return <div className="text-gray-500">Please complete previous steps to see job requirements matching.</div>;
@@ -91,31 +100,59 @@ export const JobRequirementsMatching: React.FC = () => {
     return <ErrorState onRetry={onRematch} />;
   }
 
-  if (!matches.length) {
+  if (!matchingResult) {
     return <EmptyState />;
   }
 
   return (
     <div className="space-y-6">
-      {<RematchBanner onRematch={onRematch} onDismiss={() => setShowRematchBanner(false)} />}
-      <div className="space-y-4">
-        {[
-          ...matches.filter(m => !m.profile_section_id),
-          ...matches.filter(m => m.profile_section_id)
-        ].map((match) => (
-          <MatchCard
-            key={match.id}
-            match={match}
-            profileSections={profileSections}
-            onSeeSuggestions={handleSeeSuggestions}
-          />
-        ))}
-      </div>
-      {currentMatch && (
+      {(showRematchBanner || true) && (
+        <RematchBanner onRematch={onRematch} onDismiss={() => setShowRematchBanner(false)} />
+      )}
+      
+      {/* Summary Section */}
+      <MatchingSummary result={matchingResult} />
+
+      {/* Coverage Gaps Section */}
+      {matchingResult?.coverage_gaps?.length > 0 && (
+        <div className="space-y-4">
+          <h2 className="text-xl font-semibold text-gray-900">Coverage Gaps</h2>
+          <p className="text-gray-600 text-sm">
+            These job requirements need attention to strengthen your application.
+          </p>
+          {matchingResult.coverage_gaps.map((gap, index) => (
+            <CoverageGapCard
+              key={`gap-${index}`}
+              gap={gap}
+              gapId={`gap-${index}`}
+              onSeeSuggestions={handleSeeSuggestions}
+            />
+          ))}
+        </div>
+      )}
+
+      {/* Selected Sections */}
+      {matchingResult.selected_sections?.length > 0 && (
+        <div className="space-y-4">
+          <h2 className="text-xl font-semibold text-gray-900">Selected Profile Sections</h2>
+          <p className="text-gray-600 text-sm">
+            These sections from your profile best match the job requirements.
+          </p>
+          {matchingResult.selected_sections.map((selectedSection, index) => (
+            <SelectedSectionCard
+              key={selectedSection.section_id}
+              selectedSection={selectedSection}
+              profileSections={profileSections}
+            />
+          ))}
+        </div>
+      )}
+
+      {currentMatch && matchingResult && (
         <SuggestedSectionModal
           match={currentMatch}
           open={modalOpen}
-          orderedMatchedProfileSections={getOrderedMatchedProfileSections(matches, profileSections)}
+          orderedMatchedProfileSections={getOrderedMatchedProfileSections(matchingResult.selected_sections, profileSections)}
           onClose={() => setModalOpen(false)}
           onSaveAndMatch={handleSaveAndMatch}
           onSaveOnly={handleSaveOnly}
