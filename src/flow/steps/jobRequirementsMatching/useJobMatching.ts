@@ -82,7 +82,7 @@ export const useJobMatching = () => {
   // Handle input changes
   useEffect(() => {
     if (!hasValidInputs) {
-      setShowRematchBanner(false);
+      // setShowRematchBanner(false);
       return;
     }
 
@@ -91,10 +91,10 @@ export const useJobMatching = () => {
       if (isMajorJdChange) {
         // Auto-trigger for major JD changes
         // performMatch();
-        setShowRematchBanner(false);
+        // setShowRematchBanner(false);
       } else {
         // Show banner for minor changes
-        setShowRematchBanner(true);
+        // setShowRematchBanner(true);
       }
     }
   }, [inputsChanged, matches, hasValidInputs, isMajorJdChange]);

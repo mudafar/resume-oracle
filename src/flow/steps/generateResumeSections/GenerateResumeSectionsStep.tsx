@@ -56,7 +56,7 @@ const GenerateResumeSections: React.FC = () => {
   useEffect(() => {
     // Adjust logic to check if `apiPayload` has entries
     if (!resumeSections.length && Object.keys(apiPayload).length > 0) {
-      triggerGenerate(apiPayload);
+      // triggerGenerate(apiPayload);
     }
     // eslint-disable-next-line
   }, []);
@@ -90,7 +90,7 @@ const GenerateResumeSections: React.FC = () => {
   useEffect(() => {
     if (selectedSections.length && profileSections.length) {
       if (apiPayload) {
-        triggerGenerate(apiPayload);
+        // triggerGenerate(apiPayload);
       }
     }
     // eslint-disable-next-line

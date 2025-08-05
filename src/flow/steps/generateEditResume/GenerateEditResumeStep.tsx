@@ -75,15 +75,15 @@ const GenerateEditResume: React.FC = () => {
 
   useEffect(() => {
     if (!resume && resumeSections.length > 0) {
-      triggerGenerateResume(apiPayload)
-        .then((data) => {
-          if (!data) return;
-          const markdown = convertToMarkdown(data);
-          dispatch(setResume(markdown));
-          setEditedResume(markdown);
-          dispatch(setOptimizationSummary(data.optimization_summary || null));
-          dispatch(setLastResumeInputsHash(inputsHash));
-        });
+      // triggerGenerateResume(apiPayload)
+      //   .then((data) => {
+      //     if (!data) return;
+      //     const markdown = convertToMarkdown(data);
+      //     dispatch(setResume(markdown));
+      //     setEditedResume(markdown);
+      //     dispatch(setOptimizationSummary(data.optimization_summary || null));
+      //     dispatch(setLastResumeInputsHash(inputsHash));
+      //   });
     }
   }, []);
 

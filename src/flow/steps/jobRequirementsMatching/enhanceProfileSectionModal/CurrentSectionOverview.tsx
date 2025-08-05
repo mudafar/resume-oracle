@@ -29,13 +29,14 @@ export const CurrentSectionOverview: React.FC<CurrentSectionOverviewProps> = ({
       <CardContent className="space-y-3">
         <div className="flex items-center gap-2">
           <h4 className="font-semibold">{profileSection.type}</h4>
-          <Badge variant="outline" className="text-xs">
+          {/* <Badge variant="outline" className="text-xs">
             {Math.round(selectedSection.total_weighted_score)} pts
-          </Badge>
+          </Badge> */}
         </div>
         <div className="bg-gray-50 rounded p-3 text-sm">
-          <pre className="whitespace-pre-line text-gray-700">
-            {sectionPreview}
+          <pre className="whitespace-pre-line text-gray-700 max-h-50 overflow-auto">
+            {profileSection.content}
+            {/* {sectionPreview} */}
           </pre>
         </div>
       </CardContent>

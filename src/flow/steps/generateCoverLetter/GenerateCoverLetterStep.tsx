@@ -70,16 +70,16 @@ const GenerateCoverLetter: React.FC = () => {
 
   useEffect(() => {
     if (!coverLetter && apiPayload.profileSectionsWithRequirements.length > 0) {
-      generateCoverLetter(
-        apiPayload.profileSectionsWithRequirements,
-        apiPayload.companyContext,
-        apiPayload.toneGuidance
-      ).then((data) => {
-        if (!data) return;
-        dispatch(setCoverLetter(data.cover_letter_markdown || ""));
-        dispatch(setOptimizationSummary(data.optimization_summary || null));
-        dispatch(setLastCoverLetterInputsHash(inputsHash));
-      });
+      // generateCoverLetter(
+      //   apiPayload.profileSectionsWithRequirements,
+      //   apiPayload.companyContext,
+      //   apiPayload.toneGuidance
+      // ).then((data) => {
+      //   if (!data) return;
+      //   dispatch(setCoverLetter(data.cover_letter_markdown || ""));
+      //   dispatch(setOptimizationSummary(data.optimization_summary || null));
+      //   dispatch(setLastCoverLetterInputsHash(inputsHash));
+      // });
     }
   }, []);
 

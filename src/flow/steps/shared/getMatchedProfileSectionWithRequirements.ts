@@ -15,6 +15,7 @@ export const getMatchedProfileSectionWithRequirements = (
     // Extract all requirements from coverage arrays across all matched pairs
     const allRequirements = section.matched_scored_pairs.flatMap(pair => [
       ...pair.coverage,
+      ...pair.missing,
     ]);
     
     // Remove duplicates while preserving order
