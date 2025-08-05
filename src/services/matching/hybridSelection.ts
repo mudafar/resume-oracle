@@ -41,7 +41,6 @@ export class HybridSelectionService {
       optimizedSelection, 
       gaps, 
       clusters, 
-      profileSections,
       scoredPairs,
       config
     );
@@ -66,7 +65,7 @@ export class HybridSelectionService {
       // Find best match for this critical cluster
       const clusterMatches = scoredPairs
         .filter(pair => 
-          pair.cluster_name === cluster.cluster_name &&
+          pair.cluster_id === cluster.id &&
           pair.raw_score >= config.critical_threshold
         )
         .sort((a, b) => b.raw_score - a.raw_score);
@@ -147,18 +146,22 @@ export class HybridSelectionService {
     let totalValue = 0;
     
     // Get currently covered clusters
-    const coveredClusters = this.getCoveredClusters(currentSelection, allPairs, config);
+    const coveredClusters = this.getCoveredClusters(currentSelection, allPairs, clusters, config);
     
     for (const pair of sectionPairs) {
       // Skip if below threshold
-      if (!this.meetsThreshold(pair, config)) continue;
+      if (!this.meetsThreshold(pair, clusters, config)) continue;
+      
+      // Get cluster info
+      const cluster = clusters.find(c => c.id === pair.cluster_id);
+      if (!cluster) continue;
       
       // Calculate value based on priority and whether cluster is already covered
-      const priorityMultiplier = this.getPriorityMultiplier(pair.cluster_priority);
+      const priorityMultiplier = this.getPriorityMultiplier(cluster.priority_tier);
       let clusterValue = pair.raw_score * priorityMultiplier;
       
       // Reduce value if cluster already covered (but still give some credit for reinforcement)
-      if (coveredClusters.has(pair.cluster_name)) {
+      if (coveredClusters.has(cluster.cluster_name)) {
         clusterValue *= 0.3; // 30% value for reinforcing coverage
       }
       
@@ -178,31 +181,27 @@ export class HybridSelectionService {
     config: SelectionConstraints
   ): CoverageGap[] {
     const gaps: CoverageGap[] = [];
-    const coveredClusters = this.getCoveredClusters(selectedSections, scoredPairs, config);
-    
-    for (const cluster of clusters) {
+    const coveredClusters = this.getCoveredClusters(selectedSections, scoredPairs, clusters, config);
+
+    for (const [index, cluster] of clusters.entries()) {
       if (coveredClusters.has(cluster.cluster_name)) {
         continue; // Cluster is covered
       }
       
       // Find best available match for uncovered cluster
       const clusterMatches = scoredPairs
-        .filter(pair => pair.cluster_name === cluster.cluster_name)
+        .filter(pair => pair.cluster_id === cluster.id)
         .sort((a, b) => b.raw_score - a.raw_score);
       
       const bestMatch = clusterMatches[0];
       const threshold = this.getThresholdForPriority(cluster.priority_tier, config);
       
       gaps.push({
-        cluster_name: cluster.cluster_name,
-        priority: cluster.priority_tier,
+        id: `gap-${index}`,
+        requirement_cluster: cluster,
         gap_type: bestMatch ? 
           (bestMatch.raw_score >= threshold ? "covered" : "below_threshold") : 
           "no_match",
-        best_available_score: bestMatch?.raw_score || null,
-        threshold_needed: threshold,
-        recommendations: this.generateGapRecommendation(cluster, bestMatch, threshold),
-        requirements: cluster.requirements,
       });
     }
     
@@ -216,7 +215,6 @@ export class HybridSelectionService {
     selectedSections: Set<string>,
     gaps: CoverageGap[],
     clusters: RequirementCluster[],
-    profileSections: ProfileSection[],
     scoredPairs: ScoredPair[],
     config: SelectionConstraints
   ): HybridSelectionResult {
@@ -224,114 +222,78 @@ export class HybridSelectionService {
     const selectedSectionsData: SelectedSection[] = [];
     
     for (const sectionId of selectedSections) {
-      // Get profile section details
-      const profileSection = profileSections.find(ps => ps.id === sectionId);
-      if (!profileSection) continue;
+      if(!sectionId) continue; // Skip if no section ID
       
       // Get all matches for this section that meet thresholds
       const sectionMatches = scoredPairs
         .filter(pair => 
           pair.section_id === sectionId && 
-          this.meetsThreshold(pair, config)
+          this.meetsThreshold(pair, clusters, config)
         )
         .sort((a, b) => b.raw_score - a.raw_score);
       
       // Calculate total weighted score for this section
       const totalWeightedScore = sectionMatches.reduce((sum, match) => {
-        const multiplier = this.getPriorityMultiplier(match.cluster_priority);
+        const cluster = clusters.find(c => c.id === match.cluster_id);
+        if (!cluster) return sum;
+        const multiplier = this.getPriorityMultiplier(cluster.priority_tier);
         return sum + (match.raw_score * multiplier);
       }, 0);
       
       // Generate selection rationale
-      const rationale = this.generateSelectionRationale(sectionMatches, totalWeightedScore);
+      const rationale = this.generateSelectionRationale(sectionMatches, clusters, totalWeightedScore);
       
       // Create section title from content (first 50 chars + "...")
-      const sectionTitle = this.generateSectionTitle(profileSection);
+      // const sectionTitle = this.generateSectionTitle(profileSection);
       
       selectedSectionsData.push({
-        section_id: sectionId,
-        section_title: sectionTitle,
-        section_type: profileSection.type,
-        matched_clusters: sectionMatches.map(match => ({
-          cluster_name: match.cluster_name,
-          priority: match.cluster_priority,
-          raw_score: match.raw_score,
-          weighted_score: match.raw_score * this.getPriorityMultiplier(match.cluster_priority),
-          coverage: match.coverage,
-          missing: match.missing,
-          strength_indicators: match.strength_indicators
-        })),
+        profile_section_id: sectionId,
+        matched_scored_pairs: sectionMatches,
         total_weighted_score: totalWeightedScore,
-        selection_rationale: rationale
+        rationale: rationale
       });
     }
     
     // Sort selected sections by total weighted score (highest first)
     selectedSectionsData.sort((a, b) => b.total_weighted_score - a.total_weighted_score);
     
-    // Calculate summary statistics
-    const criticalClusters = clusters.filter(c => c.priority_tier === "critical");
-    const importantClusters = clusters.filter(c => c.priority_tier === "important");
-    const criticalGaps = gaps.filter(g => g.priority === "critical").length;
-    const importantGaps = gaps.filter(g => g.priority === "important").length;
-    
-    const overallCoverage = Math.round(((clusters.length - gaps.length) / clusters.length) * 100);
-    
     return {
       selected_sections: selectedSectionsData,
       coverage_gaps: gaps,
-      summary: {
-        critical_clusters_covered: criticalClusters.length - criticalGaps,
-        critical_clusters_total: criticalClusters.length,
-        important_clusters_covered: importantClusters.length - importantGaps,
-        important_clusters_total: importantClusters.length,
-        overall_coverage: `${overallCoverage}%`,
-        profile_sections_used: selectedSections.size,
-        critical_gaps: criticalGaps
-      }
     };
   }
   
-  /**
-   * Generate a concise title for a profile section
-   */
-  private generateSectionTitle(profileSection: ProfileSection): string {
-    const content = profileSection.content.trim();
-    
-    // Try to extract a title from the first line or sentence
-    const firstLine = content.split('\n')[0];
-    const firstSentence = content.split('.')[0];
-    
-    // Use the shorter of first line or first sentence, max 60 chars
-    const candidate = firstLine.length < firstSentence.length ? firstLine : firstSentence;
-    
-    if (candidate.length <= 60) {
-      return candidate;
-    }
-    
-    // Truncate and add ellipsis
-    return candidate.substring(0, 57) + "...";
-  }
+  // Removed generateSectionTitle method since section_title is now populated by UI layer
   
   /**
    * Generate rationale for why this section was selected
    */
-  private generateSelectionRationale(matches: ScoredPair[], totalScore: number): string {
+  private generateSelectionRationale(matches: ScoredPair[], clusters: RequirementCluster[], totalScore: number): string {
     if (matches.length === 0) {
       return "Selected for specialized expertise";
     }
     
-    // Categorize matches by priority
-    const criticalMatches = matches.filter(m => m.cluster_priority === "critical");
-    const importantMatches = matches.filter(m => m.cluster_priority === "important");
-    const niceToHaveMatches = matches.filter(m => m.cluster_priority === "nice_to_have");
+    // Categorize matches by priority using cluster lookup
+    const criticalMatches = matches.filter(m => {
+      const cluster = clusters.find(c => c.id === m.cluster_id);
+      return cluster?.priority_tier === "critical";
+    });
+    const importantMatches = matches.filter(m => {
+      const cluster = clusters.find(c => c.id === m.cluster_id);
+      return cluster?.priority_tier === "important";
+    });
+    const niceToHaveMatches = matches.filter(m => {
+      const cluster = clusters.find(c => c.id === m.cluster_id);
+      return cluster?.priority_tier === "nice_to_have";
+    });
     
     const parts: string[] = [];
     
     // Critical coverage
     if (criticalMatches.length > 0) {
       if (criticalMatches.length === 1) {
-        parts.push(`Covers critical ${criticalMatches[0].cluster_name.toLowerCase()} requirement`);
+        const cluster = clusters.find(c => c.id === criticalMatches[0].cluster_id);
+        parts.push(`Covers critical ${cluster?.cluster_name?.toLowerCase() || 'requirement'} requirement`);
       } else {
         parts.push(`Covers ${criticalMatches.length} critical requirements`);
       }
@@ -376,21 +338,28 @@ export class HybridSelectionService {
   private getCoveredClusters(
     selectedSections: Set<string>, 
     scoredPairs: ScoredPair[], 
+    clusters: RequirementCluster[],
     config: SelectionConstraints
   ): Set<string> {
     const covered = new Set<string>();
     
     for (const pair of scoredPairs) {
-      if (selectedSections.has(pair.section_id) && this.meetsThreshold(pair, config)) {
-        covered.add(pair.cluster_name);
+      if (selectedSections.has(pair.section_id) && this.meetsThreshold(pair, clusters, config)) {
+        const cluster = clusters.find(c => c.id === pair.cluster_id);
+        if (cluster) {
+          covered.add(cluster.cluster_name);
+        }
       }
     }
     
     return covered;
   }
 
-  private meetsThreshold(pair: ScoredPair, config: SelectionConstraints): boolean {
-    const threshold = this.getThresholdForPriority(pair.cluster_priority, config);
+  private meetsThreshold(pair: ScoredPair, clusters: RequirementCluster[], config: SelectionConstraints): boolean {
+    const cluster = clusters.find(c => c.id === pair.cluster_id);
+    if (!cluster) return false;
+    
+    const threshold = this.getThresholdForPriority(cluster.priority_tier, config);
     return pair.raw_score >= threshold;
   }
 
@@ -421,27 +390,13 @@ export class HybridSelectionService {
     const coveredClusters = this.getCoveredClusters(
       selectedSections, 
       scoredPairs, 
+      clusters,
       config
     );
     return coveredClusters.size / clusters.length;
   }
 
-  private generateGapRecommendation(
-    cluster: RequirementCluster, 
-    bestMatch: ScoredPair | undefined, 
-    threshold: number
-  ): string {
-    if (!bestMatch) {
-      return `Add experience in ${cluster.requirements.join(", ")} through projects, courses, or professional work`;
-    }
-    
-    if (bestMatch.raw_score < threshold) {
-      const gap = threshold - bestMatch.raw_score;
-      return `Strengthen existing experience by adding ${bestMatch.missing.join(", ")} or demonstrating deeper expertise`;
-    }
-    
-    return "Requirements are adequately covered";
-  }
+  // Removed generateGapRecommendation method since recommendations field is commented out in schema
 }
 
 export const hybridSelectionService = new HybridSelectionService();

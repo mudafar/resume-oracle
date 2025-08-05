@@ -27,7 +27,7 @@ interface ResumeSection {
 
 const GenerateResumeSections: React.FC = () => {
   const dispatch = useDispatch();
-  const selectedSections = useSelector((state: RootState) => state.matches.data?.selected_sections || []);
+  const selectedSections = useSelector((state: RootState) => state.matches.selected_sections);
   const profileSections = useSelector((state: RootState) => state.profileSections.sections || []);
   const resumeSections = useSelector((state: RootState) => state.resumeSections.resumeSections || []);
   const lastInputsHash = useSelector((state: RootState) => state.resumeSections.lastInputsHash);
@@ -78,8 +78,8 @@ const GenerateResumeSections: React.FC = () => {
   const referenceMap = useMemo(() => {
     const map: { [id: string]: { requirement: string }[] } = {};
     selectedSections.forEach((section) => {
-      map[section.section_id] = section.matched_clusters.map(cluster => ({
-        requirement: cluster.cluster_name,
+      map[section.profile_section_id] = section.matched_scored_pairs.map(pair => ({
+        requirement: pair.coverage.join(', '), // Join coverage requirements
       }));
     });
     return map;

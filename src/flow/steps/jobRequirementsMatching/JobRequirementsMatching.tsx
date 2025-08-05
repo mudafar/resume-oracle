@@ -1,5 +1,5 @@
 "use client";
-import React from "react";
+import React, { useState, useEffect } from "react";
 // Utility to get profile sections referenced by matches
 import { ProfileSection } from "@/store/slices/profileSectionsSlice";
 import { createStep } from "@/utils/createStep";
@@ -7,14 +7,17 @@ import { SuggestedSectionModal } from "./suggestedSectionModal";
 import { RematchBanner, MatchCard, useJobMatching } from ".";
 import { CoverageGapCard } from "./CoverageGapCard";
 import { SelectedSectionCard } from "./SelectedSectionCard";
-import { MatchingSummary } from "./MatchingSummary";
+import { FillGapModal } from "./FillGapModal";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { AlertCircle, FileWarning } from 'lucide-react';
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
 import { RootState } from "@/store/store";
-import { HybridSelectionResult } from "@/services/zodModels";
+import { HybridSelectionResult, CoverageGap } from "@/services/zodModels";
+import { addProfileSectionReturnId } from "../createProfileSection";
+import { editSection } from "@/store/slices/profileSectionsSlice";
+import { markGapAsFilled } from "@/store/slices/matchesSlice";
 
 
 function getOrderedMatchedProfileSections(
@@ -63,6 +66,11 @@ const ErrorState = ({ onRetry }: { onRetry: () => void }) => (
 );
 
 export const JobRequirementsMatching: React.FC = () => {
+  const dispatch = useDispatch();
+  const [fillGapModalOpen, setFillGapModalOpen] = useState(false);
+  const [selectedGap, setSelectedGap] = useState<CoverageGap | null>(null);
+  const [selectedGapId, setSelectedGapId] = useState<string>("");
+
   const { 
     matches,
     profileSections,
@@ -80,13 +88,67 @@ export const JobRequirementsMatching: React.FC = () => {
     handleSaveOnly,
   } = useJobMatching();
 
-  // Replace `matchingResult` with the Redux state
-  const matchingResult = useSelector((state: RootState) => state.matches.data);
+  // Use the flattened Redux state structure
+  const matchingResult = useSelector((state: RootState) => ({
+    selected_sections: state.matches.selected_sections,
+    coverage_gaps: state.matches.coverage_gaps
+  }));
 
-  // Update `currentMatch` logic to work with `HybridSelectionResult`
+  // Update `currentMatch` logic to work with simplified `HybridSelectionResult`
   const currentMatch = modalMatchId
-    ? matchingResult?.selected_sections.find(section => section.section_id === modalMatchId)
+    ? matchingResult?.selected_sections.find(section => section.profile_section_id === modalMatchId)
     : null;
+
+  const handleFillGap = (gap: CoverageGap, gapId: string) => {
+    setSelectedGap(gap);
+    setSelectedGapId(gapId);
+    setFillGapModalOpen(true);
+  };
+
+  const handleSaveAndMarkCovered = (
+    content: string,
+    isNewSection: boolean,
+    sectionId?: string,
+    sectionType?: string
+  ) => {
+    let finalSectionId = sectionId;
+    let finalSectionTitle = "";
+    let finalSectionType = sectionType || "";
+
+    if (isNewSection && sectionType) {
+      // Create new profile section
+      const newSectionId = addProfileSectionReturnId(dispatch, sectionType, content);
+      finalSectionId = newSectionId;
+      finalSectionTitle = sectionType; // Use type as title for new sections
+      finalSectionType = sectionType;
+    } else if (sectionId) {
+      // Update existing profile section
+      const existingSection = profileSections.find(ps => ps.id === sectionId);
+      if (existingSection) {
+        dispatch(editSection({
+          id: sectionId,
+          type: existingSection.type,
+          content: content
+        }));
+        finalSectionTitle = existingSection.type;
+        finalSectionType = existingSection.type;
+      }
+    }
+    
+    // Mark the gap as filled in the Redux store (removes gap and adds to selected sections)
+    if (finalSectionId) {
+      dispatch(markGapAsFilled({
+        gapId: selectedGapId,
+        profileSectionId: finalSectionId,
+        profileSectionTitle: finalSectionTitle,
+        profileSectionType: finalSectionType
+      }));
+    }
+    
+    setFillGapModalOpen(false);
+    setSelectedGap(null);
+    setSelectedGapId("");
+  };
 
   if (!job_description.trim() || profileSections.length === 0) {
     return <div className="text-gray-500">Please complete previous steps to see job requirements matching.</div>;
@@ -109,9 +171,7 @@ export const JobRequirementsMatching: React.FC = () => {
       {(showRematchBanner || true) && (
         <RematchBanner onRematch={onRematch} onDismiss={() => setShowRematchBanner(false)} />
       )}
-      
-      {/* Summary Section */}
-      <MatchingSummary result={matchingResult} />
+    
 
       {/* Coverage Gaps Section */}
       {matchingResult?.coverage_gaps?.length > 0 && (
@@ -120,14 +180,29 @@ export const JobRequirementsMatching: React.FC = () => {
           <p className="text-gray-600 text-sm">
             These job requirements need attention to strengthen your application.
           </p>
+          
+          {/* Display all coverage gaps (Redux automatically removes filled ones) */}
           {matchingResult.coverage_gaps.map((gap, index) => (
             <CoverageGapCard
               key={`gap-${index}`}
               gap={gap}
               gapId={`gap-${index}`}
               onSeeSuggestions={handleSeeSuggestions}
+              onFillGap={handleFillGap}
             />
           ))}
+          
+          {/* Show message when no gaps remain */}
+          {matchingResult.coverage_gaps.length === 0 && (
+            <div className="text-center py-8 bg-green-50 rounded-lg border border-green-200">
+              <div className="text-green-600 text-lg font-semibold mb-2">
+                🎉 All Coverage Gaps Addressed!
+              </div>
+              <p className="text-green-700 text-sm">
+                You've successfully filled all identified gaps. Your profile now better matches the job requirements.
+              </p>
+            </div>
+          )}
         </div>
       )}
 
@@ -140,7 +215,7 @@ export const JobRequirementsMatching: React.FC = () => {
           </p>
           {matchingResult.selected_sections.map((selectedSection, index) => (
             <SelectedSectionCard
-              key={selectedSection.section_id}
+              key={selectedSection.profile_section_id}
               selectedSection={selectedSection}
               profileSections={profileSections}
             />
@@ -157,6 +232,16 @@ export const JobRequirementsMatching: React.FC = () => {
           onSaveAndMatch={handleSaveAndMatch}
           onSaveOnly={handleSaveOnly}
           onSkip={() => setModalOpen(false)}
+        />
+      )}
+
+      {selectedGap && (
+        <FillGapModal
+          open={fillGapModalOpen}
+          onClose={() => setFillGapModalOpen(false)}
+          gap={selectedGap}
+          profileSections={profileSections}
+          onSaveAndMarkCovered={handleSaveAndMarkCovered}
         />
       )}
     </div>

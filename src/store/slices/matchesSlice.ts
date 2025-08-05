@@ -1,26 +1,36 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { HybridSelectionResult } from "@/services/zodModels";
+import { HybridSelectionResult, SelectedSection, CoverageGap } from "@/services/zodModels";
 
-// Update MatchesState to store HybridSelectionResult
+// Simplified MatchesState with flat structure
 type MatchesState = {
-  data: HybridSelectionResult | null;
+  selected_sections: SelectedSection[];
+  coverage_gaps: CoverageGap[];
   lastInputsHash: string | null;
   lastJobDescription: string | null;
 };
 
 // Update initialState
 const initialState: MatchesState = {
-  data: null,
+  selected_sections: [],
+  coverage_gaps: [],
   lastInputsHash: null,
   lastJobDescription: null,
 };
+
+interface MarkGapAsFilledPayload {
+  gapId: string;
+  profileSectionId: string;
+  profileSectionTitle: string;
+  profileSectionType: string;
+}
 
 export const matchesSlice = createSlice({
   name: "matches",
   initialState,
   reducers: {
     setMatches: (state, action: PayloadAction<HybridSelectionResult>) => {
-      state.data = action.payload;
+      state.selected_sections = action.payload.selected_sections;
+      state.coverage_gaps = action.payload.coverage_gaps;
     },
     setLastInputsHash: (state, action: PayloadAction<string>) => {
       state.lastInputsHash = action.payload;
@@ -28,8 +38,78 @@ export const matchesSlice = createSlice({
     setLastJobDescription: (state, action: PayloadAction<string>) => {
       state.lastJobDescription = action.payload;
     },
+    markGapAsFilled: (state, action: PayloadAction<MarkGapAsFilledPayload>) => {
+      const { gapId, profileSectionId, profileSectionTitle, profileSectionType } = action.payload;
+      
+      // Find the gap by parsing the gapId (format: "gap-{index}")
+      const gapIndex = parseInt(gapId.replace('gap-', ''));
+      const gap = state.coverage_gaps[gapIndex];
+      
+      if (!gap) return;
+
+      // Remove the gap from coverage_gaps array
+      state.coverage_gaps.splice(gapIndex, 1);
+
+      // Check if this profile section already exists in selected_sections
+      const existingSelectedSection = state.selected_sections.find(
+        section => section.profile_section_id === profileSectionId
+      );
+
+      if (existingSelectedSection) {
+        // Create a new ScoredPair for the filled gap
+        const newScoredPair = {
+          section_id: profileSectionId,
+          cluster_id: gap.requirement_cluster.id,
+          raw_score: 85, // High score since gap was filled
+          coverage: gap.requirement_cluster.requirements || [gap.requirement_cluster.cluster_name],
+          missing: [], // No missing items since gap was filled
+          strength_indicators: [`Addressed ${gap.requirement_cluster.cluster_name} requirement through profile enhancement`],
+          evidence: "Enhanced profile section to address coverage gap",
+          enhancement_suggestions: []
+        };
+
+        // Add to existing selected section
+        existingSelectedSection.matched_scored_pairs.push(newScoredPair);
+
+        // Recalculate total weighted score (simplified - just add new score)
+        const priorityMultiplier = gap.requirement_cluster.priority_tier === 'critical' ? 3 : 
+                                   gap.requirement_cluster.priority_tier === 'important' ? 2 : 1;
+        existingSelectedSection.total_weighted_score += newScoredPair.raw_score * priorityMultiplier;
+
+        // Update selection rationale
+        existingSelectedSection.rationale += ` Additionally enhanced to address ${gap.requirement_cluster.cluster_name} requirement.`;
+      } else {
+        // Create new ScoredPair for the new section
+        const newScoredPair = {
+          section_id: profileSectionId,
+          cluster_id: gap.requirement_cluster.id,
+          raw_score: 85,
+          coverage: gap.requirement_cluster.requirements || [gap.requirement_cluster.cluster_name],
+          missing: [],
+          strength_indicators: [`Addresses ${gap.requirement_cluster.cluster_name} requirement through targeted enhancement`],
+          evidence: "New profile section created to address coverage gap",
+          enhancement_suggestions: []
+        };
+
+        // Calculate weighted score
+        const priorityMultiplier = gap.requirement_cluster.priority_tier === 'critical' ? 3 : 
+                                   gap.requirement_cluster.priority_tier === 'important' ? 2 : 1;
+
+        // Create new selected section
+        const newSelectedSection: SelectedSection = {
+          profile_section_id: profileSectionId,
+          matched_scored_pairs: [newScoredPair],
+          total_weighted_score: newScoredPair.raw_score * priorityMultiplier,
+          rationale: `Selected to address ${gap.requirement_cluster.cluster_name} requirement that was identified as a coverage gap.`
+        };
+
+        // Add to selected sections
+        state.selected_sections.push(newSelectedSection);
+      }
+    },
     clearMatches: (state) => {
-      state.data = null;
+      state.selected_sections = [];
+      state.coverage_gaps = [];
       state.lastInputsHash = null;
       state.lastJobDescription = null;
     },
@@ -40,6 +120,7 @@ export const {
   setMatches,
   setLastInputsHash,
   setLastJobDescription,
+  markGapAsFilled,
   clearMatches,
 } = matchesSlice.actions;
 

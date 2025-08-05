@@ -61,7 +61,7 @@ function getConfidenceIcon(confidence: number | null) {
 const MatchedProfileSections: React.FC = () => {
   const dispatch = useDispatch();
   const profileSections = useSelector((state: RootState) => state.profileSections.sections);
-  const selectedSections = useSelector((state: RootState) => state.matches.data?.selected_sections || []);
+  const selectedSections = useSelector((state: RootState) => state.matches.selected_sections);
   const [openSections, setOpenSections] = useState<{ [id: string]: boolean }>({});
   const [modalOpen, setModalOpen] = useState(false);
   const [selectedSection, setSelectedSection] = useState<MatchedProfileSection | null>(null);
@@ -69,16 +69,16 @@ const MatchedProfileSections: React.FC = () => {
   // Filter out undefined `profileSection` values
   const matchedProfileSections = selectedSections
     .map((section) => {
-      const profileSection = profileSections.find(ps => ps.id === section.section_id);
+      const profileSection = profileSections.find(ps => ps.id === section.profile_section_id);
       if (!profileSection) return null; // Skip if no matching profile section
 
       return {
         profileSection,
-        baseJobRequirementMatches: section.matched_clusters.map(cluster => ({
-          requirement: cluster.cluster_name,
-          confidence: cluster.weighted_score,
-          gap_description: cluster.missing.join(", "),
-          recommendation: cluster.strength_indicators.join(", ")
+        baseJobRequirementMatches: section.matched_scored_pairs.map(pair => ({
+          requirement: pair.coverage.join(', '), // Join coverage requirements  
+          confidence: pair.raw_score,
+          gap_description: pair.missing.join(', '), // Join missing requirements
+          recommendation: pair.enhancement_suggestions.join(', ') // Join suggestions
         }))
       };
     })
@@ -106,8 +106,8 @@ const MatchedProfileSections: React.FC = () => {
       }));
       // Remove gaps and recommendations from all matches for this profile section
       selectedSections.forEach((section) => {
-        section.matched_clusters.forEach((match) => {
-          if (selectedSection?.profileSection.id === match.cluster_name) {
+        section.matched_scored_pairs.forEach((pair) => {
+          if (selectedSection?.profileSection.id === pair.section_id) {
             // dispatch(updateMatch({
             //   id: match.id,
             //   match: {

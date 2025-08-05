@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
-import { CheckCircle, ChevronDown, ChevronUp, Star, Target } from 'lucide-react';
+import { CheckCircle, ChevronDown, ChevronUp, Star } from 'lucide-react';
 import { SelectedSection } from "@/services/zodModels";
 import { ProfileSection } from "@/store/slices/profileSectionsSlice";
 import { generateTextPreview } from "@/utils/textPreview";
@@ -15,24 +15,6 @@ interface SelectedSectionCardProps {
   profileSections: ProfileSection[];
 }
 
-const getPriorityColor = (priority: string) => {
-  switch (priority) {
-    case 'critical': return 'bg-red-500 text-white';
-    case 'important': return 'bg-orange-500 text-white';
-    case 'nice_to_have': return 'bg-blue-500 text-white';
-    default: return 'bg-gray-500 text-white';
-  }
-};
-
-const getPriorityIcon = (priority: string) => {
-  switch (priority) {
-    case 'critical': return '🔥';
-    case 'important': return '⚡';
-    case 'nice_to_have': return '✨';
-    default: return '📋';
-  }
-};
-
 export const SelectedSectionCard: React.FC<SelectedSectionCardProps> = ({ 
   selectedSection, 
   profileSections 
@@ -40,7 +22,7 @@ export const SelectedSectionCard: React.FC<SelectedSectionCardProps> = ({
   const [expanded, setExpanded] = useState(false);
   const [clustersExpanded, setClustersExpanded] = useState(false);
 
-  const profileSection = profileSections.find(ps => ps.id === selectedSection.section_id);
+  const profileSection = profileSections.find(ps => ps.id === selectedSection.profile_section_id);
   
   const { preview, isExpandable } = profileSection
     ? generateTextPreview(profileSection.content)
@@ -67,8 +49,8 @@ export const SelectedSectionCard: React.FC<SelectedSectionCardProps> = ({
           {/* Section Details */}
           <div>
             <div className="flex items-center gap-2 mb-2">
-              <h4 className="font-semibold text-lg">{selectedSection.section_title}</h4>
-              <Badge variant="outline">{selectedSection.section_type}</Badge>
+              <h4 className="font-semibold text-lg">{profileSection?.type || 'Unknown Section'}</h4>
+              <Badge variant="outline">{profileSection?.type || 'Unknown Type'}</Badge>
             </div>
             
             {/* Section Content */}
@@ -103,14 +85,14 @@ export const SelectedSectionCard: React.FC<SelectedSectionCardProps> = ({
           {/* Selection Rationale */}
           <div className="bg-blue-50 rounded p-3">
             <h5 className="font-medium mb-1 text-blue-800">Why This Section Was Selected</h5>
-            <p className="text-sm text-blue-700">{selectedSection.selection_rationale}</p>
+            <p className="text-sm text-blue-700">{selectedSection.rationale}</p>
           </div>
 
           {/* Matched Clusters */}
           <Collapsible open={clustersExpanded} onOpenChange={setClustersExpanded}>
             <CollapsibleTrigger asChild>
               <Button variant="outline" className="w-full justify-between">
-                <span>Matched Requirements ({selectedSection.matched_clusters.length})</span>
+                <span>Matched Requirements ({selectedSection.matched_scored_pairs.length})</span>
                 {clustersExpanded ? (
                   <ChevronUp className="h-4 w-4" />
                 ) : (
@@ -119,21 +101,18 @@ export const SelectedSectionCard: React.FC<SelectedSectionCardProps> = ({
               </Button>
             </CollapsibleTrigger>
             <CollapsibleContent className="space-y-3 mt-3">
-              {selectedSection.matched_clusters.map((cluster, index) => (
+              {selectedSection.matched_scored_pairs.map((pair, index) => (
                 <div key={index} className="border rounded p-3 bg-white">
                   <div className="flex items-center justify-between mb-2">
                     <div className="flex items-center gap-2">
-                      <span>{getPriorityIcon(cluster.priority)}</span>
-                      <h6 className="font-semibold">{cluster.cluster_name}</h6>
-                      <Badge className={getPriorityColor(cluster.priority)}>
-                        {cluster.priority.replace('_', ' ')}
+                      <span>📋</span>
+                      <h6 className="font-semibold">Job Requirement Match</h6>
+                      <Badge variant="secondary">
+                        Score: {Math.round(pair.raw_score)}%
                       </Badge>
                     </div>
                     <div className="text-right">
-                      <div className="text-sm font-bold">{Math.round(cluster.weighted_score)} pts</div>
-                      <div className="text-xs text-gray-500">
-                        Raw: {Math.round(cluster.raw_score)}
-                      </div>
+                      <div className="text-sm font-bold">{Math.round(pair.raw_score)} pts</div>
                     </div>
                   </div>
 
@@ -141,15 +120,15 @@ export const SelectedSectionCard: React.FC<SelectedSectionCardProps> = ({
                   <div className="space-y-2">
                     <div className="flex items-center gap-2">
                       <span className="text-sm font-medium">Score:</span>
-                      <Progress value={cluster.raw_score} className="flex-1" />
-                      <span className="text-sm">{Math.round(cluster.raw_score)}%</span>
+                      <Progress value={pair.raw_score} className="flex-1" />
+                      <span className="text-sm">{Math.round(pair.raw_score)}%</span>
                     </div>
 
-                    {cluster.coverage.length > 0 && (
+                    {pair.coverage.length > 0 && (
                       <div>
                         <span className="text-sm font-medium text-green-700">✓ Covered:</span>
                         <div className="flex flex-wrap gap-1 mt-1">
-                          {cluster.coverage.map((item, idx) => (
+                          {pair.coverage.map((item: string, idx: number) => (
                             <Badge key={idx} variant="secondary" className="text-xs bg-green-100 text-green-800">
                               {item}
                             </Badge>
@@ -158,11 +137,11 @@ export const SelectedSectionCard: React.FC<SelectedSectionCardProps> = ({
                       </div>
                     )}
 
-                    {cluster.missing.length > 0 && (
+                    {pair.missing.length > 0 && (
                       <div>
                         <span className="text-sm font-medium text-orange-700">⚠ Missing:</span>
                         <div className="flex flex-wrap gap-1 mt-1">
-                          {cluster.missing.map((item, idx) => (
+                          {pair.missing.map((item: string, idx: number) => (
                             <Badge key={idx} variant="secondary" className="text-xs bg-orange-100 text-orange-800">
                               {item}
                             </Badge>
@@ -171,16 +150,23 @@ export const SelectedSectionCard: React.FC<SelectedSectionCardProps> = ({
                       </div>
                     )}
 
-                    {cluster.strength_indicators.length > 0 && (
+                    {pair.strength_indicators.length > 0 && (
                       <div>
                         <span className="text-sm font-medium text-blue-700">💪 Strengths:</span>
                         <div className="flex flex-wrap gap-1 mt-1">
-                          {cluster.strength_indicators.map((item, idx) => (
+                          {pair.strength_indicators.map((item: string, idx: number) => (
                             <Badge key={idx} variant="secondary" className="text-xs bg-blue-100 text-blue-800">
                               {item}
                             </Badge>
                           ))}
                         </div>
+                      </div>
+                    )}
+
+                    {pair.evidence && (
+                      <div className="mt-2">
+                        <span className="text-sm font-medium text-gray-700">Evidence:</span>
+                        <p className="text-sm text-gray-600 mt-1">{pair.evidence}</p>
                       </div>
                     )}
                   </div>

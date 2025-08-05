@@ -136,6 +136,7 @@ export class JobRequirementsMatchingService {
         Type: ${cluster.cluster_type}
         Requirements: ${cluster.requirements.map(req => `\n  • ${req}`).join('')}
         Rationale: ${cluster.rationale}
+        ID: ${cluster.id}
       ---`
     ).join('\n\n');
   }

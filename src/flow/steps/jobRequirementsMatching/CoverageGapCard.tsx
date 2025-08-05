@@ -10,6 +10,7 @@ import { CoverageGap } from "@/services/zodModels";
 interface CoverageGapCardProps {
   gap: CoverageGap;
   onSeeSuggestions: (clusterName: string, gapId: string) => void;
+  onFillGap: (gap: CoverageGap, gapId: string) => void;
   gapId: string;
 }
 
@@ -43,11 +44,9 @@ const getGapTypeLabel = (gapType: string) => {
 export const CoverageGapCard: React.FC<CoverageGapCardProps> = ({ 
   gap, 
   onSeeSuggestions, 
+  onFillGap,
   gapId 
 }) => {
-  const scorePercentage = gap.best_available_score ? 
-    Math.min(100, (gap.best_available_score / gap.threshold_needed) * 100) : 0;
-
   return (
     <Card className="border-l-4 border-red-500 bg-red-50">
       <CardHeader>
@@ -56,43 +55,33 @@ export const CoverageGapCard: React.FC<CoverageGapCardProps> = ({
             {getGapTypeIcon(gap.gap_type)}
             <span className="ml-2">Coverage Gap</span>
           </div>
-          <Badge className={getPriorityColor(gap.priority)}>
-            {gap.priority.replace('_', ' ').toUpperCase()}
+          <Badge className={getPriorityColor(gap.requirement_cluster.priority_tier)}>
+            {gap.requirement_cluster.priority_tier.replace('_', ' ').toUpperCase()}
           </Badge>
         </CardTitle>
       </CardHeader>
       <CardContent>
         <div className="space-y-4">
           <div>
-            <h4 className="font-semibold text-lg">{gap.cluster_name}</h4>
+            <h4 className="font-semibold text-lg">{gap.requirement_cluster.cluster_name}</h4>
             <div className="flex items-center gap-2 mt-2">
               <Badge variant="outline">{getGapTypeLabel(gap.gap_type)}</Badge>
+              <Badge variant="secondary" className="text-xs">
+                {gap.requirement_cluster.cluster_type}
+              </Badge>
             </div>
           </div>
 
-          {gap.best_available_score !== null && (
-            <div>
-              <div className="flex items-center justify-between mb-2">
-                <span className="text-sm font-medium">Best Available Score</span>
-                <span className="text-sm">{gap.best_available_score}/{gap.threshold_needed}</span>
-              </div>
-              <Progress value={scorePercentage} className="w-full" />
-              <p className="text-xs text-gray-600 mt-1">
-                {scorePercentage.toFixed(1)}% of required threshold
-              </p>
-            </div>
-          )}
-
           <div>
-            <h5 className="font-medium mb-2">Recommendations</h5>
-            <p className="text-gray-700 text-sm">{gap.recommendations}</p>
+            <h5 className="font-medium mb-2">Rationale</h5>
+            <p className="text-gray-700 text-sm">{gap.requirement_cluster.rationale}</p>
           </div>
 
           <div>
             <h5 className="font-medium mb-2">Requirements</h5>
-            {(gap.requirements ?? []).length > 0 ? (
+            {gap.requirement_cluster.requirements.length > 0 ? (
               <div className="flex flex-wrap gap-1">
-                {(gap.requirements ?? []).map((requirement, idx) => (
+                {gap.requirement_cluster.requirements.map((requirement: string, idx: number) => (
                   <Badge key={idx} variant="secondary" className="text-xs bg-gray-100 text-gray-800">
                     {requirement}
                   </Badge>
@@ -105,11 +94,12 @@ export const CoverageGapCard: React.FC<CoverageGapCardProps> = ({
 
           <div className="flex gap-2">
             <Button 
-              onClick={() => onSeeSuggestions(gap.cluster_name, gapId)}
+              onClick={() => onFillGap(gap, gapId)}
               size="sm"
+              className="bg-blue-600 hover:bg-blue-700"
             >
               <Sparkles className="mr-2 h-4 w-4" />
-              See Suggestions
+              Fill This Gap
             </Button>
             <Button variant="ghost" size="sm">
               Skip for Now

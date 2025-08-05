@@ -19,7 +19,10 @@ import {
 
 export const useJobMatching = () => {
   const dispatch = useDispatch();
-  const matches = useSelector((state: RootState) => state.matches.data);
+  const matches = useSelector((state: RootState) => ({
+    selected_sections: state.matches.selected_sections,
+    coverage_gaps: state.matches.coverage_gaps
+  }));
   const lastInputsHash = useSelector((state: RootState) => state.matches.lastInputsHash);
   const lastJobDescription = useSelector((state: RootState) => state.matches.lastJobDescription);
   const profileSections = useSelector((state: RootState) => state.profileSections.sections);
@@ -71,7 +74,7 @@ export const useJobMatching = () => {
   // Initial load effect
   useEffect(() => {
     if (!matches && hasValidInputs) {
-      performMatch();
+      // performMatch();
     }
     // eslint-disable-next-line
   }, [matches, hasValidInputs]);
@@ -87,7 +90,7 @@ export const useJobMatching = () => {
       // Check for major JD change
       if (isMajorJdChange) {
         // Auto-trigger for major JD changes
-        performMatch();
+        // performMatch();
         setShowRematchBanner(false);
       } else {
         // Show banner for minor changes

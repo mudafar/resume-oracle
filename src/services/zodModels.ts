@@ -132,6 +132,7 @@ export type GeneratedCoverLetterResult = z.infer<typeof GeneratedCoverLetterResu
 
 // Enhanced schema with prioritization and clustering
 export const RequirementClusterSchema = z.object({
+  id: z.string().describe("Unique identifier for the requirement cluster, e.g., 'cluster-1', 'cluster-2', etc."),
   cluster_name: z.string().describe("Descriptive name for this requirement cluster"),
   priority_tier: z.enum(["critical", "important", "nice_to_have"]).describe("Priority level: critical (must-have), important (preferred), nice_to_have (bonus)"),
   requirements: z.array(z.string()).describe("List of related requirements in this cluster"),
@@ -150,8 +151,7 @@ export type RequirementCluster = z.infer<typeof RequirementClusterSchema>;
 
 const ScoredPairSchema = z.object({
   section_id: z.string().describe("ID of the profile section"),
-  cluster_name: z.string().describe("Name of the requirement cluster"),
-  cluster_priority: z.enum(["critical", "important", "nice_to_have"]).describe("Priority of the requirement cluster"),
+  cluster_id: z.string().describe("ID of the requirement cluster"),
   raw_score: z.number().min(0).max(100).describe("Raw matching score 0-100"),
   coverage: z.array(z.string()).describe("Specific requirements from cluster that this section covers"),
   missing: z.array(z.string()).describe("Requirements from cluster that this section does NOT cover"),
@@ -173,44 +173,34 @@ export const LLMScoringResultSchema = z.object({
 
 // Output schemas
 const SelectedSectionSchema = z.object({
-  section_id: z.string(),
-  section_title: z.string(),
-  section_type: z.string(),
-  matched_clusters: z.array(z.object({
-    cluster_name: z.string(),
-    priority: z.enum(["critical", "important", "nice_to_have"]),
-    raw_score: z.number(),
-    weighted_score: z.number(),
-    coverage: z.array(z.string()),
-    missing: z.array(z.string()),
-    strength_indicators: z.array(z.string())
-  })),
+  profile_section_id: z.string(),
+  matched_scored_pairs: z.array(ScoredPairSchema),
   total_weighted_score: z.number(),
-  selection_rationale: z.string()
+  rationale: z.string()
 });
 
 const CoverageGapSchema = z.object({
-  cluster_name: z.string(),
-  priority: z.enum(["critical", "important", "nice_to_have"]),
+  id: z.string(),
+  requirement_cluster: RequirementClusterSchema,
   gap_type: z.enum(["no_match", "below_threshold", "covered"]),
-  best_available_score: z.number().nullable(),
-  threshold_needed: z.number(),
-  recommendations: z.string(),
-  requirements: z.array(z.string()).optional().describe("List of requirements in this cluster that were not met or partially met"),
+  // best_available_score: z.number().nullable(),
+  // threshold_needed: z.number(),
+  // recommendations: z.string(),
+  // requirements: z.array(z.string()).optional().describe("List of requirements in this cluster that were not met or partially met"),
 });
 
 export const HybridSelectionResultSchema = z.object({
   selected_sections: z.array(SelectedSectionSchema),
   coverage_gaps: z.array(CoverageGapSchema),
-  summary: z.object({
-    critical_clusters_covered: z.number(),
-    critical_clusters_total: z.number(),
-    important_clusters_covered: z.number(),
-    important_clusters_total: z.number(),
-    overall_coverage: z.string(),
-    profile_sections_used: z.number(),
-    critical_gaps: z.number()
-  })
+  // summary: z.object({
+  //   critical_clusters_covered: z.number(),
+  //   critical_clusters_total: z.number(),
+  //   important_clusters_covered: z.number(),
+  //   important_clusters_total: z.number(),
+  //   overall_coverage: z.string(),
+  //   profile_sections_used: z.number(),
+  //   critical_gaps: z.number()
+  // })
 });
 
 // Types
