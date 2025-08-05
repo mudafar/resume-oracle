@@ -197,7 +197,7 @@ export class HybridSelectionService {
       const threshold = this.getThresholdForPriority(cluster.priority_tier, config);
       
       gaps.push({
-        id: `gap-${index}`,
+        id: cluster.id, // Use cluster ID as gap ID for consistency
         requirement_cluster: cluster,
         gap_type: bestMatch ? 
           (bestMatch.raw_score >= threshold ? "covered" : "below_threshold") : 

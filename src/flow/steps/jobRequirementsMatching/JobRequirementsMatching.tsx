@@ -72,7 +72,6 @@ export const JobRequirementsMatching: React.FC = () => {
   const [selectedGapId, setSelectedGapId] = useState<string>("");
 
   const { 
-    matches,
     profileSections,
     job_description,
     isLoading,
@@ -99,9 +98,9 @@ export const JobRequirementsMatching: React.FC = () => {
     ? matchingResult?.selected_sections.find(section => section.profile_section_id === modalMatchId)
     : null;
 
-  const handleFillGap = (gap: CoverageGap, gapId: string) => {
+  const handleFillGap = (gap: CoverageGap) => {
     setSelectedGap(gap);
-    setSelectedGapId(gapId);
+    setSelectedGapId(gap.id);
     setFillGapModalOpen(true);
   };
 
@@ -140,8 +139,6 @@ export const JobRequirementsMatching: React.FC = () => {
       dispatch(markGapAsFilled({
         gapId: selectedGapId,
         profileSectionId: finalSectionId,
-        profileSectionTitle: finalSectionTitle,
-        profileSectionType: finalSectionType
       }));
     }
     
@@ -182,11 +179,11 @@ export const JobRequirementsMatching: React.FC = () => {
           </p>
           
           {/* Display all coverage gaps (Redux automatically removes filled ones) */}
-          {matchingResult.coverage_gaps.map((gap, index) => (
+          {matchingResult.coverage_gaps.map((gap) => (
             <CoverageGapCard
-              key={`gap-${index}`}
+              key={gap.id}
               gap={gap}
-              gapId={`gap-${index}`}
+              // gapId={gap.id}
               onSeeSuggestions={handleSeeSuggestions}
               onFillGap={handleFillGap}
             />

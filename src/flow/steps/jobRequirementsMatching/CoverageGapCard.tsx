@@ -10,8 +10,7 @@ import { CoverageGap } from "@/services/zodModels";
 interface CoverageGapCardProps {
   gap: CoverageGap;
   onSeeSuggestions: (clusterName: string, gapId: string) => void;
-  onFillGap: (gap: CoverageGap, gapId: string) => void;
-  gapId: string;
+  onFillGap: (gap: CoverageGap) => void;
 }
 
 const getPriorityColor = (priority: string) => {
@@ -45,7 +44,6 @@ export const CoverageGapCard: React.FC<CoverageGapCardProps> = ({
   gap, 
   onSeeSuggestions, 
   onFillGap,
-  gapId 
 }) => {
   return (
     <Card className="border-l-4 border-red-500 bg-red-50">
@@ -94,7 +92,7 @@ export const CoverageGapCard: React.FC<CoverageGapCardProps> = ({
 
           <div className="flex gap-2">
             <Button 
-              onClick={() => onFillGap(gap, gapId)}
+              onClick={() => onFillGap(gap)}
               size="sm"
               className="bg-blue-600 hover:bg-blue-700"
             >

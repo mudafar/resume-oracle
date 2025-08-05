@@ -20,8 +20,6 @@ const initialState: MatchesState = {
 interface MarkGapAsFilledPayload {
   gapId: string;
   profileSectionId: string;
-  profileSectionTitle: string;
-  profileSectionType: string;
 }
 
 export const matchesSlice = createSlice({
@@ -39,13 +37,14 @@ export const matchesSlice = createSlice({
       state.lastJobDescription = action.payload;
     },
     markGapAsFilled: (state, action: PayloadAction<MarkGapAsFilledPayload>) => {
-      const { gapId, profileSectionId, profileSectionTitle, profileSectionType } = action.payload;
+      const { gapId, profileSectionId } = action.payload;
       
-      // Find the gap by parsing the gapId (format: "gap-{index}")
-      const gapIndex = parseInt(gapId.replace('gap-', ''));
+      // Find the gap by its ID
+      const gapIndex = state.coverage_gaps.findIndex(gap => gap.id === gapId);
+      
+      if (gapIndex === -1) return;
+      
       const gap = state.coverage_gaps[gapIndex];
-      
-      if (!gap) return;
 
       // Remove the gap from coverage_gaps array
       state.coverage_gaps.splice(gapIndex, 1);
@@ -71,13 +70,6 @@ export const matchesSlice = createSlice({
         // Add to existing selected section
         existingSelectedSection.matched_scored_pairs.push(newScoredPair);
 
-        // Recalculate total weighted score (simplified - just add new score)
-        const priorityMultiplier = gap.requirement_cluster.priority_tier === 'critical' ? 3 : 
-                                   gap.requirement_cluster.priority_tier === 'important' ? 2 : 1;
-        existingSelectedSection.total_weighted_score += newScoredPair.raw_score * priorityMultiplier;
-
-        // Update selection rationale
-        existingSelectedSection.rationale += ` Additionally enhanced to address ${gap.requirement_cluster.cluster_name} requirement.`;
       } else {
         // Create new ScoredPair for the new section
         const newScoredPair = {
@@ -91,15 +83,12 @@ export const matchesSlice = createSlice({
           enhancement_suggestions: []
         };
 
-        // Calculate weighted score
-        const priorityMultiplier = gap.requirement_cluster.priority_tier === 'critical' ? 3 : 
-                                   gap.requirement_cluster.priority_tier === 'important' ? 2 : 1;
 
         // Create new selected section
         const newSelectedSection: SelectedSection = {
           profile_section_id: profileSectionId,
           matched_scored_pairs: [newScoredPair],
-          total_weighted_score: newScoredPair.raw_score * priorityMultiplier,
+          total_weighted_score: 85,
           rationale: `Selected to address ${gap.requirement_cluster.cluster_name} requirement that was identified as a coverage gap.`
         };
 
