@@ -13,7 +13,7 @@ import { LoadingState, EmptyState, ErrorState, CoverageGaps, SelectedSections, M
 import { useSelector, useDispatch } from "react-redux";
 import { RootState } from "@/store/store";
 import { HybridSelectionResult, CoverageGap, SelectedSection } from "@/services/zodModels";
-import { addProfileSectionReturnId } from "../createProfileSection";
+import { addProfileSectionReturnId } from "../shared/createProfileSection";
 import { editSection } from "@/store/slices/profileSectionsSlice";
 import { markGapAsFilled } from "@/store/slices/matchesSlice";
 

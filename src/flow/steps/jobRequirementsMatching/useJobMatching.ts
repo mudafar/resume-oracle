@@ -8,7 +8,7 @@ import { jobRequirementsExtractorService } from "@/services/jobRequirementsExtra
 import { jobRequirementsMatchingService } from "@/services/jobRequirementsMatchingService";
 import sha1 from "sha1";
 import { compareTwoStrings } from "string-similarity";
-import { addProfileSectionReturnId } from "../createProfileSection";
+import { addProfileSectionReturnId } from "../shared/createProfileSection";
 import { editSection } from "@/store/slices/profileSectionsSlice";
 import {
   HybridSelectionResult,

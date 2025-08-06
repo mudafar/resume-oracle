@@ -11,8 +11,8 @@ import {
   setSections,
 } from "@/store/slices/profileSectionsSlice";
 import { openConfigModal } from "@/store/slices/llmConfigSlice";
-import { addProfileSectionReturnId } from "../createProfileSection";
-import { exportSectionsToJson, importSectionsFromJson } from "../profileSectionsExportImport";
+import { addProfileSectionReturnId } from "../shared/createProfileSection";
+import { exportSectionsToJson, importSectionsFromJson } from "./profileSectionsExportImport";
 import { ProfileSectionsActionBar } from "./ProfileSectionsActionBar";
 import { NewProfileSectionModal } from "./NewProfileSectionModal";
 import { ProfileSectionsExportModal } from "./ProfileSectionsExportModal";
