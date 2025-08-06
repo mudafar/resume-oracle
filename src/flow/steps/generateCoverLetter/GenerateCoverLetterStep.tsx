@@ -13,17 +13,16 @@ import { useLlmService } from "@/hooks/useLlmService";
 import { coverLetterGeneratorService } from "@/services/coverLetterGeneratorService";
 import { GeneratedCoverLetterResult } from "@/services/zodModels";
 import { createStep } from "@/utils/createStep";
-import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   FileText,
-  Loader2,
-  AlertTriangle,
   Mail
 } from "lucide-react";
 import { OptimizationSummaryCard } from '../shared/OptimizationSummaryCard';
 import { RegenerateBanner } from '../shared/RegenerateBanner';
-import { CoverLetterEditorCard } from './CoverLetterEditorCard'
+import { LoadingState } from '../shared/states/LoadingState';
+import { ErrorState } from '../shared/states/ErrorState';
+import { CoverLetterEditor, CoverLetterActions } from './components';
 
 const GenerateCoverLetter: React.FC = () => {
   const dispatch = useDispatch();
@@ -35,7 +34,6 @@ const GenerateCoverLetter: React.FC = () => {
   const lastCoverLetterInputsHash = useSelector((state: RootState) => state.coverLetter.lastCoverLetterInputsHash);
   const [editMode, setEditMode] = useState(false);
   const [showRegenerateBanner, setShowRegenerateBanner] = useState(false);
-  const [copied, setCopied] = useState(false);
 
   const [generateCoverLetter, { isLoading, error, data, reset }] = useLlmService<GeneratedCoverLetterResult>(
     coverLetterGeneratorService.generateCoverLetter
@@ -50,7 +48,7 @@ const GenerateCoverLetter: React.FC = () => {
   }, [jobDescription]);
 
   // Update `matches` selector to use `selected_sections` from `HybridSelectionResult`
-  const selectedSections = useSelector((state: RootState) => state.matches.data?.selected_sections || []);
+  const selectedSections = useSelector((state: RootState) => state.matches.selected_sections || []);
 
   // Prepare payload using the shared utility - memoize to prevent unnecessary re-computations
   const apiPayload = useMemo(() => {
@@ -103,26 +101,6 @@ const GenerateCoverLetter: React.FC = () => {
     }
   };
 
-  const copyToClipboard = async () => {
-    try {
-      await navigator.clipboard.writeText(coverLetter);
-      setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
-    } catch (err) {
-      console.error('Failed to copy text: ', err);
-    }
-  };
-
-  const downloadMarkdown = () => {
-    const blob = new Blob([coverLetter], { type: "text/markdown" });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = "cover_letter.md";
-    a.click();
-    URL.revokeObjectURL(url);
-  };
-
   return (
     <div className="container mx-auto max-w-5xl py-8 px-4 space-y-6">
 
@@ -137,24 +115,21 @@ const GenerateCoverLetter: React.FC = () => {
 
       {/* Loading State */}
       {isLoading && (
-        <Card>
-          <CardContent className="flex items-center justify-center py-12">
-            <div className="flex items-center space-x-2">
-              <Loader2 className="h-6 w-6 animate-spin" />
-              <span className="text-lg">Generating your cover letter...</span>
-            </div>
-          </CardContent>
-        </Card>
+        <LoadingState
+          message="Generating your cover letter..."
+          variant="card"
+          size="lg"
+        />
       )}
 
       {/* Error State */}
       {error && (
-        <Alert variant="destructive">
-          <AlertTriangle className="h-4 w-4" />
-          <AlertDescription>
-            Failed to generate cover letter. Please try again.
-          </AlertDescription>
-        </Alert>
+        <ErrorState
+          title="Generation Failed"
+          error="Failed to generate cover letter. Please try again."
+          onRetry={onRegenerate}
+          variant="card"
+        />
       )}
 
       {/* No Cover Letter State */}
@@ -177,17 +152,31 @@ const GenerateCoverLetter: React.FC = () => {
         <div className="space-y-6">
 
           {/* Main Editor Card */}
-          <CoverLetterEditorCard
-            editMode={editMode}
-            setEditMode={setEditMode}
-            copied={copied}
+          <CoverLetterEditor
             coverLetter={coverLetter}
-            dispatch={dispatch}
-            updateCoverLetter={updateCoverLetter}
-            copyToClipboard={copyToClipboard}
-            downloadMarkdown={downloadMarkdown}
-            onRegenerate={onRegenerate}
-            isLoading={isLoading}
+            editMode={editMode}
+            onToggleEdit={setEditMode}
+            onContentChange={(newContent) => dispatch(updateCoverLetter(newContent))}
+            actionBarProps={{
+              onCopy: async () => {
+                try {
+                  await navigator.clipboard.writeText(coverLetter);
+                } catch (err) {
+                  console.error('Failed to copy text: ', err);
+                }
+              },
+              onDownload: () => {
+                const blob = new Blob([coverLetter], { type: "text/markdown" });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement("a");
+                a.href = url;
+                a.download = "cover_letter.md";
+                a.click();
+                URL.revokeObjectURL(url);
+              },
+              onRegenerate,
+              isLoading
+            }}
           />
 
           <OptimizationSummaryCard
