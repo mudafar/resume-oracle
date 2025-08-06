@@ -1,0 +1,13 @@
+{
+	"servers": {
+		"spec-driven-dev-mcp": {
+			"command": "npx",
+			"args": [
+				"spec-driven-dev-mcp@1.0.1"
+			],
+			"env": {},
+			"type": "stdio"
+		}
+	},
+	"inputs": []
+}

@@ -9,10 +9,7 @@ import { CoverageGapCard } from "./CoverageGapCard";
 import { SelectedSectionCard } from "./SelectedSectionCard";
 import { FillGapModal } from "./fillGapModal/FillGapModal";
 import { EnhanceProfileSectionModal } from "./enhanceProfileSectionModal";
-import { Skeleton } from "@/components/ui/skeleton";
-import { Button } from "@/components/ui/button";
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { AlertCircle, FileWarning } from 'lucide-react';
+import { LoadingState, EmptyState, ErrorState, CoverageGaps, SelectedSections, MatchingModals } from "./components";
 import { useSelector, useDispatch } from "react-redux";
 import { RootState } from "@/store/store";
 import { HybridSelectionResult, CoverageGap, SelectedSection } from "@/services/zodModels";
@@ -34,37 +31,6 @@ function getOrderedMatchedProfileSections(
     .filter((ps) => matchCounts.has(ps.id))
     .sort((a, b) => (matchCounts.get(b.id) || 0) - (matchCounts.get(a.id) || 0));
 }
-
-const LoadingState = () => (
-  <div className="space-y-6">
-    {[...Array(3)].map((_, i) => (
-      <div key={i} className="border rounded p-4 bg-white shadow">
-        <Skeleton className="h-4 w-1/4 mb-2" />
-        <Skeleton className="h-8 w-full mb-4" />
-        <Skeleton className="h-4 w-1/2" />
-      </div>
-    ))}
-  </div>
-);
-
-const EmptyState = () => (
-  <div className="text-center py-12">
-    <FileWarning className="mx-auto h-12 w-12 text-gray-400" />
-    <h3 className="mt-2 text-lg font-semibold">No Job Requirements Found</h3>
-    <p className="mt-1 text-gray-500">Please check your job description to get started.</p>
-  </div>
-);
-
-const ErrorState = ({ onRetry }: { onRetry: () => void }) => (
-  <Alert variant="destructive">
-    <AlertCircle className="h-4 w-4" />
-    <AlertTitle>Error</AlertTitle>
-    <AlertDescription>
-      <p>Failed to fetch matches. Please try again.</p>
-      <Button onClick={onRetry} className="mt-4">Retry</Button>
-    </AlertDescription>
-  </Alert>
-);
 
 export const JobRequirementsMatching: React.FC = () => {
   const dispatch = useDispatch();
@@ -191,90 +157,30 @@ export const JobRequirementsMatching: React.FC = () => {
       {(showRematchBanner || true) && (
         <RematchBanner onRematch={onRematch} onDismiss={() => setShowRematchBanner(false)} />
       )}
-    
 
-      {/* Coverage Gaps Section */}
-      {matchingResult?.coverage_gaps?.length > 0 && (
-        <div className="space-y-4">
-          <h2 className="text-xl font-semibold text-gray-900">Coverage Gaps</h2>
-          <p className="text-gray-600 text-sm">
-            These job requirements need attention to strengthen your application.
-          </p>
-          
-          {/* Display all coverage gaps (Redux automatically removes filled ones) */}
-          {matchingResult.coverage_gaps.map((gap) => (
-            <CoverageGapCard
-              key={gap.id}
-              gap={gap}
-              // gapId={gap.id}
-              onSeeSuggestions={handleSeeSuggestions}
-              onFillGap={handleFillGap}
-            />
-          ))}
-          
-          {/* Show message when no gaps remain */}
-          {matchingResult.coverage_gaps.length === 0 && (
-            <div className="text-center py-8 bg-green-50 rounded-lg border border-green-200">
-              <div className="text-green-600 text-lg font-semibold mb-2">
-                🎉 All Coverage Gaps Addressed!
-              </div>
-              <p className="text-green-700 text-sm">
-                You've successfully filled all identified gaps. Your profile now better matches the job requirements.
-              </p>
-            </div>
-          )}
-        </div>
-      )}
+      <CoverageGaps
+        coverageGaps={matchingResult?.coverage_gaps || []}
+        onSeeSuggestions={handleSeeSuggestions}
+        onFillGap={handleFillGap}
+      />
 
-      {/* Selected Sections */}
-      {matchingResult.selected_sections?.length > 0 && (
-        <div className="space-y-4">
-          <h2 className="text-xl font-semibold text-gray-900">Selected Profile Sections</h2>
-          <p className="text-gray-600 text-sm">
-            These sections from your profile best match the job requirements.
-          </p>
-          {matchingResult.selected_sections.map((selectedSection, index) => (
-            <SelectedSectionCard
-              key={selectedSection.profile_section_id}
-              selectedSection={selectedSection}
-              profileSections={profileSections}
-              onEnhanceSection={handleEnhanceSection}
-            />
-          ))}
-        </div>
-      )}
+      <SelectedSections
+        selectedSections={matchingResult?.selected_sections || []}
+        profileSections={profileSections}
+        onEnhanceSection={handleEnhanceSection}
+      />
 
-      {/* {currentMatch && matchingResult && (
-        <SuggestedSectionModal
-          match={currentMatch}
-          open={modalOpen}
-          orderedMatchedProfileSections={getOrderedMatchedProfileSections(matchingResult.selected_sections, profileSections)}
-          onClose={() => setModalOpen(false)}
-          onSaveAndMatch={handleSaveAndMatch}
-          onSaveOnly={handleSaveOnly}
-          onSkip={() => setModalOpen(false)}
-        />
-      )} */}
-
-      {selectedGap && (
-        <FillGapModal
-          open={fillGapModalOpen}
-          onClose={() => setFillGapModalOpen(false)}
-          gap={selectedGap}
-          profileSections={profileSections}
-          onSaveAndMarkCovered={handleSaveAndMarkCovered}
-        />
-      )}
-
-      {selectedSectionForEnhancement && (
-        <EnhanceProfileSectionModal
-          open={enhanceModalOpen}
-          onClose={() => setEnhanceModalOpen(false)}
-          selectedSection={selectedSectionForEnhancement}
-          profileSections={profileSections}
-          onSaveEnhancement={handleSaveEnhancement}
-        />
-      )}
+      <MatchingModals
+        selectedGap={selectedGap}
+        fillGapModalOpen={fillGapModalOpen}
+        onCloseFillGap={() => setFillGapModalOpen(false)}
+        onSaveAndMarkCovered={handleSaveAndMarkCovered}
+        selectedSectionForEnhancement={selectedSectionForEnhancement}
+        enhanceModalOpen={enhanceModalOpen}
+        onCloseEnhance={() => setEnhanceModalOpen(false)}
+        onSaveEnhancement={handleSaveEnhancement}
+        profileSections={profileSections}
+      />
     </div>
   );
 };

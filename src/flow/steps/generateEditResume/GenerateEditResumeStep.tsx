@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useState, useRef } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { RootState } from "@/store/store";
-import { ResumeSection } from "@/store/slices/resumeSectionsSlice";
+import { ResumeSection as ResumeInputSection } from "@/store/slices/resumeSectionsSlice";
 import {
   setResume,
   setOptimizationSummary,
@@ -16,22 +16,8 @@ import sha1 from "sha1";
 import { createStep } from "@/utils/createStep";
 import { RegenerateBanner } from '../shared/RegenerateBanner';
 import { OptimizationSummaryCard } from '../shared/OptimizationSummaryCard';
-import {
-  FileText,
-  Loader2,
-  AlertTriangle,
-  Edit3,
-  Download,
-  FileDown,
-  Save,
-  RotateCcw,
-  Eye,
-  Check
-} from "lucide-react";
-import { Alert, AlertDescription } from "@/components/ui/alert";
+import { ResumeEditor, ResumeActions, ResumeStates } from './components';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Textarea } from "@/components/ui/textarea";
 
 const GenerateEditResume: React.FC = () => {
   const dispatch = useDispatch();
@@ -50,7 +36,11 @@ const GenerateEditResume: React.FC = () => {
     resumeGeneratorService.buildResume
   );
 
-  const apiPayload: ResumeSection[] = resumeSections.map(s => ({ type: s.type, content: s.content }));
+  const apiPayload: ResumeSection[] = resumeSections.map(s => ({ 
+    type: s.type, 
+    content: s.content,
+    profile_section_id: s.profile_section_id 
+  }));
 
   const inputsHash = useMemo(
     () => sha1(JSON.stringify({ resumeSections })),
@@ -207,134 +197,38 @@ const GenerateEditResume: React.FC = () => {
 
         <div className="flex gap-8 py-6">
           <div className="flex-1">
-            {!resume && !isLoading && !error && (
-              <Card className="shadow-sm">
-                <CardContent className="flex items-center justify-center py-20">
-                  <div className="text-center space-y-6">
-                    <FileText className="h-16 w-16 mx-auto text-gray-400" />
-                    <h3 className="text-lg font-medium text-gray-900">No resume generated yet</h3>
-                    <p className="text-sm text-gray-600">
-                      Add some resume sections to get started
-                    </p>
-                  </div>
-                </CardContent>
-              </Card>
-            )}
-
-            {/* Loading State */}
-            {isLoading && (
-              <Card className="shadow-sm">
-                <CardContent className="flex items-center justify-center py-12">
-                  <div className="flex flex-col items-center space-y-4">
-                    <Loader2 className="h-8 w-8 animate-spin text-blue-600" />
-                    <span className="text-sm text-gray-600">Generating resume...</span>
-                  </div>
-                </CardContent>
-              </Card>
-            )}
-
-            {/* Error State */}
-            {error && (
-              <div className="mb-6">
-                <Alert variant="destructive">
-                  <AlertTriangle className="h-4 w-4" />
-                  <AlertDescription>
-                    Failed to generate resume. Please try again.
-                  </AlertDescription>
-                </Alert>
-              </div>
-            )}
+            <ResumeStates
+              isLoading={isLoading}
+              error={error}
+              hasResume={!!resume}
+            />
 
             {resume && !isLoading && (
               <Card className="shadow-sm min-h-[800px]">
                 <CardHeader className="pb-6">
                   <div className="flex items-center justify-between">
                     <CardTitle className="text-xl font-semibold">Your Resume</CardTitle>
-                    <div className="flex items-center space-x-3">
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => setEditMode(!editMode)}
-                        className="flex items-center space-x-2"
-                      >
-                        {editMode ? <Eye className="h-4 w-4" /> : <Edit3 className="h-4 w-4" />}
-                        <span>{editMode ? 'Preview' : 'Edit'}</span>
-                      </Button>
-
-                      {editMode && (
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={saveDraft}
-                          className="flex items-center space-x-2"
-                          disabled={draftSaved}
-                        >
-                          {draftSaved ? <Check className="h-4 w-4" /> : <Save className="h-4 w-4" />}
-                          <span>{draftSaved ? 'Saved' : 'Save'}</span>
-                        </Button>
-                      )}
-
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={exportMarkdown}
-                        className="flex items-center space-x-2"
-                      >
-                        <FileDown className="h-4 w-4" />
-                        <span>Markdown</span>
-                      </Button>
-
-                      {/* <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={exportPdf}
-                        disabled={isExportingPdf}
-                        className="flex items-center space-x-2"
-                      >
-                        {isExportingPdf ? (
-                          <Loader2 className="h-4 w-4 animate-spin" />
-                        ) : (
-                          <Download className="h-4 w-4" />
-                        )}
-                        <span>PDF</span>
-                      </Button> */}
-
-                      <Button
-                        size="sm"
-                        onClick={onRegenerate}
-                        disabled={isLoading}
-                        className="flex items-center space-x-2"
-                      >
-                        {isLoading ? (
-                          <Loader2 className="h-4 w-4 animate-spin" />
-                        ) : (
-                          <RotateCcw className="h-4 w-4" />
-                        )}
-                        <span>Regenerate</span>
-                      </Button>
-                    </div>
+                    <ResumeActions
+                      editMode={editMode}
+                      draftSaved={draftSaved}
+                      isLoading={isLoading}
+                      isExportingPdf={isExportingPdf}
+                      onToggleEdit={() => setEditMode(!editMode)}
+                      onSaveDraft={saveDraft}
+                      onExportMarkdown={exportMarkdown}
+                      onRegenerate={onRegenerate}
+                    />
                   </div>
                 </CardHeader>
                 <CardContent className="px-8 pt-0 pb-8">
-                  {editMode ? (
-                    <Textarea
-                      value={editedResume}
-                      onChange={(e) => setEditedResume(e.target.value)}
-                      className="w-full h-[800px] font-mono text-sm resize-none border-0 p-4 focus:ring-0 bg-gray-50 rounded-md"
-                      placeholder="Edit your resume in Markdown format..."
-                    />
-                  ) : (
-                    <div
-                      ref={markdownContentRef}
-                      className="prose prose-lg max-w-none"
-                      style={{
-                        lineHeight: '1.7',
-                        color: '#374151',
-                      }}
-                    >
-                      {renderMarkdown(editMode ? editedResume : resume)}
-                    </div>
-                  )}
+                  <ResumeEditor
+                    editMode={editMode}
+                    editedResume={editedResume}
+                    resume={resume}
+                    onResumeChange={setEditedResume}
+                    markdownContentRef={markdownContentRef}
+                    renderMarkdown={renderMarkdown}
+                  />
                 </CardContent>
               </Card>
             )}

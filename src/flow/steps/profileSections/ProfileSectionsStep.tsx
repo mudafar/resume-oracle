@@ -22,6 +22,7 @@ import { ModelConfigPrompt } from "./ModelConfigPrompt";
 import { Toast } from "./Toast";
 import { createStep } from "@/utils/createStep";
 import { ProfileSectionsImportJSONModal } from "./ProfileSectionsImportJSONModal";
+import { SectionsList, ModalsManager, ProfileSectionsActions } from "./components";
 
 const ProfileSections: React.FC = () => {
   const sections = useSelector((state: RootState) => state.profileSections.sections);
@@ -145,62 +146,33 @@ const ProfileSections: React.FC = () => {
 
   return (
     <div>
-      {/* Inline Model Config Prompt */}
-      <ModelConfigPrompt
-        show={showPrompt}
-        onClose={() => setShowPrompt(false)}
+      <ProfileSectionsActions
+        showPrompt={showPrompt}
+        onClosePrompt={() => setShowPrompt(false)}
         onConfigure={handleOpenModelConfig}
-      />
-      {/* Action Bar */}
-      <ProfileSectionsActionBar
         onNewSection={() => setNewSectionModalOpen(true)}
-        // onImportAI={() => setImportAIModalOpen(true)}
         onImportFile={() => setImportJSONModalOpen(true)}
         onExport={() => setExportModalOpen(true)}
         onDeleteAll={() => setDeleteAllConfirm(true)}
         disabledExport={sections.length === 0}
         disabledDeleteAll={sections.length === 0}
       />
-      <ProfileSectionsExportModal
-        open={exportModalOpen}
-        onClose={() => setExportModalOpen(false)}
-        profileSections={sections}
-        onToast={(msg, type = "success") => {
-          setToastMessage(msg);
-          setToastType(type);
-          setToastOpen(true);
-        }}
-      />
-      <NewProfileSectionModal
-        open={newSectionModalOpen}
-        onClose={() => setNewSectionModalOpen(false)}
-        onAdd={({ type, content }) => {
+
+      <ModalsManager
+        newSectionModalOpen={newSectionModalOpen}
+        onCloseNewSection={() => setNewSectionModalOpen(false)}
+        onAddSection={({ type, content }) => {
           dispatch(addSection({ type, content }));
           setNewSectionModalOpen(false);
         }}
-      />
-      {/* Delete All Confirmation Modal */}
-      <DeleteAllProfileSectionsModal
-        open={deleteAllConfirm}
-        onCancel={() => setDeleteAllConfirm(false)}
-        onConfirm={handleDeleteAll}
-      />
-      {/* Import Modal (separate component) */}
-      {/* <ProfileSectionsImportModal
-        open={importModalOpen}
-        onClose={() => setImportModalOpen(false)}
-        onImportSection={(section: ProfileSection) => dispatch(addSection(section))}
-        onImportAll={(sectionsArr: ProfileSection[]) => sectionsArr.forEach(section => dispatch(addSection(section)))}
-        onToast={(msg, type = "success") => {
-          setToastMessage(msg);
-          setToastType(type);
-          setToastOpen(true);
-        }}
-      /> */}
-      {/* ProfileSectionImportAIModal moved to GetStartedStep */}
-      <ProfileSectionsImportJSONModal
-        open={importJSONModalOpen}
-        onClose={() => setImportJSONModalOpen(false)}
+        exportModalOpen={exportModalOpen}
+        onCloseExport={() => setExportModalOpen(false)}
+        profileSections={sections}
+        deleteAllConfirm={deleteAllConfirm}
+        onCancelDeleteAll={() => setDeleteAllConfirm(false)}
+        onConfirmDeleteAll={handleDeleteAll}
+        importJSONModalOpen={importJSONModalOpen}
+        onCloseImportJSON={() => setImportJSONModalOpen(false)}
         onImportSection={(section: ProfileSection) => dispatch(addSection(section))}
         onImportAll={(sectionsArr: ProfileSection[]) => sectionsArr.forEach(section => dispatch(addSection(section)))}
         onToast={(msg, type = "success") => {
@@ -210,28 +182,20 @@ const ProfileSections: React.FC = () => {
         }}
       />
 
-      {/* Remove Add Section Card - now handled by modal only */}
-      <div>
-      {sections.length === 0 && (
-          <div className="text-gray-500">No profile sections yet. Add one above.</div>
-        )}
-        {sections.map((section) => (
-          <ProfileSectionCard
-            key={section.id}
-            section={section}
-            isCollapsed={collapsed[section.id]}
-            onToggleCollapse={() => setCollapsed(c => ({ ...c, [section.id]: !c[section.id] }))}
-            onEdit={handleEdit}
-            onDelete={handleDelete}
-            editingId={editingId}
-            editType={editType}
-            editContent={editContent}
-            setEditType={setEditType}
-            setEditContent={setEditContent}
-            setEditingId={setEditingId}
-          />
-        ))}
-      </div>
+      <SectionsList
+        sections={sections}
+        collapsed={collapsed}
+        onToggleCollapse={(id) => setCollapsed(c => ({ ...c, [id]: !c[id] }))}
+        onEdit={handleEdit}
+        onDelete={handleDelete}
+        editingId={editingId}
+        editType={editType}
+        editContent={editContent}
+        setEditType={setEditType}
+        setEditContent={setEditContent}
+        setEditingId={setEditingId}
+      />
+
       <Toast
         open={toastOpen}
         message={toastMessage}
