@@ -1,67 +1,51 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Resume Oracle
 
-## Getting Started
+AI-driven resume and cover letter optimization platform that transforms job descriptions into tailored applications.
 
-First, run the development server:
+## Overview
+
+Resume Oracle is a guided, step-by-step workflow that helps job seekers create highly targeted resumes and cover letters by analyzing job descriptions and matching them with existing experience. Unlike traditional resume builders, it starts with the job requirements and optimizes your profile accordingly.
+
+### Key Features
+
+- **Job-Description Centered**: Workflow driven by specific job requirements rather than generic templates
+- **Zero Hallucination**: Uses only your existing experience - no fictional content added
+- **Multi-Step Coaching**: 7-step guided process with persistent state management
+- **AI-Powered Matching**: Intelligent scoring and gap analysis for profile sections vs. job requirements
+- **ATS-Optimized Export**: Clean Markdown output optimized for applicant tracking systems
+
+### Workflow Steps
+
+1. **Profile Sections** - Import and structure your existing experience
+2. **Job Description** - Paste target job description and company context
+3. **Requirements Matching** - AI extracts and matches job requirements to your profile
+4. **Profile Enhancement** - Enhance sections with missing requirements
+5. **Resume Generation** - Create tailored resume sections
+6. **Resume Editor** - Edit and export final resume as Markdown/PDF
+7. **Cover Letter** - Generate personalized cover letter
+
+## Tech Stack
+
+- **Frontend**: Next.js 15, React 18, TypeScript, Tailwind CSS, shadcn/ui
+- **State Management**: Redux Toolkit with persistence
+- **AI Integration**: LangChain.js with custom `useLlmService` hook
+- **Type Safety**: Zod schemas for LLM output validation
+
+## Quick Start
 
 ```bash
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000) to start the application.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Documentation
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+- [Development Guide](./DEV.md) - Architecture, patterns, and development workflow
+- [Feature Overview](./feature_overview.md) - Detailed feature descriptions
+- [UI Flow](./multi_step_ui_flow.md) - Complete user journey documentation
 
-## Learn More
+## Contributing
 
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
-
-
-## TODOS 
-
-
-<!-- - save Job Requirements Matching to store, so no need to fire API again, provide refresh button to force referesh
-- show matched profile section, at least a few lines with the ability to expand
-- order first with gaps/recommendation at top -->✅
-
-<!-- -suggest profile section should try to edit one of the available profile sections
-- return the ID of base profile section, summary of changes made --> ✅
-
-
--Matched Profile Sections
-<!-- show only few lines of profile section -->  ✅
-order top that has enhancements available? currently by matched requirements
-
-
-- prioritize  profile section experience with longer time !!
-
-- resume sections
--- add cancel editing UI
-<!-- -- should fit in a resume standard section length --> ✅ 
-
-- resume generation
-<!-- -- generate a cover letter same response --> ✅
-<!-- within two pages -->
-
-- cover letter
--- store reponse
--- provide a regenerate button to force refresh 
+This project follows strict TypeScript patterns and uses AI-assisted development. See [DEV.md](./DEV.md) for development guidelines and architectural decisions. 
