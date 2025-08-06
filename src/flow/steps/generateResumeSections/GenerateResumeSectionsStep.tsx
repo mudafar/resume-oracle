@@ -2,22 +2,14 @@ import React, { useEffect, useMemo, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { RootState } from "@/store/store";
 import { getMatchedProfileSectionWithRequirements } from "../shared/getMatchedProfileSectionWithRequirements";
-import { groupMatchesByProfileSection, MatchedProfileSection } from "../groupMatchesByProfileSection";
 import { RegenerateBanner } from "../shared/RegenerateBanner";
-import { ResumeSectionCard } from "./ResumeSectionCard"
 import { setResumeSections, updateResumeSection, setLastInputsHash } from "@/store/slices/resumeSectionsSlice";
 import { useLlmService } from "@/hooks/useLlmService";
 import { resumeSectionsGeneratorService } from "@/services/resumeSectionsGeneratorService";
-import { ProfileSectionWithRequirements, GeneratedResumeSectionResult } from "@/services/zodModels";
+import { GeneratedResumeSectionResult } from "@/services/zodModels";
 import sha1 from "sha1";
 import { createStep } from "@/utils/createStep";
-import { 
-  AlertTriangle, 
-  Loader2,
-  FileText,
-} from "lucide-react";
-import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { ResumeSectionsList, ResumeSectionsStates } from "./components";
 
 interface ResumeSection {
   profile_section_id: string;
@@ -117,49 +109,23 @@ const GenerateResumeSections: React.FC = () => {
 
       {/* Main Content */}
       <main className="space-y-6">
-        {isLoading ? (
-          <Card className="border-dashed">
-            <CardContent className="flex items-center justify-center py-12">
-              <div className="text-center space-y-3">
-                <Loader2 className="w-8 h-8 animate-spin mx-auto text-blue-600" />
-                <p className="text-gray-600 font-medium">Generating resume sections...</p>
-                <p className="text-sm text-gray-500">This may take a few moments</p>
-              </div>
-            </CardContent>
-          </Card>
-        ) : error ? (
-          <Alert className="border-red-200 bg-red-50">
-            <AlertTriangle className="h-4 w-4 text-red-600" />
-            <AlertDescription className="text-red-800">
-              <strong>Generation Failed:</strong> Unable to generate resume sections. Please try again.
-            </AlertDescription>
-          </Alert>
-        ) : resumeSections.length === 0 ? (
-          <Card className="border-dashed">
-            <CardContent className="text-center py-12 space-y-4">
-              <FileText className="w-12 h-12 mx-auto text-gray-400" />
-              <div className="space-y-2">
-                <h3 className="text-lg font-semibold text-gray-900">No Resume Sections</h3>
-                <p className="text-gray-600">No sections have been generated yet. They will appear here once processing is complete.</p>
-              </div>
-            </CardContent>
-          </Card>
-        ) : (
-          <div className="grid gap-6">
-            {resumeSections.map((section) => (
-              <ResumeSectionCard
-                key={section.profile_section_id}
-                section={section}
-                editing={editing}
-                setEditing={setEditing}
-                editedContent={editedContent}
-                setEditedContent={setEditedContent}
-                dispatch={dispatch}
-                updateResumeSection={updateResumeSection}
-                referenceMap={referenceMap}
-              />
-            ))}
-          </div>
+        <ResumeSectionsStates
+          isLoading={isLoading}
+          error={error}
+          hasResumeSections={resumeSections.length > 0}
+          onRetry={onRegenerate}
+        />
+        
+        {resumeSections.length > 0 && !isLoading && !error && (
+          <ResumeSectionsList
+            resumeSections={resumeSections}
+            editing={editing}
+            setEditing={setEditing}
+            editedContent={editedContent}
+            setEditedContent={setEditedContent}
+            dispatch={dispatch}
+            referenceMap={referenceMap}
+          />
         )}
       </main>
     </div>
