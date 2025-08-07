@@ -28,6 +28,8 @@ export const EnhanceProfileSectionModal: React.FC<EnhanceProfileSectionModalProp
   const [experienceInput, setExperienceInput] = useState<string>("");
   const [additionalContext, setAdditionalContext] = useState<string>("");
   const [enhancedContent, setEnhancedContent] = useState<string>("");
+  const [integrationSummary, setIntegrationSummary] = useState<string>("");
+  const [keyAdditions, setKeyAdditions] = useState<string[]>([]);
 
   const [triggerEnhance, { isLoading }] = useLlmService(
     profileSectionEnhancerService.enhanceProfileSection
@@ -46,8 +48,9 @@ export const EnhanceProfileSectionModal: React.FC<EnhanceProfileSectionModalProp
         experienceInput,
         additionalContext || undefined
       );
-      
       setEnhancedContent(result.enhanced_content);
+      setIntegrationSummary(result.integration_summary || "");
+      setKeyAdditions(result.key_additions || []);
       setPhase('review');
     } catch (error) {
       console.error("Failed to enhance profile section:", error);
@@ -70,6 +73,8 @@ export const EnhanceProfileSectionModal: React.FC<EnhanceProfileSectionModalProp
     setExperienceInput("");
     setAdditionalContext("");
     setEnhancedContent("");
+    setIntegrationSummary("");
+    setKeyAdditions([]);
   };
 
   const handleClose = () => {
@@ -123,6 +128,8 @@ export const EnhanceProfileSectionModal: React.FC<EnhanceProfileSectionModalProp
             onSave={handleSave}
             onBack={handleBack}
             onClose={handleClose}
+            integrationSummary={integrationSummary}
+            keyAdditions={keyAdditions}
           />
         </div>
       </div>

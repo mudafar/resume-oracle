@@ -16,6 +16,8 @@ interface EnhancementInterfaceProps {
   onSave: () => void;
   onBack: () => void;
   onClose: () => void;
+  integrationSummary?: string;
+  keyAdditions?: string[];
 }
 
 export const EnhancementInterface: React.FC<EnhancementInterfaceProps> = ({
@@ -31,6 +33,8 @@ export const EnhancementInterface: React.FC<EnhancementInterfaceProps> = ({
   onSave,
   onBack,
   onClose,
+  integrationSummary,
+  keyAdditions,
 }) => {
   if (phase === 'input') {
     return (
@@ -52,6 +56,8 @@ export const EnhancementInterface: React.FC<EnhancementInterfaceProps> = ({
       setEnhancedContent={setEnhancedContent}
       onSave={onSave}
       onBack={onBack}
+      integrationSummary={integrationSummary}
+      keyAdditions={keyAdditions}
     />
   );
 };

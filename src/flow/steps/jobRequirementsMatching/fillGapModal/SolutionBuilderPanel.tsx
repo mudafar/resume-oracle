@@ -30,6 +30,8 @@ interface SolutionBuilderPanelProps {
   onGenerate: () => void;
   onSave: () => void;
   onBack: () => void;
+  structureRationale?: string;
+  keyHighlights?: string[];
 }
 
 export const SolutionBuilderPanel: React.FC<SolutionBuilderPanelProps> = ({
@@ -52,6 +54,8 @@ export const SolutionBuilderPanel: React.FC<SolutionBuilderPanelProps> = ({
   onGenerate,
   onSave,
   onBack,
+  structureRationale = "",
+  keyHighlights = [],
 }) => {
   const selectedSection = profileSections.find(ps => ps.id === selectedSectionId);
   const canGenerate = experienceInput.trim().length > 0 && 
@@ -85,6 +89,26 @@ export const SolutionBuilderPanel: React.FC<SolutionBuilderPanelProps> = ({
                   placeholder="Generated content will appear here..."
                 />
               </div>
+
+              {/* Structure Rationale and Key Highlights */}
+              {(structureRationale || (keyHighlights && keyHighlights.length > 0)) && (
+                <div className="mt-4 p-4 bg-gray-50 rounded border border-gray-200">
+                  <h3 className="text-lg font-semibold mb-2">Structure Rationale</h3>
+                  {structureRationale && (
+                    <p className="mb-2 text-gray-700">{structureRationale}</p>
+                  )}
+                  {keyHighlights && keyHighlights.length > 0 && (
+                    <div>
+                      <h4 className="font-medium mb-1">Key Highlights:</h4>
+                      <ul className="list-disc list-inside text-gray-700">
+                        {keyHighlights.map((highlight, idx) => (
+                          <li key={idx}>{highlight}</li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+                </div>
+              )}
 
               <div className="flex gap-2">
                 <Button onClick={onSave} className="flex-1">

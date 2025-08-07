@@ -28,10 +28,12 @@ export const FillGapModal: React.FC<FillGapModalProps> = ({
   const [phase, setPhase] = useState<'input' | 'review'>('input');
   const [generatedContent, setGeneratedContent] = useState<string>("");
   const [selectedAction, setSelectedAction] = useState<'extend' | 'create'>('extend');
-  const [selectedSectionId, setSelectedSectionId] = useState<string>("");
+  const [selectedSectionId, setSelectedSectionId] = useState<string>(() => profileSections.length > 0 ? profileSections[0].id : "");
   const [newSectionType, setNewSectionType] = useState<string>("experience");
   const [experienceInput, setExperienceInput] = useState<string>("");
   const [additionalContext, setAdditionalContext] = useState<string>("");
+  const [structureRationale, setStructureRationale] = useState<string>("");
+  const [keyHighlights, setKeyHighlights] = useState<string[]>([]);
 
   // LLM service hooks
   const [triggerEnhance, { isLoading: isEnhancing }] = useLlmService(
@@ -43,11 +45,23 @@ export const FillGapModal: React.FC<FillGapModalProps> = ({
 
   const isLoading = isEnhancing || isGenerating;
 
+  // Automatically select the first section when switching to 'extend' and none is selected
+  React.useEffect(() => {
+    if (selectedAction === 'extend' && !selectedSectionId && profileSections.length > 0) {
+      setSelectedSectionId(profileSections[0].id);
+    }
+  }, [selectedAction, profileSections, selectedSectionId]);
+
   const handleGenerate = async () => {
     try {
       if (selectedAction === 'extend') {
         const selectedSection = profileSections.find(ps => ps.id === selectedSectionId);
         if (!selectedSection) {
+          // Should not happen, but fallback to first section if available
+          if (profileSections.length > 0) {
+            setSelectedSectionId(profileSections[0].id);
+            return;
+          }
           console.error("No section selected for enhancement");
           return;
         }
@@ -57,18 +71,19 @@ export const FillGapModal: React.FC<FillGapModalProps> = ({
           experienceInput,
           additionalContext || undefined
         );
-        
         setGeneratedContent(result.enhanced_content);
+        setStructureRationale("");
+        setKeyHighlights([]);
       } else {
         const result: NewProfileSection = await triggerGenerate(
           newSectionType,
           experienceInput,
           additionalContext || undefined
         );
-        
         setGeneratedContent(result.content);
+        setStructureRationale(result.structure_rationale || "");
+        setKeyHighlights(result.key_highlights || []);
       }
-      
       setPhase('review');
     } catch (error) {
       console.error("Failed to generate content:", error);
@@ -95,10 +110,12 @@ export const FillGapModal: React.FC<FillGapModalProps> = ({
     setPhase('input');
     setGeneratedContent("");
     setSelectedAction('extend');
-    setSelectedSectionId("");
+    setSelectedSectionId(profileSections.length > 0 ? profileSections[0].id : "");
     setNewSectionType("experience");
     setExperienceInput("");
     setAdditionalContext("");
+    setStructureRationale("");
+    setKeyHighlights([]);
   };
 
   const handleClose = () => {
@@ -129,7 +146,7 @@ export const FillGapModal: React.FC<FillGapModalProps> = ({
         <div className="w-1/3 flex-shrink-0">
           <GapContextPanel gap={gap} />
         </div>
-        
+
         {/* Right Panel: Solution Builder */}
         <div className="flex-1 overflow-y-auto">
           <SolutionBuilderPanel
@@ -152,6 +169,8 @@ export const FillGapModal: React.FC<FillGapModalProps> = ({
             onGenerate={handleGenerate}
             onSave={handleSave}
             onBack={handleBack}
+            structureRationale={structureRationale}
+            keyHighlights={keyHighlights}
           />
         </div>
       </div>

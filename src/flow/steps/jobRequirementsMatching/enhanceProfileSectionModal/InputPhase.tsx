@@ -60,7 +60,7 @@ export const InputPhase: React.FC<InputPhaseProps> = ({
         </div>
       </div>
 
-      <div className="flex gap-3 pt-4 border-t">
+      {/* <div className="flex gap-3 pt-4 border-t">
         <Button 
           onClick={onGenerate}
           disabled={!experienceInput.trim() || isLoading}
@@ -81,7 +81,7 @@ export const InputPhase: React.FC<InputPhaseProps> = ({
         <Button variant="outline" onClick={onClose}>
           Cancel
         </Button>
-      </div>
+      </div> */}
     </div>
   );
 };
