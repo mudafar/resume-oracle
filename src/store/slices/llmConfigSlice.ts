@@ -1,6 +1,6 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
-export type LLMProvider = "free" | "google" | "groq" | "openrouter" | "custom";
+export type LLMProvider = "free" | "google-genai" | "groq" | "openrouter" | "openai" | "custom";
 export type LLMVariant = "default" | "balanced" | "high-accuracy";
 
 export interface LLMConfig {

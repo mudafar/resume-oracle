@@ -100,7 +100,10 @@ export const SelectedSectionCard: React.FC<SelectedSectionCardProps> = ({
                   </p>
                 </div>
                 <Button 
-                  onClick={() => onEnhanceSection(selectedSection)}
+                  onClick={() => {
+                    console.log('Enhance Section button clicked for:', selectedSection);
+                    onEnhanceSection?.(selectedSection);
+                  }}
                   size="sm"
                   className="bg-orange-600 hover:bg-orange-700 ml-4"
                 >

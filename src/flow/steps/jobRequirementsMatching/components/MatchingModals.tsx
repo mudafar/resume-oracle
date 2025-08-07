@@ -32,6 +32,13 @@ export const MatchingModals: React.FC<MatchingModalsProps> = ({
   onSaveEnhancement,
   profileSections
 }) => {
+  console.log('MatchingModals render:', { 
+    enhanceModalOpen, 
+    selectedSectionForEnhancement: selectedSectionForEnhancement?.profile_section_id,
+    profileSectionsCount: profileSections.length,
+    profileSectionIds: profileSections.map(ps => ps.id)
+  });
+
   return (
     <>
       {selectedGap && (

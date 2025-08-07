@@ -2,13 +2,6 @@ import React, { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "@/store/store";
 import { setLLMConfig, resetLLMConfig, LLMProvider, LLMVariant } from "@/store/slices/llmConfigSlice";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -34,6 +27,7 @@ import {
   ChevronDown,
   ChevronRight
 } from "lucide-react";
+import { SharedModal, ModalAction } from "./shared/modal";
 
 const PROVIDERS: { value: LLMProvider; label: string; icon: React.ReactNode }[] = [
   { 
@@ -172,19 +166,46 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
   const variantOptions = PROVIDER_VARIANTS[provider];
   const selectedProvider = PROVIDERS.find(p => p.value === provider);
 
-  return (
-    <Dialog open={open} onOpenChange={onClose}>
-      <DialogContent className="min-w-3xl max-h-[90vh] overflow-y-auto">
-        <DialogHeader>
-          <DialogTitle className="flex items-center gap-2">
-            <Settings className="w-5 h-5" />
-            Model Configuration
-          </DialogTitle>
-          <DialogDescription>
-            Configure your AI model settings and credentials
-          </DialogDescription>
-        </DialogHeader>
+  const modalActions: ModalAction[] = [
+    {
+      label: "Reset",
+      onClick: handleReset,
+      variant: "outline",
+      icon: <RotateCcw className="w-4 h-4" />,
+      disabled: saving
+    }
+  ];
 
+  if (onSkip && !blockSkip) {
+    modalActions.push({
+      label: "Skip",
+      onClick: handleSkip,
+      variant: "ghost",
+      disabled: saving
+    });
+  }
+
+  modalActions.push({
+    label: saving ? "Saving..." : "Save",
+    onClick: handleSave,
+    variant: "default",
+    icon: <Save className="w-4 h-4" />,
+    disabled: !canSave || saving,
+    loading: saving
+  });
+
+  return (
+    <SharedModal
+      open={open}
+      onClose={onClose}
+      title="Model Configuration"
+      description="Configure your AI model settings and credentials"
+      icon={<Settings className="w-5 h-5" />}
+      actions={modalActions}
+      size="lg"
+      closeOnOverlayClick={!saving}
+    >
+      <div className="p-6">
         <div className="space-y-6">
           {/* Contextual Info Card */}
           <Alert className="border-blue-200 bg-blue-50/50">
@@ -232,7 +253,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
               {/* Variant */}
               <div className="space-y-2">
                 <Label className="text-xs text-gray-500 uppercase tracking-wide">Variant</Label>
-                <Select value={variant} onValueChange={setVariant}>
+                <Select value={variant} onValueChange={(value) => setVariant(value as LLMVariant)}>
                   <SelectTrigger className="w-full">
                     <SelectValue />
                   </SelectTrigger>
@@ -331,42 +352,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
             </div>
           )}
         </div>
-
-        {/* Action Row - Sticky on scroll */}
-        <div className="sticky bottom-0 bg-white pt-6 border-t flex items-center gap-3">
-          <Button
-            variant="outline"
-            onClick={handleReset}
-            disabled={saving}
-            className="flex items-center gap-2"
-          >
-            <RotateCcw className="w-4 h-4" />
-            Reset
-          </Button>
-          
-          <div className="flex-1" />
-          
-          {onSkip && !blockSkip && (
-            <Button
-              variant="ghost"
-              onClick={handleSkip}
-              disabled={saving}
-              className="text-gray-600"
-            >
-              Skip
-            </Button>
-          )}
-          
-          <Button
-            onClick={handleSave}
-            disabled={!canSave || saving}
-            className="flex items-center gap-2"
-          >
-            <Save className="w-4 h-4" />
-            {saving ? "Saving..." : "Save"}
-          </Button>
-        </div>
-      </DialogContent>
-    </Dialog>
+      </div>
+    </SharedModal>
   );
 };

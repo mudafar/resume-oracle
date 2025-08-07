@@ -5,10 +5,6 @@ import { ProfileSection } from "@/store/slices/profileSectionsSlice";
 import { createStep } from "@/utils/createStep";
 // import { SuggestedSectionModal } from "./suggestedSectionModal";
 import { RematchBanner, MatchCard, useJobMatching } from ".";
-import { CoverageGapCard } from "./CoverageGapCard";
-import { SelectedSectionCard } from "./SelectedSectionCard";
-import { FillGapModal } from "./fillGapModal/FillGapModal";
-import { EnhanceProfileSectionModal } from "./enhanceProfileSectionModal";
 import { LoadingState, EmptyState, ErrorState, CoverageGaps, SelectedSections, MatchingModals } from "./components";
 import { useSelector, useDispatch } from "react-redux";
 import { RootState } from "@/store/store";
@@ -74,11 +70,14 @@ export const JobRequirementsMatching: React.FC = () => {
   };
 
   const handleEnhanceSection = (selectedSection: SelectedSection) => {
+    console.log('handleEnhanceSection called with:', selectedSection);
     setSelectedSectionForEnhancement(selectedSection);
     setEnhanceModalOpen(true);
+    console.log('Enhanced modal should be open now, state:', { enhanceModalOpen: true, selectedSection: selectedSection.profile_section_id });
   };
 
   const handleSaveEnhancement = (sectionId: string, enhancedContent: string) => {
+    console.log('handleSaveEnhancement called');
     // Update the profile section with enhanced content
     const profileSection = profileSections.find(ps => ps.id === sectionId);
     if (profileSection) {
@@ -91,6 +90,7 @@ export const JobRequirementsMatching: React.FC = () => {
     
     setEnhanceModalOpen(false);
     setSelectedSectionForEnhancement(null);
+    console.log('Enhanced modal closed');
   };
 
   const handleSaveAndMarkCovered = (
@@ -177,7 +177,11 @@ export const JobRequirementsMatching: React.FC = () => {
         onSaveAndMarkCovered={handleSaveAndMarkCovered}
         selectedSectionForEnhancement={selectedSectionForEnhancement}
         enhanceModalOpen={enhanceModalOpen}
-        onCloseEnhance={() => setEnhanceModalOpen(false)}
+        onCloseEnhance={() => {
+          console.log('onCloseEnhance called');
+          setEnhanceModalOpen(false);
+          setSelectedSectionForEnhancement(null);
+        }}
         onSaveEnhancement={handleSaveEnhancement}
         profileSections={profileSections}
       />

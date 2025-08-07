@@ -1,6 +1,5 @@
 "use client";
 import React, { useState } from "react";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { CoverageGap } from "@/services/zodModels";
 import { ProfileSection } from "@/store/slices/profileSectionsSlice";
 import { GapContextPanel } from "./GapContextPanel";
@@ -8,6 +7,8 @@ import { SolutionBuilderPanel } from "./SolutionBuilderPanel";
 import { useLlmService } from "@/hooks/useLlmService";
 import { profileSectionEnhancerService, EnhancedProfileSection } from "@/services/profileSectionEnhancerService";
 import { profileSectionGeneratorService, NewProfileSection } from "@/services/profileSectionGeneratorService";
+import { WizardModal } from "../../shared/modal";
+import { Search } from "lucide-react";
 
 interface FillGapModalProps {
   open: boolean;
@@ -106,44 +107,54 @@ export const FillGapModal: React.FC<FillGapModalProps> = ({
   };
 
   return (
-    <Dialog open={open} onOpenChange={handleClose}>
-      <DialogContent className="min-w-[75vw] min-h-[90vh] overflow-hidden">
-        <DialogHeader>
-          <DialogTitle>Fill Coverage Gap</DialogTitle>
-        </DialogHeader>
-        
-        <div className="flex gap-6 h-[calc(90vh-8rem)] overflow-hidden">
-          {/* Left Panel: Gap Context */}
-          <div className="w-1/3 flex-shrink-0">
-            <GapContextPanel gap={gap} />
-          </div>
-          
-          {/* Right Panel: Solution Builder */}
-          <div className="flex-1 overflow-y-auto">
-            <SolutionBuilderPanel
-              phase={phase}
-              selectedAction={selectedAction}
-              setSelectedAction={setSelectedAction}
-              selectedSectionId={selectedSectionId}
-              setSelectedSectionId={setSelectedSectionId}
-              newSectionType={newSectionType}
-              setNewSectionType={setNewSectionType}
-              experienceInput={experienceInput}
-              setExperienceInput={setExperienceInput}
-              additionalContext={additionalContext}
-              setAdditionalContext={setAdditionalContext}
-              generatedContent={generatedContent}
-              setGeneratedContent={setGeneratedContent}
-              profileSections={profileSections}
-              gap={gap}
-              isLoading={isLoading}
-              onGenerate={handleGenerate}
-              onSave={handleSave}
-              onBack={handleBack}
-            />
-          </div>
+    <WizardModal
+      open={open}
+      onClose={handleClose}
+      title="Fill Coverage Gap"
+      description={`Address gap: ${gap.requirement_cluster.cluster_name}`}
+      icon={<Search className="w-5 h-5 text-blue-600" />}
+      currentStep={phase === 'input' ? 1 : 2}
+      totalSteps={2}
+      onNext={phase === 'input' ? handleGenerate : undefined}
+      onBack={phase === 'review' ? handleBack : undefined}
+      onFinish={phase === 'review' ? handleSave : undefined}
+      nextLabel={isLoading ? "Generating..." : "Generate Solution"}
+      finishLabel="Save & Mark Covered"
+      isLoading={isLoading}
+      canNext={experienceInput.trim().length > 0}
+      canFinish={generatedContent.trim().length > 0}
+    >
+      <div className="flex gap-6 h-[calc(80vh-2rem)] overflow-hidden">
+        {/* Left Panel: Gap Context */}
+        <div className="w-1/3 flex-shrink-0">
+          <GapContextPanel gap={gap} />
         </div>
-      </DialogContent>
-    </Dialog>
+        
+        {/* Right Panel: Solution Builder */}
+        <div className="flex-1 overflow-y-auto">
+          <SolutionBuilderPanel
+            phase={phase}
+            selectedAction={selectedAction}
+            setSelectedAction={setSelectedAction}
+            selectedSectionId={selectedSectionId}
+            setSelectedSectionId={setSelectedSectionId}
+            newSectionType={newSectionType}
+            setNewSectionType={setNewSectionType}
+            experienceInput={experienceInput}
+            setExperienceInput={setExperienceInput}
+            additionalContext={additionalContext}
+            setAdditionalContext={setAdditionalContext}
+            generatedContent={generatedContent}
+            setGeneratedContent={setGeneratedContent}
+            profileSections={profileSections}
+            gap={gap}
+            isLoading={isLoading}
+            onGenerate={handleGenerate}
+            onSave={handleSave}
+            onBack={handleBack}
+          />
+        </div>
+      </div>
+    </WizardModal>
   );
 };

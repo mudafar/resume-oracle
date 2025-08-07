@@ -1,17 +1,7 @@
 import React, { useMemo, useState } from "react";
-import {
-  Button
-} from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle
-} from "@/components/ui/card";
-import { X, Download, Copy, Check } from "lucide-react";
+import { SharedModal, ModalAction } from "../shared/modal";
+import { Download, Copy, Check, FileText } from "lucide-react";
 import { ProfileSection } from "@/store/slices/profileSectionsSlice";
-
 
 interface ProfileSectionsExportModalProps {
   open: boolean;
@@ -37,8 +27,6 @@ export const ProfileSectionsExportModal: React.FC<ProfileSectionsExportModalProp
     () => `profile-sections-${new Date().toISOString().split("T")[0]}.json`,
     []
   );
-
-  if (!open) return null;
 
   const handleDownload = () => {
     const blob = new Blob([exportData], { type: "application/json" });
@@ -67,80 +55,50 @@ export const ProfileSectionsExportModal: React.FC<ProfileSectionsExportModalProp
     onClose();
   };
 
+  const actions: ModalAction[] = [
+    {
+      label: "Download JSON",
+      onClick: handleDownload,
+      variant: "default",
+      icon: <Download className="w-4 h-4" />
+    },
+    {
+      label: copied ? "Copied!" : "Copy to Clipboard",
+      onClick: handleCopy,
+      variant: "outline",
+      icon: copied ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />
+    },
+    {
+      label: "Close",
+      onClick: resetAndClose,
+      variant: "ghost"
+    }
+  ];
+
   return (
-    <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm"
-      role="dialog"
-      aria-modal="true"
+    <SharedModal
+      open={open}
+      onClose={resetAndClose}
+      title="Export Profile Sections"
+      description="Download or copy your profile sections in JSON format."
+      icon={<FileText className="w-5 h-5 text-blue-600" />}
+      badge={{ text: `${profileSections.length} sections`, variant: "secondary" }}
+      size="lg"
+      actions={actions}
     >
-      <Card className="w-full max-w-lg mx-4 animate-in fade-in zoom-in-95">
-        <CardHeader className="flex items-start justify-between space-y-0 pb-2">
-          <div>
-            <CardTitle className="flex items-center gap-2 text-lg">
-              Export Profile Sections
-            </CardTitle>
-            <CardDescription>
-              Download or copy your profile sections in JSON format.
-            </CardDescription>
+      <div className="p-6 space-y-4">
+        {/* JSON Preview */}
+        <div>
+          <label className="block text-sm font-medium mb-1">
+            Preview ({profileSections.length} sections)
+          </label>
+          <div className="max-h-48 overflow-y-auto rounded-md border border-input bg-muted/50 p-3 text-xs font-mono">
+            <pre className="whitespace-pre-wrap break-words">
+              {exportData}
+            </pre>
           </div>
-          <Button
-            variant="ghost"
-            size="icon"
-            className="text-muted-foreground hover:text-foreground"
-            onClick={resetAndClose}
-            aria-label="Close export modal"
-          >
-            <X className="w-4 h-4" />
-          </Button>
-        </CardHeader>
-
-        <CardContent className="space-y-4">
-          {/* Export Controls */}
-          <div className="flex flex-col sm:flex-row gap-2">
-            <Button onClick={handleDownload} className="flex items-center gap-2">
-              <Download className="w-4 h-4" />
-              Download JSON
-            </Button>
-            <Button
-              variant="outline"
-              onClick={handleCopy}
-              className="flex items-center gap-2"
-              aria-label="Copy JSON to clipboard"
-            >
-              {copied ? (
-                <>
-                  <Check className="w-4 h-4" />
-                  Copied!
-                </>
-              ) : (
-                <>
-                  <Copy className="w-4 h-4" />
-                  Copy to Clipboard
-                </>
-              )}
-            </Button>
-          </div>
-
-          {/* JSON Preview */}
-          <div>
-            <label className="block text-sm font-medium mb-1">
-              Preview ({profileSections.length} sections)
-            </label>
-            <div className="max-h-48 overflow-y-auto rounded-md border border-input bg-muted/50 p-3 text-xs font-mono">
-              <pre className="whitespace-pre-wrap break-words">
-                {exportData}
-              </pre>
-            </div>
-          </div>
-
-          {/* Footer */}
-          <div className="flex justify-end pt-2">
-            <Button variant="outline" onClick={resetAndClose}>
-              Close
-            </Button>
-          </div>
-        </CardContent>
-      </Card>
-    </div>
+        </div>
+      </div>
+    </SharedModal>
   );
 };
