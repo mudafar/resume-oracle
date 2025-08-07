@@ -12,6 +12,11 @@ export const getMatchedProfileSectionWithRequirements = (
     const profileSection = profileSections.find(ps => ps.id === section.profile_section_id);
     if (!profileSection) return null; // Skip if no matching profile section
 
+    const requirementClusters = section.matched_scored_pairs.map(pair => ({
+      cluster_name: pair.cluster_name,
+      priority_tier: pair.priority_tier,
+      requirements: [...pair.coverage, ...pair.missing],
+    }));
     // Extract all requirements from coverage arrays across all matched pairs
     const allRequirements = section.matched_scored_pairs.flatMap(pair => [
       ...pair.coverage,
@@ -25,7 +30,7 @@ export const getMatchedProfileSectionWithRequirements = (
 
     return {
       profile_section: profileSection,
-      requirements: uniqueRequirements,
+      requirement_clusters: requirementClusters
     };
   }).filter(Boolean) as ProfileSectionWithRequirements[]; // Remove null values and cast to correct type
 };

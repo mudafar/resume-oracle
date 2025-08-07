@@ -5,6 +5,7 @@ import {
   GeneratedResumeSectionResultListSchema,
   GeneratedResumeSectionResult,
 } from "./zodModels";
+import { buildSectionsContext } from "./utils";
 
 export class ResumeSectionsGeneratorService {
   /**
@@ -15,12 +16,7 @@ export class ResumeSectionsGeneratorService {
     llmConfig?: any
   ): Promise<GeneratedResumeSectionResult[]> {
     // Build context string for prompt
-    const sections_context = profileSectionsWithRequirements
-      .map(pswr => {
-        const requirements_context = pswr.requirements.map(req => `    - ${req}`).join("\n");
-        return `Profile Section ID: ${pswr.profile_section.id}\nProfile Section Type: ${pswr.profile_section.type}\nProfile Section Content: ${pswr.profile_section.content}\nMatched Requirements List:\n${requirements_context}`;
-      })
-      .join("\n\n");
+    const sections_context = buildSectionsContext(profileSectionsWithRequirements)
     const prompt = ChatPromptTemplate.fromTemplate(`
             You are a Senior Resume Editor and Content Strategist specializing in transforming detailed professional profiles into concise, impactful resume sections.
 
@@ -28,11 +24,12 @@ export class ResumeSectionsGeneratorService {
             Your mission is to create resume-optimized summaries of profile sections that preserve all evidence of matched requirements while condensing content to fit standard resume formatting and space constraints. You must:
             - Summarize profile sections without adding new information
             - Highlight matched requirements through existing content
+            - Prioritize requirements based on their cluster priority tier
             - Apply appropriate resume formatting for each section type
             - Maintain authenticity and evidence-based claims
 
             ## Input Data
-            **PROFILE SECTIONS WITH MATCHED REQUIREMENTS**: Each section contains original detailed content and a list of job requirements that this section already matches through existing evidence.
+            **PROFILE SECTIONS WITH MATCHED REQUIREMENTS**: Each section contains original detailed content and a list of prioritized clustered job requirements that this section already matches through existing evidence.
 
             {sections_with_requirements}
 

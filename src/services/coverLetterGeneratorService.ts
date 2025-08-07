@@ -5,6 +5,7 @@ import {
   ProfileSectionWithRequirements,
   GeneratedCoverLetterResult
 } from "./zodModels";
+import { buildSectionsContext } from "./utils";
 
 export class CoverLetterGeneratorService {
   /**
@@ -28,11 +29,12 @@ export class CoverLetterGeneratorService {
             You are a Senior Career Strategist and Interview Landing Specialist with expertise in creating compelling cover letters that secure interview invitations.
 
             ## Mission
-            Your mission is to craft a strategically optimized cover letter that transforms profile sections and job requirements into a compelling narrative that positions the candidate as the ideal fit worthy of an interview invitation. You must:
+            Your mission is to craft a strategically optimized cover letter that transforms profile sections and prioritized clustered job requirements into a compelling narrative that positions the candidate as the ideal fit worthy of an interview invitation. You must:
             - Create a compelling professional story that connects candidate background to role requirements
             - Demonstrate clear value proposition and cultural alignment through existing experience only
             - Mirror the company's communication style and job description tone
             - Address matched requirements organically through natural experience narratives
+            - Priorize requirements based on their cluster priority tier
             - Generate genuine enthusiasm that motivates hiring managers to schedule interviews
 
             ## Input Data
@@ -58,6 +60,7 @@ export class CoverLetterGeneratorService {
             - Use specific examples and quantifiable achievements already present in profile content
             - Connect requirements to demonstrated business impact without adding new claims
             - Never force requirements that don't naturally fit within existing experience context
+            - Highlight requirements based on their priority tier, ensuring the most critical ones are emphasized
             - Only highlight requirements that have genuine, substantial evidence in the profile sections
 
             **PRIORITY 3: Cultural and Tonal Alignment**
@@ -84,16 +87,7 @@ export class CoverLetterGeneratorService {
     `);
 
     // Build comprehensive context with all sections and their requirements (match Python formatting)
-    const sectionsContext = profileSectionsWithRequirements
-      .map(pswr => {
-        const requirements = pswr.requirements.map(req => `    - ${req}`).join("\n");
-        return (
-          `Type: ${pswr.profile_section.type}\n` +
-          `Content: ${pswr.profile_section.content}\n` +
-          `Matched Requirements:\n${requirements}\n`
-        );
-      })
-      .join("\n");
+    const sectionsContext = buildSectionsContext(profileSectionsWithRequirements)
 
     const companyContextText = companyContext || "No specific company context provided";
     const toneGuidanceText = toneGuidance || "Standard professional tone";

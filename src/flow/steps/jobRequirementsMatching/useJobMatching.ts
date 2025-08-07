@@ -134,7 +134,7 @@ export const useJobMatching = () => {
     // New state for updated components
     profileSections,
     job_description,
-    isLoading,
+    isLoading: isLoading || isExtracting,
     error,
     showRematchBanner,
     modalOpen,

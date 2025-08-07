@@ -10,7 +10,7 @@ interface RematchBannerProps {
 }
 
 export const RematchBanner: React.FC<RematchBannerProps> = ({ onRematch, onDismiss }) => (
-  <Alert className="sticky top-0 z-10 bg-yellow-50 border-yellow-400 text-yellow-800 mb-4">
+  <Alert className="top-0 z-10 bg-yellow-50 border-yellow-400 text-yellow-800 mb-4">
     <AlertTitle>Inputs Changed</AlertTitle>
     <AlertDescription>
       <div className="flex items-center justify-between">

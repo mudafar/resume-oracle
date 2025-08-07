@@ -42,9 +42,14 @@ export const MatchedProfileSectionSchema = z.object({
   base_job_requirement_matches: z.array(BaseJobRequirementMatchSchema),
 });
 
+// TODO: use normal TS types for schemas not used in langchain prompts
 export const ProfileSectionWithRequirementsSchema = z.object({
   profile_section: ProfileSectionSchema.describe("The profile section to process"),
-  requirements: z.array(z.string()).describe("List of job requirements to optimize for"),
+  requirement_clusters: z.array(z.object({
+    cluster_name: z.string().describe("Name of the requirement cluster this section matches"),
+    priority_tier: z.enum(["critical", "important", "nice_to_have"]).describe("Priority level of the cluster"),
+    requirements: z.array(z.string()).describe("List of requirements in this cluster that this section matches"),
+  })).describe("List of requirement clusters this profile section matches"),
 });
 
 export const ProfileSectionSuggestionSchema = z.object({
@@ -152,6 +157,8 @@ export type RequirementCluster = z.infer<typeof RequirementClusterSchema>;
 const ScoredPairSchema = z.object({
   section_id: z.string().describe("ID of the profile section"),
   cluster_id: z.string().describe("ID of the requirement cluster"),
+  cluster_name: z.string().describe("Name of the requirement cluster"),
+  priority_tier: z.enum(["critical", "important", "nice_to_have"]).describe("Priority level of the cluster"),
   raw_score: z.number().min(0).max(100).describe("Raw matching score 0-100"),
   coverage: z.array(z.string()).describe("Specific requirements from cluster that this section covers"),
   missing: z.array(z.string()).describe("Requirements from cluster that this section does NOT cover"),
