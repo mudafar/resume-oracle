@@ -3,10 +3,15 @@
 		"spec-driven-dev-mcp": {
 			"command": "npx",
 			"args": [
-				"spec-driven-dev-mcp@1.0.1"
+				"spec-driven-dev-mcp@latest"
 			],
 			"env": {},
 			"type": "stdio"
+		},
+		"Context7": {
+		"type": "stdio",
+		"command": "npx",
+		"args": ["-y", "@upstash/context7-mcp@latest"]
 		}
 	},
 	"inputs": []
