@@ -31,14 +31,23 @@ Resume Oracle is a guided, step-by-step workflow that helps job seekers create h
 - **AI Integration**: LangChain.js with custom `useLlmService` hook
 - **Type Safety**: Zod schemas for LLM output validation
 
-## Quick Start
+## Setup & Installation
 
-```bash
-npm install
-npm run dev
-```
+### Prerequisites
 
-Open [http://localhost:3000](http://localhost:3000) to start the application.
+**LLM API Key Required**: This application requires a Gemini API key (or other supported services) to function. You can provide it either:
+- As environment variable `NEXT_PUBLIC_GEMINI_API_KEY` in `.env.local`
+- Manually through the app UI
+
+### Getting a Free Gemini API Key
+
+1. Visit [Google AI Studio](https://aistudio.google.com/app/apikey)
+2. Sign in with your Google account
+3. Click "Create API key"
+4. Copy your API key
+
+
+**Note**: If you don't set the environment variable, you can enter your API key directly in the application interface.
 
 ## Documentation
 
@@ -46,6 +55,7 @@ Open [http://localhost:3000](http://localhost:3000) to start the application.
 - [Feature Overview](./feature_overview.md) - Detailed feature descriptions
 - [UI Flow](./multi_step_ui_flow.md) - Complete user journey documentation
 
+
 ## Contributing
 
-This project follows strict TypeScript patterns and uses AI-assisted development. See [DEV.md](./DEV.md) for development guidelines and architectural decisions. 
+This project follows strict TypeScript patterns and uses AI-assisted development. See [Development Guide](./DEV.md) 
