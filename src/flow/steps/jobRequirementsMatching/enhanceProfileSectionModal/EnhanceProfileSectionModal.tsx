@@ -1,13 +1,13 @@
 "use client";
 import React, { useState } from "react";
 import { Sparkles } from 'lucide-react';
-import { SelectedSection } from "@/services/zodModels";
-import { ProfileSection } from "@/store/slices/profileSectionsSlice";
+import type { ProfileSection } from "@/types/store";
 import { useLlmService } from "@/hooks/useLlmService";
 import { profileSectionEnhancerService, EnhancedProfileSection } from "@/services/profileSectionEnhancerService";
 import { ContextPanel } from "./ContextPanel";
 import { EnhancementInterface } from "./EnhancementInterface";
 import { WizardModal } from "../../shared/modal";
+import { SelectedSection } from "@/schemas/matching";
 
 interface EnhanceProfileSectionModalProps {
   open: boolean;

@@ -1,10 +1,7 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
+import { CoverLetterState } from "@/types/store/coverLetterSlice.types";
 
-interface CoverLetterState {
-  coverLetter: string;
-  optimizationSummary: string | null;
-  lastCoverLetterInputsHash: string | null;
-}
+
 
 const initialState: CoverLetterState = {
   coverLetter: "",
@@ -44,4 +41,4 @@ export const {
   clearCoverLetter,
 } = coverLetterSlice.actions;
 
-export default coverLetterSlice.reducer; 
+export default coverLetterSlice.reducer;

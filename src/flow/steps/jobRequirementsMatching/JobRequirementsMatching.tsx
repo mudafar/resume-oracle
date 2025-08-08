@@ -1,17 +1,17 @@
 "use client";
 import React, { useState, useEffect } from "react";
 // Utility to get profile sections referenced by matches
-import { ProfileSection } from "@/store/slices/profileSectionsSlice";
 import { createStep } from "@/utils/createStep";
 // import { SuggestedSectionModal } from "./suggestedSectionModal";
 import { RematchBanner, MatchCard, useJobMatching } from ".";
 import { LoadingState, EmptyState, ErrorState, CoverageGaps, SelectedSections, MatchingModals } from "./components";
 import { useSelector, useDispatch } from "react-redux";
 import { RootState } from "@/store/store";
-import { HybridSelectionResult, CoverageGap, SelectedSection } from "@/services/zodModels";
+import { ProfileSection } from "@/types/store";
 import { addProfileSectionReturnId } from "../shared/createProfileSection";
 import { editSection } from "@/store/slices/profileSectionsSlice";
 import { markGapAsFilled } from "@/store/slices/matchesSlice";
+import { CoverageGap, HybridSelectionResult, SelectedSection } from "@/schemas/matching";
 
 
 function getOrderedMatchedProfileSections(

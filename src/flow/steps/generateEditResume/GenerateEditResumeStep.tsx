@@ -1,14 +1,12 @@
 import React, { useEffect, useMemo, useState, useRef } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { RootState } from "@/store/store";
-import { ResumeSection as ResumeInputSection } from "@/store/slices/resumeSectionsSlice";
 import {
   setResume,
   setOptimizationSummary,
   setLastResumeInputsHash,
   updateResume
 } from "@/store/slices/resumeSlice";
-import { ResumeOutput, ResumeSection } from "@/services/zodModels";
 import { useLlmService } from "@/hooks/useLlmService";
 import { resumeGeneratorService } from "@/services/resumeGeneratorService";
 import jsPDF from "jspdf";
@@ -18,6 +16,8 @@ import { RegenerateBanner } from '../shared/RegenerateBanner';
 import { OptimizationSummaryCard } from '../shared/OptimizationSummaryCard';
 import { ResumeEditor, ResumeActions, ResumeStates } from './components';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { ResumeSection } from "@/types/store";
+import { ResumeOutput } from "@/schemas/resume";
 
 const GenerateEditResume: React.FC = () => {
   const dispatch = useDispatch();

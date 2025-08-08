@@ -1,4 +1,4 @@
-import { StepConfig, StepDefinition } from "@/types/stepTypes";
+import { StepConfig, StepDefinition } from "@/types/flow/step.types";
 
 // Generic createStep factory function
 

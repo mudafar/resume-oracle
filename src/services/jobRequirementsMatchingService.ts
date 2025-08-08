@@ -1,9 +1,9 @@
 import { ChatPromptTemplate } from "@langchain/core/prompts";
 import { llmService } from "./llmService";
-import { ProfileSection } from "@/store/slices/profileSectionsSlice";
-import { HybridSelectionResult, LLMScoringResult, LLMScoringResultSchema, RequirementCluster } from "./zodModels";
+import { ProfileSection } from "@/schemas/profile";
+import { HybridSelectionResult, LLMScoringResultSchema } from "@/schemas/matching/scoring.schema";
+import { RequirementCluster } from "@/schemas/job/requirementCluster.schema";
 import { hybridSelectionService } from "./matching/hybridSelection";
-
 
 export class JobRequirementsMatchingService {
 

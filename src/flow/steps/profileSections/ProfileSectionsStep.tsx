@@ -6,22 +6,15 @@ import {
   addSection,
   editSection,
   deleteSection,
-  ProfileSection,
-  SectionTypeEnum,
   setSections,
 } from "@/store/slices/profileSectionsSlice";
+import { SectionTypeEnum } from "@/types/store";
+import { ProfileSection } from "@/types/store";
 import { openConfigModal } from "@/store/slices/llmConfigSlice";
 import { addProfileSectionReturnId } from "../shared/createProfileSection";
 import { exportSectionsToJson, importSectionsFromJson } from "./profileSectionsExportImport";
-import { ProfileSectionsActionBar } from "./ProfileSectionsActionBar";
-import { NewProfileSectionModal } from "./NewProfileSectionModal";
-import { ProfileSectionsExportModal } from "./ProfileSectionsExportModal";
-import { ProfileSectionCard } from "./ProfileSectionCard";
-import { DeleteAllProfileSectionsModal } from "./DeleteAllProfileSectionsModal";
-import { ModelConfigPrompt } from "./ModelConfigPrompt";
 import { Toast } from "./Toast";
 import { createStep } from "@/utils/createStep";
-import { ProfileSectionsImportJSONModal } from "./ProfileSectionsImportJSONModal";
 import { SectionsList, ModalsManager, ProfileSectionsActions } from "./components";
 
 const ProfileSections: React.FC = () => {
@@ -67,17 +60,6 @@ const ProfileSections: React.FC = () => {
       return next;
     });
   }, [sections]);
-
-  // Persist heroSkipped in localStorage
-  // useEffect(() => {
-  //   const stored = localStorage.getItem("profileSectionsHeroSkipped");
-  //   if (stored === "true") setHeroSkipped(true);
-  // }, []);
-  // const handleSkipHero = () => {
-  //   setHeroSkipped(true);
-  //   setNewSectionModalOpen(true);
-  //   // localStorage.setItem("profileSectionsHeroSkipped", "true");
-  // };
 
   const handleAdd = () => {
     if (addContent.trim()) {

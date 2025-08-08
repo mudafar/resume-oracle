@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { FormModal } from "../shared/modal";
-import { SectionTypeEnum, sectionTypes } from "@/store/slices/profileSectionsSlice";
+import { SectionTypeEnum, sectionTypes } from "@/types/store";
 import { Plus } from "lucide-react";
 
 interface NewProfileSectionModalProps {

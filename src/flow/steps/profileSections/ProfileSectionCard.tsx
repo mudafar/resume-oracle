@@ -28,7 +28,7 @@ import {
   ProfileSection,
   SectionTypeEnum,
   sectionTypes
-} from "@/store/slices/profileSectionsSlice";
+} from "@/types/store";
 
 interface ProfileSectionCardProps {
   section: ProfileSection;

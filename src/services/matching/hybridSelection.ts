@@ -1,4 +1,7 @@
-import { CoverageGap, HybridSelectionResult, ProfileSection, RequirementCluster, ScoredPair, SelectedSection, SelectionConstraints } from "../zodModels";
+import { RequirementCluster } from "@/schemas/job";
+import { CoverageGap, HybridSelectionResult, ScoredPair, SelectedSection } from "@/schemas/matching";
+import { SelectionConstraints } from "@/types/matching/selection.types";
+import { ProfileSection } from "@/types/store";
 
 
 

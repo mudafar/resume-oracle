@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { StepDefinition } from "@/types/stepTypes";
+import { StepDefinition } from "@/types/flow/step.types";
 import {
   ScrollText
 } from "lucide-react";

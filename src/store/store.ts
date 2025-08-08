@@ -2,7 +2,6 @@ import { configureStore, combineReducers } from "@reduxjs/toolkit";
 import { persistStore, persistReducer } from "redux-persist";
 import storage from "redux-persist/lib/storage";
 
-import counterReducer from "./slices/counterSlice";
 import profileSectionsReducer from "./slices/profileSectionsSlice";
 import jobContextReducer from "./slices/jobDescriptionSlice";
 import matchesReducer from "./slices/matchesSlice";
@@ -13,7 +12,6 @@ import llmConfigReducer from "./slices/llmConfigSlice";
 import stepReducer from "./slices/stepSlice";
 
 const rootReducer = combineReducers({
-  counter: counterReducer,
   profileSections: profileSectionsReducer,
   jobContext: jobContextReducer,
   matches: matchesReducer,

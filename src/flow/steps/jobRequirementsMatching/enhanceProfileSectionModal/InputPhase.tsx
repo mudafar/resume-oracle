@@ -60,28 +60,6 @@ export const InputPhase: React.FC<InputPhaseProps> = ({
         </div>
       </div>
 
-      {/* <div className="flex gap-3 pt-4 border-t">
-        <Button 
-          onClick={onGenerate}
-          disabled={!experienceInput.trim() || isLoading}
-          className="flex-1"
-        >
-          {isLoading ? (
-            <div className="flex items-center gap-2">
-              <div className="h-4 w-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-              Enhancing...
-            </div>
-          ) : (
-            <>
-              <Sparkles className="mr-2 h-4 w-4" />
-              Enhance Section
-            </>
-          )}
-        </Button>
-        <Button variant="outline" onClick={onClose}>
-          Cancel
-        </Button>
-      </div> */}
     </div>
   );
 };

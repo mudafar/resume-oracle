@@ -1,8 +1,9 @@
 import { ChatPromptTemplate } from "@langchain/core/prompts";
 import { llmService } from "./llmService";
-import { LLMConfig } from "@/store/slices/llmConfigSlice";
 import { z } from "zod";
+import { LLMConfig } from "@/types/store";
 
+// TODO: move this schema
 // Schema for the new profile section result
 export const NewProfileSectionSchema = z.object({
   content: z.string().describe("The complete new profile section content"),

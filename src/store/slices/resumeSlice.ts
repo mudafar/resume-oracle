@@ -1,10 +1,5 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-
-interface ResumeState {
-  resume: string;
-  optimizationSummary: string | null;
-  lastResumeInputsHash: string | null;
-}
+import { ResumeState } from "@/types/store/resumeSlice.types";
 
 const initialState: ResumeState = {
   resume: "",
@@ -44,4 +39,4 @@ export const {
   clearResume,
 } = resumeSlice.actions;
 
-export default resumeSlice.reducer; 
+export default resumeSlice.reducer;

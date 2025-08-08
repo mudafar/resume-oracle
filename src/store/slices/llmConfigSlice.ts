@@ -1,19 +1,6 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
+import { LLMConfig } from "@/types/store/llmConfigSlice.types";
 
-export type LLMProvider = "free" | "google-genai" | "groq" | "openrouter" | "openai" | "custom";
-export type LLMVariant = "default" | "balanced" | "high-accuracy";
-
-export interface LLMConfig {
-  provider: LLMProvider;
-  variant: LLMVariant;
-  apiKey: string | null;
-  endpointUrl: string | null;
-  showConfigModal: boolean;
-  temperature?: number;
-  topP?: number;
-}
-
-//  TODO unify type with service
 const initialState: LLMConfig = {
   provider: "free",
   variant: "default",

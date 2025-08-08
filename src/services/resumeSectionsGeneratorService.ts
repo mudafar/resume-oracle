@@ -1,11 +1,12 @@
 import { ChatPromptTemplate } from "@langchain/core/prompts";
 import { llmService } from "./llmService";
 import {
-  ProfileSectionWithRequirements,
   GeneratedResumeSectionResultListSchema,
   GeneratedResumeSectionResult,
-} from "./zodModels";
+} from "@/schemas/resume/";
+
 import { buildSectionsContext } from "./utils";
+import { ProfileSectionWithRequirements } from "@/schemas/profile";
 
 export class ResumeSectionsGeneratorService {
   /**

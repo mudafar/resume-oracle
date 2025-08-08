@@ -1,11 +1,10 @@
 "use client";
 import React from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import { Target } from 'lucide-react';
-import { SelectedSection } from "@/services/zodModels";
-import { ProfileSection } from "@/store/slices/profileSectionsSlice";
 import { generateTextPreview } from "@/utils/textPreview";
+import { SelectedSection } from "@/schemas/matching";
+import { ProfileSection } from "@/types/store";
 
 interface CurrentSectionOverviewProps {
   profileSection: ProfileSection;

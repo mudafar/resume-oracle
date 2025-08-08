@@ -1,42 +1,6 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { nanoid } from "nanoid";
-
-
-interface ProfileSectionBase {
-  type: string;
-  content: string;
-}
-
-export interface ProfileSection extends ProfileSectionBase {
-  id: string;
-}
-
-export interface ResumeSection {
-  profile_section_id: string;
-  type: string;
-  content: string;
-}
-
-interface ProfileSectionsState {
-  sections: ProfileSection[];
-  resumeSections: ResumeSection[];
-}
-
-export enum SectionTypeEnum {
-  Summary = "Summary",
-  Experience = "Experience",
-  Skills = "Skills",
-  Education = "Education",
-  Project = "Project",
-  Certification = "Certification",
-  Volunteering = "Volunteering",
-  Language = "Language",
-  Award = "Award",
-  Course = "Course",
-  Custom = "Custom Section",
-}
-
-export const sectionTypes = Object.values(SectionTypeEnum);
+import { ProfileSectionsState, ProfileSection, ProfileSectionBase, ResumeSection, SectionTypeEnum, sectionTypes } from "@/types/store/profileSectionsSlice.types";
 
 
 const initialState: ProfileSectionsState = {

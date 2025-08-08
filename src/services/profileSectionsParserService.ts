@@ -1,11 +1,11 @@
 import { ChatPromptTemplate } from "@langchain/core/prompts";
 import { z } from "zod";
 import { llmService } from "./llmService";
-import { ProfileSectionSchema, ProfileSectionListSchema } from "./zodModels";
-import { LLMConfig } from "@/store/slices/llmConfigSlice";
+import { ProfileSectionListSchema, ProfileSectionSchema } from "@/schemas/profile";
+import { LLMConfig } from "@/types/store";
 
 // Removed local LLMConfig interface, now using imported LLMConfig type
-
+// TODO: move this infer
 type ProfileSection = z.infer<typeof ProfileSectionSchema>;
 type ProfileType = "linkedin" | "resume";
 

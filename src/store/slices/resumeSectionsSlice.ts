@@ -1,15 +1,6 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
+import { ResumeSectionsState, ResumeSection } from "@/types/store/resumeSectionsSlice.types";
 
-export interface ResumeSection {
-  profile_section_id: string;
-  type: string;
-  content: string;
-}
-
-interface ResumeSectionsState {
-  resumeSections: ResumeSection[];
-  lastInputsHash: string | null;
-}
 
 const initialState: ResumeSectionsState = {
   resumeSections: [],
@@ -47,4 +38,4 @@ export const {
   clearResumeSections,
 } = resumeSectionsSlice.actions;
 
-export default resumeSectionsSlice.reducer; 
+export default resumeSectionsSlice.reducer;

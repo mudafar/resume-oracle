@@ -6,9 +6,9 @@ import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { CheckCircle, ChevronDown, ChevronUp, Star, Sparkles } from 'lucide-react';
-import { SelectedSection } from "@/services/zodModels";
-import { ProfileSection } from "@/store/slices/profileSectionsSlice";
+import { ProfileSection } from "@/types/store";
 import { generateTextPreview } from "@/utils/textPreview";
+import { SelectedSection } from "@/schemas/matching";
 
 interface SelectedSectionCardProps {
   selectedSection: SelectedSection;

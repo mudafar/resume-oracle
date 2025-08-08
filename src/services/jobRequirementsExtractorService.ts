@@ -1,5 +1,5 @@
 import { ChatPromptTemplate } from "@langchain/core/prompts";
-import { JobRequirementClustersSchema, JobRequirementListSchema, RequirementCluster } from "./zodModels";
+import { RequirementCluster, JobRequirementClustersSchema } from "@/schemas/job";
 import { llmService } from "./llmService";
 
 export class JobRequirementsExtractorService {

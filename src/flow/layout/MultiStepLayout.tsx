@@ -14,8 +14,12 @@ interface MultiStepLayoutProps {
   children?: React.ReactNode;
 }
 
+interface StepFallbackProps {
+  currentStepData: { label?: string; description?: string; icon?: React.ReactNode };
+}
 
-const StepFallback = ({ currentStepData }) => {
+
+const StepFallback: React.FC<StepFallbackProps> = ({ currentStepData }) => {
   return (
       <div className="bg-card rounded-lg border p-8 text-center">
         <div className="w-16 h-16 bg-muted rounded-full flex items-center justify-center mx-auto mb-4">
@@ -132,4 +136,4 @@ export const MultiStepLayout: React.FC<MultiStepLayoutProps> = ({
       </footer>
     </div>
   );
-}; 
+};

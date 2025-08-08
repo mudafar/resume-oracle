@@ -1,26 +1,14 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { HybridSelectionResult, SelectedSection, CoverageGap } from "@/services/zodModels";
+import { MatchesState, MarkGapAsFilledPayload } from "@/types/store/matchesSlice.types";
 
 // Simplified MatchesState with flat structure
-type MatchesState = {
-  selected_sections: SelectedSection[];
-  coverage_gaps: CoverageGap[];
-  lastInputsHash: string | null;
-  lastJobDescription: string | null;
-};
-
-// Update initialState
 const initialState: MatchesState = {
   selected_sections: [],
   coverage_gaps: [],
   lastInputsHash: null,
   lastJobDescription: null,
 };
-
-interface MarkGapAsFilledPayload {
-  gapId: string;
-  profileSectionId: string;
-}
 
 export const matchesSlice = createSlice({
   name: "matches",
@@ -59,6 +47,8 @@ export const matchesSlice = createSlice({
         const newScoredPair = {
           section_id: profileSectionId,
           cluster_id: gap.requirement_cluster.id,
+          cluster_name: gap.requirement_cluster.cluster_name,
+          priority_tier: gap.requirement_cluster.priority_tier || 'important',
           raw_score: 85, // High score since gap was filled
           coverage: gap.requirement_cluster.requirements || [gap.requirement_cluster.cluster_name],
           missing: [], // No missing items since gap was filled
@@ -75,6 +65,8 @@ export const matchesSlice = createSlice({
         const newScoredPair = {
           section_id: profileSectionId,
           cluster_id: gap.requirement_cluster.id,
+          cluster_name: gap.requirement_cluster.cluster_name,
+          priority_tier: gap.requirement_cluster.priority_tier || 'important',
           raw_score: 85,
           coverage: gap.requirement_cluster.requirements || [gap.requirement_cluster.cluster_name],
           missing: [],

@@ -1,10 +1,8 @@
 import { ChatPromptTemplate } from "@langchain/core/prompts";
 import { llmService } from "./llmService";
-import {
-  ResumeOutputSchema,
-  ResumeOutput,
-  ResumeSection,
-} from "./zodModels";
+import { ResumeSection } from "@/types/store";
+import { ResumeOutput, ResumeOutputSchema } from "@/schemas/resume";
+
 
 export class ResumeGeneratorService {
   constructor() {

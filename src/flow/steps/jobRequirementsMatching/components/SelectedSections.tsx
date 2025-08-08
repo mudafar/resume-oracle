@@ -1,7 +1,7 @@
 import React from "react";
-import { SelectedSection } from "@/services/zodModels";
-import { ProfileSection } from "@/store/slices/profileSectionsSlice";
+import  { ProfileSection } from "@/types/store";
 import { SelectedSectionCard } from "../SelectedSectionCard";
+import { SelectedSection } from "@/schemas/matching";
 
 interface SelectedSectionsProps {
   selectedSections: SelectedSection[];

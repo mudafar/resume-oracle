@@ -1,7 +1,8 @@
 import React, { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "@/store/store";
-import { setLLMConfig, resetLLMConfig, LLMProvider, LLMVariant } from "@/store/slices/llmConfigSlice";
+import { setLLMConfig, resetLLMConfig } from "@/store/slices/llmConfigSlice";
+import type { LLMProvider, LLMVariant } from "@/types/store";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";

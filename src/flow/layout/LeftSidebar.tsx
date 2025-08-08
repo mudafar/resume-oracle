@@ -1,8 +1,7 @@
 import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
-import { StepDefinition } from "@/types/stepTypes";
+import { StepDefinition } from "@/types/flow/step.types";
 import {
   Check,
   Settings,

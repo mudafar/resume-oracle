@@ -1,8 +1,5 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-
-interface StepState {
-  currentStep: number;
-}
+import { StepState } from '@/types/store/stepSlice.types';
 
 const initialState: StepState = {
   currentStep: 0,

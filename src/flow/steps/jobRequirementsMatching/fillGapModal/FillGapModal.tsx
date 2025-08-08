@@ -1,7 +1,6 @@
 "use client";
 import React, { useState } from "react";
-import { CoverageGap } from "@/services/zodModels";
-import { ProfileSection } from "@/store/slices/profileSectionsSlice";
+import type { ProfileSection } from "@/types/store";
 import { GapContextPanel } from "./GapContextPanel";
 import { SolutionBuilderPanel } from "./SolutionBuilderPanel";
 import { useLlmService } from "@/hooks/useLlmService";
@@ -9,6 +8,7 @@ import { profileSectionEnhancerService, EnhancedProfileSection } from "@/service
 import { profileSectionGeneratorService, NewProfileSection } from "@/services/profileSectionGeneratorService";
 import { WizardModal } from "../../shared/modal";
 import { Search } from "lucide-react";
+import { CoverageGap } from "@/schemas/matching";
 
 interface FillGapModalProps {
   open: boolean;

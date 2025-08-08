@@ -2,9 +2,9 @@ import { ChatPromptTemplate } from "@langchain/core/prompts";
 import { llmService } from "./llmService";
 import {
   GeneratedCoverLetterResultSchema,
-  ProfileSectionWithRequirements,
   GeneratedCoverLetterResult
-} from "./zodModels";
+} from "@/schemas/coverLetter";
+import { ProfileSectionWithRequirements } from "@/schemas/profile/profileEnhancement.schema";
 import { buildSectionsContext } from "./utils";
 
 export class CoverLetterGeneratorService {

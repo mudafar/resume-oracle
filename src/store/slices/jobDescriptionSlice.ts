@@ -1,9 +1,5 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-
-interface JobDescriptionState {
-  job_description: string;
-  company_context: string;
-}
+import { JobDescriptionState } from "@/types/store/jobDescriptionSlice.types";
 
 const initialState: JobDescriptionState = {
   job_description: "",
@@ -24,4 +20,4 @@ const jobDescriptionSlice = createSlice({
 });
 
 export const { setJobDescription, setCompanyContext } = jobDescriptionSlice.actions;
-export default jobDescriptionSlice.reducer; 
+export default jobDescriptionSlice.reducer;
