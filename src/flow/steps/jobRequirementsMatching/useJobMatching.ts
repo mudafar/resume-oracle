@@ -10,12 +10,8 @@ import sha1 from "sha1";
 import { compareTwoStrings } from "string-similarity";
 import { addProfileSectionReturnId } from "../shared/createProfileSection";
 import { editSection } from "@/store/slices/profileSectionsSlice";
-import {
-  HybridSelectionResult,
-  JobRequirement,
-  JobRequirementMatch,
-  RequirementCluster,
-} from "@/services/zodModels";
+import { HybridSelectionResult } from "@/schemas/matching";
+
 
 export const useJobMatching = () => {
   const dispatch = useDispatch();
