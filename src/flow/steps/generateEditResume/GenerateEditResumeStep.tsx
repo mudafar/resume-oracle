@@ -1,30 +1,27 @@
-import React, { useEffect, useMemo, useState, useRef } from "react";
+import React, { useEffect, useMemo, useState, useRef, useCallback } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { RootState } from "@/store/store";
 import {
   setResume,
   setOptimizationSummary,
-  setLastResumeInputsHash,
   updateResume
 } from "@/store/slices/resumeSlice";
 import { useLlmService } from "@/hooks/useLlmService";
 import { resumeGeneratorService } from "@/services/resumeGeneratorService";
 import jsPDF from "jspdf";
-import sha1 from "sha1";
 import { createStep } from "@/utils/createStep";
-import { RegenerateBanner } from '../shared/RegenerateBanner';
+import { ChangeAlertBanner } from "@/flow/steps/shared";
 import { OptimizationSummaryCard } from '../shared/OptimizationSummaryCard';
 import { ResumeEditor, ResumeActions, ResumeStates } from './components';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { ResumeSection } from "@/types/store";
-import { ResumeOutput } from "@/schemas/resume";
+import type { ResumeOutput } from "@/schemas/resume";
+import { useAutoRetrigger } from "@/hooks/useAutoRetrigger";
 
 const GenerateEditResume: React.FC = () => {
   const dispatch = useDispatch();
   const resumeSections = useSelector((state: RootState) => state.resumeSections.resumeSections || []);
   const resume = useSelector((state: RootState) => state.resume.resume);
   const optimizationSummary = useSelector((state: RootState) => state.resume.optimizationSummary);
-  const lastResumeInputsHash = useSelector((state: RootState) => state.resume.lastResumeInputsHash);
   const [editMode, setEditMode] = useState(false);
   const [isExportingPdf, setIsExportingPdf] = useState(false);
   const [showRegenerateBanner, setShowRegenerateBanner] = useState(false);
@@ -32,21 +29,19 @@ const GenerateEditResume: React.FC = () => {
   const [editedResume, setEditedResume] = useState("");
 
   const markdownContentRef = useRef<HTMLDivElement>(null);
-  const [triggerGenerateResume, { isLoading, error, data, reset }] = useLlmService<ResumeOutput>(
+  const [triggerGenerateResume, { isLoading, error }] = useLlmService<ResumeOutput>(
     resumeGeneratorService.buildResume
   );
 
-  const apiPayload: ResumeSection[] = resumeSections.map(s => ({ 
-    type: s.type, 
-    content: s.content,
-    profile_section_id: s.profile_section_id 
-  }));
-
-  const inputsHash = useMemo(
-    () => sha1(JSON.stringify({ resumeSections })),
-    [resumeSections]
-  );
-  const inputsChanged = inputsHash !== lastResumeInputsHash;
+  // Auto-retrigger integration
+  const onAutoRun = useCallback(async (isLatest: () => boolean) => {
+    const data = await triggerGenerateResume(resumeSections);
+    if (!isLatest() || !data) return;
+    const markdown = convertToMarkdown(data);
+    dispatch(setResume(markdown));
+    setEditedResume(markdown);
+    dispatch(setOptimizationSummary(data.optimization_summary || null));
+  }, [triggerGenerateResume, resumeSections, dispatch]);
 
   const convertToMarkdown = (data: ResumeOutput) => {
     const resume = data.resume;
@@ -64,42 +59,17 @@ const GenerateEditResume: React.FC = () => {
   };
 
   useEffect(() => {
-    if (!resume && resumeSections.length > 0) {
-      // triggerGenerateResume(apiPayload)
-      //   .then((data) => {
-      //     if (!data) return;
-      //     const markdown = convertToMarkdown(data);
-      //     dispatch(setResume(markdown));
-      //     setEditedResume(markdown);
-      //     dispatch(setOptimizationSummary(data.optimization_summary || null));
-      //     dispatch(setLastResumeInputsHash(inputsHash));
-      //   });
-    }
-  }, []);
-
-  useEffect(() => {
     if (resume && !editedResume) {
       setEditedResume(resume);
     }
   }, [resume]);
+  const { showBanner, setShowBanner, onManualRun: onRegenerate, isRunning, error: autoError } = useAutoRetrigger({
+    stepKey: "generate-edit-resume",
+    inputs: { resumeSections },
+    onAutoRun,
+  });
 
-  useEffect(() => {
-    if (inputsChanged) {
-      setShowRegenerateBanner(true);
-    }
-  }, [inputsChanged]);
 
-  const onRegenerate = async () => {
-    setShowRegenerateBanner(false);
-    const data = await triggerGenerateResume(apiPayload);
-    if (data) {
-      const markdown = convertToMarkdown(data);
-      dispatch(setResume(markdown));
-      setEditedResume(markdown);
-      dispatch(setOptimizationSummary(data.optimization_summary || null));
-      dispatch(setLastResumeInputsHash(inputsHash));
-    }
-  };
 
   const saveDraft = () => {
     dispatch(updateResume(editedResume));
@@ -187,23 +157,25 @@ const GenerateEditResume: React.FC = () => {
     <div className="w-full h-full bg-gray-50">
       <div className="w-full">
         {/* Regenerate Banner */}
-        <RegenerateBanner
-          show={showRegenerateBanner}
-          isLoading={isLoading}
-          onRegenerate={onRegenerate}
-          onDismiss={() => setShowRegenerateBanner(false)}
-          message="Your resume inputs have changed and may be outdated."
-        />
+        {showBanner && (
+          <ChangeAlertBanner
+            message="Your inputs changed slightly since the last resume build."
+            subtitle="Major changes regenerate automatically; minor changes let you choose."
+            ctaText="Regenerate now"
+            onCta={onRegenerate}
+            onDismiss={() => setShowBanner(false)}
+          />
+        )}
 
         <div className="flex gap-8 py-6">
           <div className="flex-1">
             <ResumeStates
-              isLoading={isLoading}
-              error={error}
+              isLoading={isLoading || isRunning}
+              error={error || autoError}
               hasResume={!!resume}
             />
 
-            {resume && !isLoading && (
+            {resume && !(isLoading || isRunning) && (
               <Card className="shadow-sm min-h-[800px]">
                 <CardHeader className="pb-6">
                   <div className="flex items-center justify-between">

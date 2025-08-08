@@ -65,3 +65,4 @@ This project follows strict TypeScript patterns and uses AI-assisted development
 ## TODOS
 - [ ] add setting to reset all redux store
 - [ ] add setting to reset all LLM cache
+- [ ] provide a way to regenerate Resume and relevant steps, force re-run of LLM
