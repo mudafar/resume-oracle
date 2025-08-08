@@ -79,6 +79,40 @@ export class ExampleService {
 }
 ```
 
+### Auto re-trigger detection (useAutoRetrigger)
+
+Use the generic useAutoRetrigger hook to automatically re-run LLM services when step inputs change and to show a banner for minor changes.
+
+Usage pattern
+1) Aggregate inputs for your step; keep the object shape stable.
+2) Memoize your onAutoRun with useCallback and guard dispatches with isLatest().
+3) Render ChangeAlertBanner when showBanner is true.
+
+
+Example: Resume Sections Generation
+```tsx
+const payload = useMemo(() => getMatchedProfileSectionWithRequirements(selectedSections, profileSections), [selectedSections, profileSections]);
+const inputs = useMemo(() => ({ payload }), [payload]);
+
+const onGenerate = useCallback(async (isLatest: () => boolean) => {
+  const result = await triggerGenerate(payload);
+  if (!isLatest()) return;
+  dispatch(setResumeSections(result));
+}, [triggerGenerate, payload, dispatch]);
+
+const { showBanner, onManualRun, isRunning, error } = useAutoRetrigger({
+  stepKey: "generate-resume-sections",
+  inputs,
+  onAutoRun: onGenerate,
+});
+```
+
+Tips
+- Keep inputs stable: wrap arrays/objects in a memoized wrapper (e.g., { payload }).
+- Avoid infinite loops: memoize onAutoRun with useCallback and don’t mutate inputs during render.
+- Concurrency: always use the isLatest() predicate before applying results.
+- Banner UX: use the shared ChangeAlertBanner from `@/flow/steps/shared`.
+
 ## State Management
 
 ### Redux Architecture

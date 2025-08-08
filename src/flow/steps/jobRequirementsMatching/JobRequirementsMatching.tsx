@@ -3,11 +3,12 @@ import React, { useState, useEffect } from "react";
 // Utility to get profile sections referenced by matches
 import { createStep } from "@/utils/createStep";
 // import { SuggestedSectionModal } from "./suggestedSectionModal";
-import { RematchBanner, MatchCard, useJobMatching } from ".";
+import { MatchCard, useJobMatching } from ".";
+import { ChangeAlertBanner } from "@/flow/steps/shared";
 import { LoadingState, EmptyState, ErrorState, CoverageGaps, SelectedSections, MatchingModals } from "./components";
 import { useSelector, useDispatch } from "react-redux";
 import { RootState } from "@/store/store";
-import { ProfileSection } from "@/types/store";
+import type { ProfileSection } from "@/schemas/profile";
 import { addProfileSectionReturnId } from "../shared/createProfileSection";
 import { editSection } from "@/store/slices/profileSectionsSlice";
 import { markGapAsFilled } from "@/store/slices/matchesSlice";
@@ -154,8 +155,14 @@ export const JobRequirementsMatching: React.FC = () => {
 
   return (
     <div className="space-y-6">
-      {(showRematchBanner || true) && (
-        <RematchBanner onRematch={onRematch} onDismiss={() => setShowRematchBanner(false)} />
+      {showRematchBanner && (
+        <ChangeAlertBanner
+          message="Your inputs changed slightly. Rerun matching to refresh results."
+          subtitle="Major changes rerun automatically; minor changes let you choose."
+          ctaText="Rematch now"
+          onCta={onRematch}
+          onDismiss={() => setShowRematchBanner(false)}
+        />
       )}
 
       <CoverageGaps

@@ -59,3 +59,9 @@ Resume Oracle is a guided, step-by-step workflow that helps job seekers create h
 ## Contributing
 
 This project follows strict TypeScript patterns and uses AI-assisted development. See [Development Guide](./DEV.md) 
+
+
+
+## TODOS
+- [ ] add setting to reset all redux store
+- [ ] add setting to reset all LLM cache

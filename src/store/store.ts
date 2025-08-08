@@ -10,6 +10,7 @@ import resumeReducer from "./slices/resumeSlice";
 import coverLetterReducer from "./slices/coverLetterSlice";
 import llmConfigReducer from "./slices/llmConfigSlice";
 import stepReducer from "./slices/stepSlice";
+import signaturesReducer from "./slices/signaturesSlice";
 
 const rootReducer = combineReducers({
   profileSections: profileSectionsReducer,
@@ -20,6 +21,7 @@ const rootReducer = combineReducers({
   coverLetter: coverLetterReducer,
   llmConfig: llmConfigReducer,
   step: stepReducer,
+  signatures: signaturesReducer,
 });
 
 const persistConfig = {
