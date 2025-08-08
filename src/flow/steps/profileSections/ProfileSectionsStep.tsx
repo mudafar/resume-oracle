@@ -144,7 +144,8 @@ const ProfileSections: React.FC = () => {
         newSectionModalOpen={newSectionModalOpen}
         onCloseNewSection={() => setNewSectionModalOpen(false)}
         onAddSection={({ type, content }) => {
-          dispatch(addSection({ type, content }));
+          addProfileSectionReturnId(dispatch, type, content);
+          // dispatch(addSection({ type, content }));
           setNewSectionModalOpen(false);
         }}
         exportModalOpen={exportModalOpen}

@@ -11,3 +11,6 @@ export const ProfileParserResponseSchema = z.object({
     .array(ProfileSectionSchema)
     .describe("List of extracted profile sections"),
 });
+
+export type ProfileSection = z.infer<typeof ProfileSectionSchema>;
+export type ProfileType = "linkedin" | "resume";

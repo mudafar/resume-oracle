@@ -2,16 +2,8 @@ import { ChatPromptTemplate } from "@langchain/core/prompts";
 import { llmService } from "./llmService";
 import { z } from "zod";
 import { LLMConfig } from "@/types/store";
+import { NewProfileSection, NewProfileSectionSchema } from "@/schemas/profile";
 
-// TODO: move this schema
-// Schema for the new profile section result
-export const NewProfileSectionSchema = z.object({
-  content: z.string().describe("The complete new profile section content"),
-  structure_rationale: z.string().describe("Brief explanation of the chosen structure and approach"),
-  key_highlights: z.array(z.string()).describe("List of key achievements or capabilities highlighted in the section")
-});
-
-export type NewProfileSection = z.infer<typeof NewProfileSectionSchema>;
 
 export class ProfileSectionGeneratorService {
   /**

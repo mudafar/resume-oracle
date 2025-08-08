@@ -1,11 +1,11 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { nanoid } from "nanoid";
-import { ProfileSectionsState, ProfileSection, ProfileSectionBase, ResumeSection, SectionTypeEnum, sectionTypes } from "@/types/store/profileSectionsSlice.types";
+import { ProfileSectionsState } from "@/types/store/profileSectionsSlice.types";
+import { ProfileSection } from "@/schemas/profile";
 
 
 const initialState: ProfileSectionsState = {
   sections: [],
-  resumeSections: [],
 };
 
 const profileSectionsSlice = createSlice({
@@ -16,7 +16,7 @@ const profileSectionsSlice = createSlice({
       reducer(state, action: PayloadAction<ProfileSection>) {
         state.sections.push(action.payload);
       },
-      prepare(section:  ProfileSectionBase | ProfileSection) {
+      prepare(section:  ProfileSection) {
         const id = "id" in section ? section.id : nanoid(8);
         return { payload: { id, type: section.type, content: section.content } };
       },
@@ -36,15 +36,12 @@ const profileSectionsSlice = createSlice({
       const [moved] = state.sections.splice(from, 1);
       state.sections.splice(to, 0, moved);
     },
-    setResumeSections(state, action: PayloadAction<ResumeSection[]>) {
-      state.resumeSections = action.payload;
-    },
     setSections(state, action: PayloadAction<ProfileSection[]>) {
       state.sections = action.payload;
     },
   },
 });
 
-export const { addSection, editSection, deleteSection, reorderSections, setResumeSections, setSections } = profileSectionsSlice.actions;
+export const { addSection, editSection, deleteSection, setSections } = profileSectionsSlice.actions;
 export default profileSectionsSlice.reducer;
 
