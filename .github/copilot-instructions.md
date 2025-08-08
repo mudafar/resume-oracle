@@ -39,6 +39,26 @@
 - Testing: Jest and React Testing Library
 - LLM Services: langchain-js v0.3 and zod v4 schemas 
 
+# Type & Schema Organization (updated)
+- Domain-driven structure for TypeScript types and Zod schemas.
+- Types live under `src/types/<domain>` using `*.types.ts` files; schemas live under `src/schemas/<domain>` using `*.schema.ts` files.
+- Do NOT import types directly from Redux slices. Use the store types barrel: `import type { ProfileSection } from "@/types/store"`.
+- Zod schemas should be imported from their domain files, e.g., `@/schemas/profile/profileSection.schema`.
+- Transitional re-exports exist in `src/services/zodModels.ts` for backward compatibility (schemas + inferred types). Prefer domain paths for new code.
+- When re-exporting types only, use `export type { ... }` to satisfy isolatedModules.
+
+Recommended imports
+```ts
+// Types (store)
+import type { ProfileSection, SectionTypeEnum } from "@/types/store";
+
+// Zod schemas (domain-first)
+import { ProfileSectionSchema } from "@/schemas/profile/profileSection.schema";
+
+// Transitional (allowed, not preferred for new code)
+import { SelectedSection } from "@/services/zodModels";
+```
+
 # Architecture Patterns
 ## Folder Structure
 src/
@@ -51,7 +71,18 @@ src/
   ├── services/             # LLM services
   ├── store/                # Redux store setup and slices
   ├── utils/                # Utility functions and helpers
-  └── types/                # TypeScript types and interfaces
+  ├── types/                # TypeScript types and interfaces
+  │   ├── flow/             # Flow-related types
+  │   ├── store/            # Redux store state types (barrel at src/types/store/index.ts)
+  │   └── matching/         # Shared matching types (e.g., selection.types.ts)
+  └── schemas/              # Zod schemas per domain
+      ├── job/              # jobRequirement.schema.ts, jobRequirementMatch.schema.ts 
+      ├── profile/          # profileSection.schema.ts, profileEnhancement.schema.ts
+      ├── resume/           # resumeSection.schema.ts, resumeOutput.schema.ts
+      ├── coverLetter/      # coverLetter.schema.ts
+      └── matching/         # scoring.schema.ts (ScoredPair, SelectedSection, CoverageGap, HybridSelection)
+  
+      
 
 ## Component Architecture
 - Use compound components for complex UI elements (e.g., step, modals, wizards)
@@ -70,6 +101,7 @@ src/
 - Define Zod schemas for output validation
 - Use a custom React hook (`useLlmService`) to provide a consistent interface for LLM service calls
 - Use `invokeWithStructuredOutput` for structured output from LLM services
+ - Import inferred types from domain schemas when needed using `z.infer<typeof Schema>` (or from `@/services/zodModels` during transition).
 
 
 
@@ -80,6 +112,7 @@ src/
 - Use type unions instead of enums where appropriate
 - Prefer `interface` over `type` for object shapes
 - Use generic types for reusable components and hooks
+ - Prefer importing types from `@/types/...` barrels rather than slice files. Avoid `@/store/slices/...` for types.
 
 ## React Patterns
 - Use functional components with hooks exclusively
@@ -96,7 +129,7 @@ import { useDispatch } from 'react-redux';
 
 // 2. Internal utilities and types
 import { formatDate } from '@/utils/date';
-import type { Task } from '@/types/task';
+import type { ProfileSection } from '@/types/store';
 
 // 3. Component imports
 import { Button } from '@/components/ui/Button';
@@ -117,7 +150,8 @@ import { Button } from '@/components/ui/Button';
 - Components: PascalCase (TaskCard.tsx, ProjectList.tsx)
 - Hooks: camelCase starting with 'use' (useTaskFilters.ts)
 - Utilities: camelCase (formatCurrency.ts, validateEmail.ts)
-- Types: camelCase with .types.ts suffix (task.types.ts)
+- Types: camelCase with .types.ts suffix by domain (e.g., profileSectionsSlice.types.ts)
+- Schemas: kebab-case with .schema.ts suffix by domain (e.g., profile-section.schema.ts)
 - Constants: UPPER_SNAKE_CASE (API_ENDPOINTS.ts)
 
 ## Variables and Functions
@@ -136,6 +170,12 @@ import { Button } from '@/components/ui/Button';
 - Database fields: snake_case (created_at, user_id)
 - Redux actions: UPPER_SNAKE_CASE (FETCH_TASKS_SUCCESS)
 - Redux slice names: camelCase (taskSlice, authSlice)
+- Types import policy: import state types from `@/types/store` and schema types from `@/schemas/<domain>/*.schema`; avoid importing types from slices.
+
+## Migration Notes (for contributors)
+- Existing modules may still import from `@/services/zodModels` which re-exports most schemas and inferred types. This is acceptable for incremental changes.
+- When touching a file, move imports to domain-first paths (`@/types/store`, `@/schemas/...`) unless blocked.
+- Do not change schema content during refactors—structure only.
 
 
 # Styling Standards  
