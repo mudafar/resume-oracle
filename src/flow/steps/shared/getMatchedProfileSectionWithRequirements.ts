@@ -1,5 +1,6 @@
-import { ProfileSection } from "@/store/slices/profileSectionsSlice";
-import { ProfileSectionWithRequirements, SelectedSection } from "@/services/zodModels";
+import type { ProfileSection } from "@/schemas/profile";
+import type { ProfileSectionWithRequirements } from "@/schemas/profile";
+import type { SelectedSection } from "@/schemas/matching";
 /**
  * Prepares matched profile sections payload for API calls
  * Used by both GenerateResumeSectionsStep and GenerateCoverLetterStep

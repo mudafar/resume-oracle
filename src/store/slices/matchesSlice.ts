@@ -1,5 +1,6 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { HybridSelectionResult, SelectedSection, CoverageGap } from "@/services/zodModels";
+import type { HybridSelectionResult } from "@/schemas/matching";
+import type { SelectedSection } from "@/schemas/matching";
 import { MatchesState, MarkGapAsFilledPayload } from "@/types/store/matchesSlice.types";
 
 // Simplified MatchesState with flat structure

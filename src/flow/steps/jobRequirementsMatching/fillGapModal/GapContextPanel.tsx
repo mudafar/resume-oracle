@@ -2,7 +2,7 @@
 import React from "react";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { CoverageGap } from "@/services/zodModels";
+import type { CoverageGap } from "@/schemas/matching";
 import { AlertTriangle, XCircle, Target } from "lucide-react";
 
 interface GapContextPanelProps {

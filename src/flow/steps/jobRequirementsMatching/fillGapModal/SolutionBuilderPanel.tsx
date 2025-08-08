@@ -6,8 +6,8 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
-import { CoverageGap } from "@/services/zodModels";
-import { ProfileSection } from "@/store/slices/profileSectionsSlice";
+import type { CoverageGap } from "@/schemas/matching";
+import type { ProfileSection } from "@/schemas/profile";
 import { ArrowLeft, Sparkles, Save } from "lucide-react";
 
 interface SolutionBuilderPanelProps {

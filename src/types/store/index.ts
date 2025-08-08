@@ -7,3 +7,4 @@ export * from "./profileSectionsSlice.types";
 export * from "./resumeSectionsSlice.types";
 export * from "./resumeSlice.types";
 export * from "./stepSlice.types";
+export * from "./signaturesSlice.types";

@@ -1,5 +1,3 @@
-import type { ProfileSectionWithRequirements } from "./zodModels";
-
 /**
  * Builds a context string for resume section generation, including cluster name and priority tier.
  */

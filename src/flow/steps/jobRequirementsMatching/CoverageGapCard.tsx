@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { AlertTriangle, XCircle, Target, Sparkles } from 'lucide-react';
-import { CoverageGap } from "@/services/zodModels";
+import type { CoverageGap } from "@/schemas/matching";
 
 interface CoverageGapCardProps {
   gap: CoverageGap;

@@ -1,5 +1,5 @@
 import React from "react";
-import { CoverageGap } from "@/services/zodModels";
+import type { CoverageGap } from "@/schemas/matching";
 import { CoverageGapCard } from "../CoverageGapCard";
 
 interface CoverageGapsProps {
