@@ -5,7 +5,7 @@ const nextConfig: NextConfig = {
   /* configconst nextConfig: NextConfig = {
     /* config options here */
   output: "export",
-  basePath: process.env.PAGES_BASE_PATH || "resume-oracle",
+  basePath: process.env.PAGES_BASE_PATH || "/resume-oracle",
   typescript: {
     // TODO: remove the ignoreBuildErrors option after fixing the type errors.
     // !! WARN !!
