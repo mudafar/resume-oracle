@@ -63,6 +63,8 @@ This project follows strict TypeScript patterns and uses AI-assisted development
 
 
 ## TODOS
+- [ ] custom hook to scroll to top of page after each step change
+- [ ] on final step completion, show confirmation modal to start over (clear all state, except profile sections)
 - [ ] add setting to reset all redux store
 - [ ] add setting to reset all LLM cache
 - [ ] provide a way to regenerate Resume and relevant steps, force re-run of LLM
