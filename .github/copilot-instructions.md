@@ -44,7 +44,6 @@
 - Types live under `src/types/<domain>` using `*.types.ts` files; schemas live under `src/schemas/<domain>` using `*.schema.ts` files.
 - Do NOT import types directly from Redux slices. Use the store types barrel: `import type { ProfileSection } from "@/types/store"`.
 - Zod schemas should be imported from their domain files, e.g., `@/schemas/profile/profileSection.schema`.
-- Transitional re-exports exist in `src/services/zodModels.ts` for backward compatibility (schemas + inferred types). Prefer domain paths for new code.
 - When re-exporting types only, use `export type { ... }` to satisfy isolatedModules.
 
 Recommended imports
@@ -61,28 +60,7 @@ import { SelectedSection } from "@/services/zodModels";
 
 # Architecture Patterns
 ## Folder Structure
-src/
-  ├── app/                  # Next.js app directory
-  ├── components/           # Shared UI components
-  ├── flow/                 # Multi-step flow components
-  │   ├── steps/            # Individual step components
-  │   └── MultiStepFlow.tsx # Main flow component
-  ├── hooks/                # Custom React hooks
-  ├── services/             # LLM services
-  ├── store/                # Redux store setup and slices
-  ├── utils/                # Utility functions and helpers
-  ├── types/                # TypeScript types and interfaces
-  │   ├── flow/             # Flow-related types
-  │   ├── store/            # Redux store state types (barrel at src/types/store/index.ts)
-  │   └── matching/         # Shared matching types (e.g., selection.types.ts)
-  └── schemas/              # Zod schemas per domain
-      ├── job/              # jobRequirement.schema.ts, jobRequirementMatch.schema.ts 
-      ├── profile/          # profileSection.schema.ts, profileEnhancement.schema.ts
-      ├── resume/           # resumeSection.schema.ts, resumeOutput.schema.ts
-      ├── coverLetter/      # coverLetter.schema.ts
-      └── matching/         # scoring.schema.ts (ScoredPair, SelectedSection, CoverageGap, HybridSelection)
-  
-      
+[See Folder Structure](/DEV.md#folder-structure)
 
 ## Component Architecture
 - Use compound components for complex UI elements (e.g., step, modals, wizards)
@@ -101,7 +79,7 @@ src/
 - Define Zod schemas for output validation
 - Use a custom React hook (`useLlmService`) to provide a consistent interface for LLM service calls
 - Use `invokeWithStructuredOutput` for structured output from LLM services
- - Import inferred types from domain schemas when needed using `z.infer<typeof Schema>` (or from `@/services/zodModels` during transition).
+ - Import inferred types from domain schemas when needed using `z.infer<typeof Schema>` 
 
 
 
@@ -172,10 +150,6 @@ import { Button } from '@/components/ui/Button';
 - Redux slice names: camelCase (taskSlice, authSlice)
 - Types import policy: import state types from `@/types/store` and schema types from `@/schemas/<domain>/*.schema`; avoid importing types from slices.
 
-## Migration Notes (for contributors)
-- Existing modules may still import from `@/services/zodModels` which re-exports most schemas and inferred types. This is acceptable for incremental changes.
-- When touching a file, move imports to domain-first paths (`@/types/store`, `@/schemas/...`) unless blocked.
-- Do not change schema content during refactors—structure only.
 
 
 # Styling Standards  

@@ -4,22 +4,45 @@ Developer documentation for Resume Oracle's architecture, patterns, and developm
 
 ## Project Architecture
 
-### Core Structure
+### Folder Structure
 
 ```
 src/
-├── app/                    # Next.js app router
-├── components/ui/          # shadcn/ui components
-├── flow/                   # Multi-step workflow logic
-│   ├── MultiStepFlow.tsx   # Main flow orchestrator
-│   ├── layout/             # Layout components
-│   └── steps/              # Individual step implementations
-├── hooks/                  # Custom React hooks
-├── lib/                    # Utilities
-├── services/               # LLM service integrations
-├── store/                  # Redux state management
-├── types/                  # TypeScript definitions
-└── utils/                  # Helper functions
+├── app/                        # Next.js app directory (routing, layout, global styles)
+│   ├── favicon.ico
+│   ├── globals.css
+│   ├── layout.tsx
+│   └── page.tsx
+├── components/
+│   ├── shared/                 # Shared feature UI (banners, cards, forms, modals)
+│   └── ui/                     # shadcn/ui components (atomic/molecular)
+├── constants/                  # App-wide constants
+├── hooks/                      # Custom React hooks
+├── lib/                        # Utilities (general helpers)
+├── multiStepFlow/              # Multi-step flow logic & layouts
+│   ├── MultiStepFlow.tsx       # Main flow orchestrator
+│   ├── layout/                 # Layout components
+│   ├── settingsModal/          # Settings modal logic
+│   └── steps/                  # Individual step implementations
+├── schemas/                    # Zod schemas (domain-driven)
+│   ├── coverLetter/
+│   ├── flow/
+│   ├── job/
+│   ├── llm/
+│   ├── matching/
+│   ├── profile/
+│   └── resume/
+├── services/                   # LLM service integrations
+├── store/                      # Redux state management
+│   ├── providers.tsx
+│   ├── store.ts
+│   └── slices/
+├── types/                      # TypeScript definitions (domain-driven)
+│   ├── flow/
+│   ├── matching/
+│   ├── multiStepFlow/
+│   └── store/
+└── utils/                      # Helper functions (feature and general)
 ```
 
 ### Step-Based Architecture
@@ -216,9 +239,9 @@ import { Button } from '@/components/ui/Button';
 
 ### Testing Strategy
 
-- Jest and React Testing Library for unit tests
+<!-- - Jest and React Testing Library for unit tests
 - Focus on user behavior over implementation details
-- Test LLM service integrations with mocked responses
+- Test LLM service integrations with mocked responses -->
 
 ## Performance Considerations
 
@@ -226,13 +249,13 @@ import { Button } from '@/components/ui/Button';
 
 - **LLM Results**: Cached in localStorage with parameter hashing
 - **Component State**: React.memo for expensive renders
-- **Redux Selectors**: Memoized selectors for derived state
+<!-- - **Redux Selectors**: Memoized selectors for derived state -->
 
 ### Optimization Techniques
 
-- Lazy loading for step components
+<!-- - Lazy loading for step components
 - Debounced inputs for real-time validation
-- Virtualization for large lists (future consideration)
+- Virtualization for large lists (future consideration) -->
 
 ## Build and Deployment
 
@@ -259,7 +282,7 @@ NEXT_PUBLIC_LLM_API_KEY=
 
 1. **Type Errors**: Ensure Zod schemas match TypeScript interfaces
 2. **Cache Issues**: Clear localStorage if LLM responses seem stale
-3. **State Persistence**: Check redux-persist configuration for hydration issues
+3. **State Persistence**: Clear redux localstorage 
 
 ### Debug Tools
 
@@ -268,8 +291,3 @@ NEXT_PUBLIC_LLM_API_KEY=
 - Network tab for LLM service calls
 
 ## Future Architecture Plans
-
-1. **Client-Side LLM**: Migrate to browser-based LLM processing
-2. **Micro-Frontends**: Split into independent deployable modules  
-3. **Plugin System**: Extensible architecture for community contributions
-4. **Real-time Collaboration**: WebSocket integration for shared editing
