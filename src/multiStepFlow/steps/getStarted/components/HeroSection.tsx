@@ -1,5 +1,6 @@
 import React from 'react';
 import { FileText } from 'lucide-react';
+import { ResumeOracleIcon } from '@/multiStepFlow/ResumeOracleIcon';
 
 interface HeroSectionProps {}
 
@@ -7,8 +8,8 @@ export const HeroSection: React.FC<HeroSectionProps> = () => {
   return (
     <>
       {/* Illustration */}
-      <div className="w-32 h-32 mb-4 bg-gradient-to-br from-blue-100 to-indigo-100 rounded-3xl flex items-center justify-center shadow-lg">
-        <FileText className="w-16 h-16 text-blue-600" />
+      <div className="mb-4 flex items-center justify-center">
+        <ResumeOracleIcon size={196} className='' />
       </div>
 
       {/* Headline & Subtext */}

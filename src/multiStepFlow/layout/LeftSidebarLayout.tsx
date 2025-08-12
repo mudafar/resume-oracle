@@ -5,7 +5,6 @@ import { StepDefinition } from "@/types/multiStepFlow/step.types";
 import {
   Check,
   Settings,
-  Bell,
   User,
   Key,
 } from "lucide-react";
@@ -53,7 +52,7 @@ export function LeftSidebarLayout({ steps, currentStep, onStepChange, appName, a
     <Sidebar variant="inset">
       <SidebarHeader>
         <div className="flex items-center gap-2">
-          <div className="flex items-center justify-center w-8 h-8 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg text-white">
+          <div className="flex items-center justify-center w-10 h-10 ">
             {appIcon}
           </div>
           <div className="grid flex-1 text-left text-sm leading-tight">

@@ -1,8 +1,5 @@
-import React, { useState } from "react";
+import React from "react";
 import { StepDefinition } from "@/types/multiStepFlow/step.types";
-import {
-  ScrollText
-} from "lucide-react";
 
 import {
   SidebarProvider,
@@ -10,6 +7,7 @@ import {
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { LeftSidebarLayout } from "./LeftSidebarLayout";
 import { MainLayout } from "./MainLayout";
+import { AppIcon } from "./AppIcon";
 
 
 interface AppLayout {
@@ -27,7 +25,7 @@ export const Layout: React.FC<AppLayout> = ({
     onStepChange,
     children,
     appName = "Resume Oracle",
-    appIcon = <ScrollText className="w-6 h-6" />
+    appIcon = <AppIcon size={32} className="" />
   }) => {
     const isFirst = currentStep === 0;
     const isLast = currentStep === steps.length - 1;
