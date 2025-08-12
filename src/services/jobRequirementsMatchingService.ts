@@ -98,33 +98,27 @@ export class JobRequirementsMatchingService {
     Return only pairs you're confident about scoring accurately.
     `);
 
-    try {
-      const llmResult = await llmService.invokeWithStructuredOutput(
-        prompt,
-        LLMScoringResultSchema,
-        {
-          clusters_formatted,
-          profile_sections_formatted,
-          company_context_section
-        },
+    const llmResult = await llmService.invokeWithStructuredOutput(
+      prompt,
+      LLMScoringResultSchema,
+      {
+        clusters_formatted,
+        profile_sections_formatted,
+        company_context_section
+      },
         llmConfig
-      );
+    );
 
 
-      // 2. TS: Apply hybrid selection algorithm (existing code)
-      const optimalSelection = await hybridSelectionService.selectOptimalSections(
-        llmResult.scored_pairs,
-        requirementClusters,
-        profileSections,
-        { max_sections: 8, critical_threshold: 50 }
-      );
+    // 2. TS: Apply hybrid selection algorithm (existing code)
+    const optimalSelection = await hybridSelectionService.selectOptimalSections(
+      llmResult.scored_pairs,
+      requirementClusters,
+      profileSections,
+      { max_sections: 8, critical_threshold: 50 }
+    );
 
-      return optimalSelection;
-
-    } catch (error) {
-      console.error("[ERROR] Optimized matching failed:", error);
-      return this.getEmptyResult();
-    }
+    return optimalSelection;
   }
 
   /**
@@ -154,24 +148,7 @@ export class JobRequirementsMatchingService {
   }
 
 
-  /**
-   * Get empty result for error cases
-   */
-  private getEmptyResult(): HybridSelectionResult {
-    return {
-      selected_sections: [],
-      coverage_gaps: [],
-      summary: {
-        critical_clusters_covered: 0,
-        critical_clusters_total: 0,
-        important_clusters_covered: 0,
-        important_clusters_total: 0,
-        overall_coverage: "0%",
-        profile_sections_used: 0,
-        critical_gaps: 0
-      }
-    };
-  }
+  // Removed empty-result fallback; errors will propagate to the caller
 
 }
 

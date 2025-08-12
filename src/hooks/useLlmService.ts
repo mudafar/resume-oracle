@@ -1,6 +1,7 @@
 import { useState, useCallback, useRef, useEffect } from "react";
 import { useSelector } from "react-redux";
 import { selectLlmConfig } from "@/store/slices/llmConfigSlice";
+import { useLlmError } from "./useLlmError";
 
 /**
  * Generic async hook for LLM services.
@@ -28,6 +29,7 @@ type CacheEntry<T> = {
 
 export function useLlmService<T = any>(serviceFn: ServiceFunction<T>): UseLlmServiceReturn<T> {
   const llmConfig = useSelector(selectLlmConfig);
+  const { handleError } = useLlmError();
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<any>(null);
   const [data, setData] = useState<T | null>(null);
@@ -89,6 +91,7 @@ export function useLlmService<T = any>(serviceFn: ServiceFunction<T>): UseLlmSer
       } catch (err) {
         setError(err);
         setIsLoading(false);
+        handleError(err);
         throw err;
       }
     },

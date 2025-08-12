@@ -87,22 +87,17 @@ export class ProfileSectionGeneratorService {
             Create a polished, professional profile section that effectively showcases the user's experience and capabilities while following industry best practices for the specified section type.
             `);
 
-    try {
-      const result = await llmService.invokeWithStructuredOutput(
-        prompt,
-        NewProfileSectionSchema,
-        {
-          section_type: sectionType,
-          user_experience: userExperience,
-          additional_context_section,
-        },
-        llmConfig
-      );
-      return result;
-    } catch (error) {
-      console.error("[ERROR] generateProfileSection failed:", error);
-      throw error;
-    }
+    const result = await llmService.invokeWithStructuredOutput(
+      prompt,
+      NewProfileSectionSchema,
+      {
+        section_type: sectionType,
+        user_experience: userExperience,
+        additional_context_section,
+      },
+      llmConfig
+    );
+    return result;
   }
 }
 

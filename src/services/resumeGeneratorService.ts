@@ -68,23 +68,12 @@ export class ResumeGeneratorService {
     `);
 
     const sections_content = this._buildSectionsContent(resumeSections);
-
-    try {
-      const result = await llmService.invokeWithStructuredOutput(
-        prompt,
-        ResumeOutputSchema,
-        { sections_content },
-        llmConfig
-      );
-      return result;
-    } catch (e) {
-      // Fallback: return a minimal ResumeOutput with error message
-      console.error("[ERROR] buildResume failed:", e);
-      return {
-        resume: [],
-        optimization_summary: `Error occurred during resume organization - no structural changes applied`
-      };
-    }
+    return await llmService.invokeWithStructuredOutput(
+      prompt,
+      ResumeOutputSchema,
+      { sections_content },
+      llmConfig
+    );
   };
 
   private _buildSectionsContent(resumeSections: ResumeSection[]): string {

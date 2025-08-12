@@ -1,7 +1,7 @@
 import { initChatModel } from "langchain/chat_models/universal";
 import { ChatPromptTemplate } from "@langchain/core/prompts";
 import { z } from "zod";
-import { LLMConfig } from "@/store/slices/llmConfigSlice";
+import { LLMConfig } from "@/types/store";
 
 // interface LLMConfig {
 //   provider?: string;
@@ -93,7 +93,7 @@ export class LLMService {
     /**
      * Invoke LLM with prompt template and structured output
      */
-    const llm = await this.getLLM(config);
+  const llm = await this.getLLM(config);
     const chain = promptTemplate.pipe(llm.withStructuredOutput(outputSchema));
     return await chain.invoke(inputs);
   }

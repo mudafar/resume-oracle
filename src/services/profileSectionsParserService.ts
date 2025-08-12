@@ -49,23 +49,18 @@ export class ProfileSectionsParserService {
             {profile_text}
             `);
 
-    try {
-      const result = await llmService.invokeWithStructuredOutput(
-        prompt,
-        ProfileSectionListSchema,
-        {
-          profile_text: text,
-          profile_type: profileType,
-          format_hints: this._getFormatHints(profileType),
-        },
-        llmConfig
-      );
+    const result = await llmService.invokeWithStructuredOutput(
+      prompt,
+      ProfileSectionListSchema,
+      {
+        profile_text: text,
+        profile_type: profileType,
+        format_hints: this._getFormatHints(profileType),
+      },
+      llmConfig
+    );
 
-      return result.profile_sections;
-    } catch (error) {
-      console.error(`[ERROR] parseProfileSections failed:`, error);
-      return [];
-    }
+    return result.profile_sections;
   }
 
   private _getFormatHints(profileType: ProfileType): string {

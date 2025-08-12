@@ -1,7 +1,7 @@
 import { ChatPromptTemplate } from "@langchain/core/prompts";
-import { ProfileSection } from "./zodModels";
+import { ProfileSection } from "@/schemas/profile";
 import { llmService } from "./llmService";
-import { LLMConfig } from "@/store/slices/llmConfigSlice";
+import { LLMConfig } from "@/types/store";
 import { z } from "zod";
 
 // Schema for the enhanced profile section result
@@ -88,23 +88,18 @@ export class ProfileSectionEnhancerService {
             The result should be indistinguishable from content that was originally written as a single, cohesive piece.
             `);
 
-    try {
-      const result = await llmService.invokeWithStructuredOutput(
-        prompt,
-        EnhancedProfileSectionSchema,
-        {
-          section_type: profileSection.type,
-          section_content: profileSection.content,
-          brief_experience: briefExperience,
-          additional_context_section,
-        },
-        llmConfig
-      );
-      return result;
-    } catch (error) {
-      console.error("[ERROR] enhanceProfileSection failed:", error);
-      throw error;
-    }
+    const result = await llmService.invokeWithStructuredOutput(
+      prompt,
+      EnhancedProfileSectionSchema,
+      {
+        section_type: profileSection.type,
+        section_content: profileSection.content,
+        brief_experience: briefExperience,
+        additional_context_section,
+      },
+      llmConfig
+    );
+    return result;
   }
 }
 

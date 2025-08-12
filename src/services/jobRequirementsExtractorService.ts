@@ -108,22 +108,17 @@ export class JobRequirementsExtractorService {
       Focus on creating clusters that would benefit from being matched to the same profile evidence source.
 
             `);
-    try {
-      const result = await llmService.invokeWithStructuredOutput(
-        prompt,
-        JobRequirementClustersSchema,
-        {
-          job_desc: jobDescription,
-          company_context_section,
-          context_integration_section,
-        },
-        llmConfig
-      );
-      return result.requirement_clusters;
-    } catch (error) {
-      console.error("[ERROR] extractJobRequirements failed:", error);
-      return [];
-    }
+    const result = await llmService.invokeWithStructuredOutput(
+      prompt,
+      JobRequirementClustersSchema,
+      {
+        job_desc: jobDescription,
+        company_context_section,
+        context_integration_section,
+      },
+      llmConfig
+    );
+    return result.requirement_clusters;
   }
 }
 

@@ -64,25 +64,15 @@ export class ResumeSectionsGeneratorService {
 
             Generate concise, professionally formatted resume sections that effectively communicate the candidate's qualifications for the matched requirements without adding any new information.
     `);
-    try {
-      const result = await llmService.invokeWithStructuredOutput(
-        prompt,
-        GeneratedResumeSectionResultListSchema,
-        {
-          sections_with_requirements: sections_context,
-        },
-        llmConfig
-      );
-      return result.generated_resume_section_result_list;
-    } catch (error) {
-      console.error("[ERROR] generateResumeSection failed:", error);
-      // Fallback: return original sections as resume sections
-      return profileSectionsWithRequirements.map(pswr => ({
-        profile_section_id: pswr.profile_section.id,
-        type: pswr.profile_section.type,
-        content: pswr.profile_section.content,
-      }));
-    }
+    const result = await llmService.invokeWithStructuredOutput(
+      prompt,
+      GeneratedResumeSectionResultListSchema,
+      {
+        sections_with_requirements: sections_context,
+      },
+      llmConfig
+    );
+    return result.generated_resume_section_result_list;
   }
 }
 

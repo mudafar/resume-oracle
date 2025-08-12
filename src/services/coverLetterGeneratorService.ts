@@ -92,70 +92,17 @@ export class CoverLetterGeneratorService {
     const companyContextText = companyContext || "No specific company context provided";
     const toneGuidanceText = toneGuidance || "Standard professional tone";
 
-    try {
-      const result = await llmService.invokeWithStructuredOutput(
-        prompt,
-        GeneratedCoverLetterResultSchema,
-        {
-          sections_with_requirements: sectionsContext,
-          company_context: companyContextText,
-          tone_guidance: toneGuidanceText,
-        },
-        llmConfig
-      );
-      return result;
-    } catch (error) {
-      console.error("[ERROR] generateCoverLetter failed:", error);
-      // Fallback: return a basic cover letter using only existing profile content
-      const fallbackSummary =
-        "Unable to generate interview optimization analysis due to processing error. Fallback cover letter created using existing profile content only.";
-      const fallbackContent = this._generateFallbackCoverLetter(profileSectionsWithRequirements, companyContext, toneGuidance);
-      return {
-        optimization_summary: fallbackSummary,
-        cover_letter_markdown: fallbackContent,
-      };
-    }
-  }
-
-  private _generateFallbackCoverLetter(
-    profileSectionsWithRequirements: ProfileSectionWithRequirements[],
-    companyContext?: string,
-    toneGuidance?: string
-  ): string {
-    // Extract key information from profile sections
-    const experienceSections = profileSectionsWithRequirements.filter(s =>
-      ["experience", "work", "employment"].includes(s.profile_section.type.toLowerCase())
+    const result = await llmService.invokeWithStructuredOutput(
+      prompt,
+      GeneratedCoverLetterResultSchema,
+      {
+        sections_with_requirements: sectionsContext,
+        company_context: companyContextText,
+        tone_guidance: toneGuidanceText,
+      },
+      llmConfig
     );
-    const skillsSections = profileSectionsWithRequirements.filter(s =>
-      ["skills", "technical", "competencies"].includes(s.profile_section.type.toLowerCase())
-    );
-    let fallbackLetter = `# Cover Letter\n\nDear Hiring Manager,\n\nI am writing to express my strong interest in this position. Based on my background and experience, I believe I would be a valuable addition to your team.\n\n`;
-    if (experienceSections.length) {
-      fallbackLetter += "My professional experience includes:\n\n";
-      for (const section of experienceSections.slice(0, 2)) {
-        const contentPreview = section.profile_section.content.length > 200
-          ? section.profile_section.content.slice(0, 200) + "..."
-          : section.profile_section.content;
-        fallbackLetter += `- ${contentPreview}\n`;
-      }
-      fallbackLetter += "\n";
-    }
-    if (skillsSections.length) {
-      fallbackLetter += "My key competencies align well with your requirements:\n\n";
-      for (const section of skillsSections.slice(0, 1)) {
-        const contentPreview = section.profile_section.content.length > 150
-          ? section.profile_section.content.slice(0, 150) + "..."
-          : section.profile_section.content;
-        fallbackLetter += `- ${contentPreview}\n`;
-      }
-      fallbackLetter += "\n";
-    }
-    if (companyContext) {
-      fallbackLetter += `I am particularly drawn to your organization because ${companyContext.toLowerCase()}\n\n`;
-    }
-    fallbackLetter +=
-      "I would welcome the opportunity to discuss how my background and enthusiasm can contribute to your team's success. Thank you for your consideration.\n\nSincerely,\n[Your Name]";
-    return fallbackLetter;
+    return result;
   }
 }
 
