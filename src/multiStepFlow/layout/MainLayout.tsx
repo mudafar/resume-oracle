@@ -3,6 +3,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { ChevronLeft, ChevronRight, FileText } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useScrollToTop } from "@/hooks/useScrollToTop";
 
 interface MultiStepLayoutProps {
   steps: any[];
@@ -21,25 +22,25 @@ interface StepFallbackProps {
 
 const StepFallback: React.FC<StepFallbackProps> = ({ currentStepData }) => {
   return (
-      <div className="bg-card rounded-lg border p-8 text-center">
-        <div className="w-16 h-16 bg-muted rounded-full flex items-center justify-center mx-auto mb-4">
-          {currentStepData.icon || <FileText className="w-8 h-8 text-muted-foreground" />}
-        </div>
-        <h3 className="text-lg font-semibold mb-2">
-          Welcome to {currentStepData.label}
-        </h3>
-        <p className="text-muted-foreground mb-6">
-          {currentStepData.description || "This is where your content will appear."}
-        </p>
-        <div className="flex justify-center gap-3">
-          <Button variant="outline" size="sm">
-            Learn More
-          </Button>
-          <Button size="sm">
-            Get Started
-          </Button>
-        </div>
+    <div className="bg-card rounded-lg border p-8 text-center">
+      <div className="w-16 h-16 bg-muted rounded-full flex items-center justify-center mx-auto mb-4">
+        {currentStepData.icon || <FileText className="w-8 h-8 text-muted-foreground" />}
       </div>
+      <h3 className="text-lg font-semibold mb-2">
+        Welcome to {currentStepData.label}
+      </h3>
+      <p className="text-muted-foreground mb-6">
+        {currentStepData.description || "This is where your content will appear."}
+      </p>
+      <div className="flex justify-center gap-3">
+        <Button variant="outline" size="sm">
+          Learn More
+        </Button>
+        <Button size="sm">
+          Get Started
+        </Button>
+      </div>
+    </div>
   )
 }
 
@@ -52,6 +53,10 @@ export const MainLayout: React.FC<MultiStepLayoutProps> = ({
   currentStepData,
   children,
 }) => {
+  const mainContentDivRef = React.useRef<HTMLDivElement>(null);
+  // Scroll to top when currentStep changes
+  useScrollToTop(mainContentDivRef, currentStep, { behavior: "smooth" });
+
   return (
     <div className="flex-1 flex flex-col min-w-0">
       {/* Header */}
@@ -78,7 +83,7 @@ export const MainLayout: React.FC<MultiStepLayoutProps> = ({
           </div>
         </div>
       </header>
-      
+
       {/* Description Bar */}
       {currentStepData.description && (
         <div className="border-b bg-muted/30 px-4">
@@ -90,9 +95,9 @@ export const MainLayout: React.FC<MultiStepLayoutProps> = ({
 
 
       {/* Main Content Area */}
-      <main className="flex-1 p-6 overflow-auto">
+      <main className="flex-1 p-6 overflow-auto" ref={mainContentDivRef}>
         <div className=" w-full h-full">
-          {children || <StepFallback currentStepData={currentStepData} /> }
+          {children || <StepFallback currentStepData={currentStepData} />}
         </div>
       </main>
 

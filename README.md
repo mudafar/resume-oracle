@@ -63,8 +63,8 @@ This project follows strict TypeScript patterns and uses AI-assisted development
 
 
 ## TODOS
-- [ ] handle no APIKEY provided error properly
-- [ ] custom hook to scroll to top of page after each step change
+- [x] handle no APIKEY provided error properly
+- [x] custom hook to scroll to top of page after each step change
 - [ ] on final step completion, show confirmation modal to start over (clear all state, except profile sections)
 - [ ] add setting to reset all redux store
 - [ ] add setting to reset all LLM cache

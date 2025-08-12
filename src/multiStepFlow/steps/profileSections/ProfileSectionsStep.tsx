@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, use } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { RootState } from "@/store/store";
 import {
@@ -9,13 +9,14 @@ import {
   setSections,
 } from "@/store/slices/profileSectionsSlice";
 import { SectionTypeEnum } from "@/types/store";
-import { ProfileSection } from "@/types/store";
 import { openConfigModal } from "@/store/slices/llmConfigSlice";
 import { addProfileSectionReturnId } from "../../../utils/createProfileSection";
 import { exportSectionsToJson, importSectionsFromJson } from "./profileSectionsExportImport";
 import { Toast } from "./Toast";
 import { createStep } from "@/utils/createStep";
 import { SectionsList, ModalsManager, ProfileSectionsActions } from "./components";
+import { ProfileSection } from "@/schemas/profile";
+import { useScrollToTop } from "@/hooks/useScrollToTop";
 
 const ProfileSections: React.FC = () => {
   const sections = useSelector((state: RootState) => state.profileSections.sections);
@@ -42,6 +43,7 @@ const ProfileSections: React.FC = () => {
   const [toastType, setToastType] = useState<"success" | "error">("success");
 
 
+  useScrollToTop();
   // Collapse all sections by default, and when sections change
   useEffect(() => {
     setCollapsed(prev => {
