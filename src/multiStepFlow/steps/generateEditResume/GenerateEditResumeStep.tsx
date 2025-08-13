@@ -27,8 +27,19 @@ const GenerateEditResume: React.FC = () => {
   const [showRegenerateBanner, setShowRegenerateBanner] = useState(false);
   const [draftSaved, setDraftSaved] = useState(false);
   const [editedResume, setEditedResume] = useState("");
-
   const markdownContentRef = useRef<HTMLDivElement>(null);
+
+
+    if (!resumeSections?.length) {
+      return (
+        <Card>
+          <CardContent className="flex items-center justify-center py-12">
+            <p className="text-md text-gray-500">Please complete all required steps to generate a resume.</p>
+          </CardContent>
+        </Card>
+      );
+    }
+
   const [triggerGenerateResume, { isLoading, error }] = useLlmService<ResumeOutput>(
     resumeGeneratorService.buildResume
   );

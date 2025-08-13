@@ -13,6 +13,7 @@ import { addProfileSectionReturnId } from "../../../utils/createProfileSection";
 import { editSection } from "@/store/slices/profileSectionsSlice";
 import { markGapAsFilled } from "@/store/slices/matchesSlice";
 import { CoverageGap, HybridSelectionResult, SelectedSection } from "@/schemas/matching";
+import { Card, CardContent } from "@/components/ui/card";
 
 
 function getOrderedMatchedProfileSections(
@@ -137,9 +138,16 @@ export const JobRequirementsMatching: React.FC = () => {
     setSelectedGapId("");
   };
 
-  if (!job_description.trim() || profileSections.length === 0) {
-    return <div className="text-gray-500">Please complete previous steps to see job requirements matching.</div>;
-  }
+
+  if (!job_description.trim() || !profileSections?.length) {
+  return (
+    <Card>
+      <CardContent className="flex items-center justify-center py-12">
+        <p className="text-md text-gray-500">Please complete all required steps to match your profile sections with job requirements.</p>
+      </CardContent>
+    </Card>
+  );
+}
 
   if (isLoading) {
     return <LoadingState />;

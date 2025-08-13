@@ -10,6 +10,7 @@ import type { GeneratedResumeSectionResult } from "@/schemas/resume";
 import { useAutoRetrigger } from "@/hooks/useAutoRetrigger";
 import { createStep } from "@/utils/createStep";
 import { ResumeSectionsList, ResumeSectionsStates } from "./components";
+import { Card, CardContent } from "@/components/ui/card";
 
 const GenerateResumeSections: React.FC = () => {
   const dispatch = useDispatch();
@@ -19,6 +20,15 @@ const GenerateResumeSections: React.FC = () => {
   const [editing, setEditing] = useState<{ [id: string]: boolean }>({});
   const [editedContent, setEditedContent] = useState<{ [id: string]: string }>({});
 
+      if (!profileSections?.length || !selectedSections?.length) {
+      return (
+        <Card>
+          <CardContent className="flex items-center justify-center py-12">
+            <p className="text-md text-gray-500">Please complete all required steps to generate resume sections.</p>
+          </CardContent>
+        </Card>
+      );
+    }
   // LLM service trigger
   const [triggerGenerate, { isLoading, error }] = useLlmService<GeneratedResumeSectionResult[]>(
     resumeSectionsGeneratorService.generateResumeSection

@@ -33,6 +33,16 @@ const GenerateCoverLetter: React.FC = () => {
   const [editMode, setEditMode] = useState(false);
   const [showRegenerateBanner, setShowRegenerateBanner] = useState(false);
 
+  if (!profileSections || !companyContext || !jobDescription) {
+    return (
+      <Card>
+        <CardContent className="flex items-center justify-center py-12">
+          <p className="text-md text-gray-500">Please complete all required steps to generate a cover letter.</p>
+        </CardContent>
+      </Card>
+    );
+  }
+
   const [generateCoverLetter, { isLoading, error, data, reset }] = useLlmService<GeneratedCoverLetterResult>(
     coverLetterGeneratorService.generateCoverLetter
   );
