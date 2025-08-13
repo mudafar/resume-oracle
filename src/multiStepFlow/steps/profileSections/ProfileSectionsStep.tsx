@@ -193,6 +193,6 @@ const ProfileSections: React.FC = () => {
 
 export const ProfileSectionsStep = createStep({
   id: "profile-sections",
-  label: "Profile Sections",
+  label: "Your Profile",
   description: "Add and manage your profile sections."
 })(ProfileSections); 

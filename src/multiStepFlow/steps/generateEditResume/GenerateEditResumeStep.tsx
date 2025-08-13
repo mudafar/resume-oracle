@@ -10,7 +10,7 @@ import { useLlmService } from "@/hooks/useLlmService";
 import { resumeGeneratorService } from "@/services/resumeGeneratorService";
 import jsPDF from "jspdf";
 import { createStep } from "@/utils/createStep";
-import { ChangeAlertBanner } from "@/components/shared";
+import { ChangeAlertBanner, EmptyState } from "@/components/shared";
 import { OptimizationSummaryCard } from '../../../components/shared/OptimizationSummaryCard';
 import { ResumeEditor, ResumeActions, ResumeStates } from './components';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -32,11 +32,12 @@ const GenerateEditResume: React.FC = () => {
 
     if (!resumeSections?.length) {
       return (
-        <Card>
-          <CardContent className="flex items-center justify-center py-12">
-            <p className="text-md text-gray-500">Please complete all required steps to generate a resume.</p>
-          </CardContent>
-        </Card>
+        <EmptyState
+          title="Setup required"
+          message="Please complete all required steps to generate a resume."
+          iconType="alert"
+          variant="card"
+        />
       );
     }
 
@@ -230,6 +231,6 @@ const GenerateEditResume: React.FC = () => {
 
 export const GenerateEditResumeStep = createStep({
   id: "generate-edit-resume",
-  label: "Generate & Edit Resume",
+  label: "Build Resume",
   description: "Generate, edit, and export your professional resume"
 })(GenerateEditResume);

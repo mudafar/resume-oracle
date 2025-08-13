@@ -28,6 +28,6 @@ const JobDescription: React.FC = () => {
 
 export const JobDescriptionStep = createStep({
   id: "job-description",
-  label: "Job Description & Company Details",
+  label: "Job Details",
   description: "Describe the job and company context."
 })(JobDescription);

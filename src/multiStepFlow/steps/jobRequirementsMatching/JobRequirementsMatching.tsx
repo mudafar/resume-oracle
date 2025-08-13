@@ -5,7 +5,7 @@ import { createStep } from "@/utils/createStep";
 // import { SuggestedSectionModal } from "./suggestedSectionModal";
 import { MatchCard, useJobMatching } from ".";
 import { ChangeAlertBanner } from "@/components/shared";
-import { LoadingState, EmptyState, ErrorState, CoverageGaps, SelectedSections, MatchingModals } from "./components";
+import { LoadingState, ErrorState, CoverageGaps, SelectedSections, MatchingModals } from "./components";
 import { useSelector, useDispatch } from "react-redux";
 import { RootState } from "@/store/store";
 import type { ProfileSection } from "@/schemas/profile";
@@ -14,6 +14,7 @@ import { editSection } from "@/store/slices/profileSectionsSlice";
 import { markGapAsFilled } from "@/store/slices/matchesSlice";
 import { CoverageGap, HybridSelectionResult, SelectedSection } from "@/schemas/matching";
 import { Card, CardContent } from "@/components/ui/card";
+import { EmptyState } from "@/components/shared";
 
 
 function getOrderedMatchedProfileSections(
@@ -54,15 +55,23 @@ export const JobRequirementsMatching: React.FC = () => {
     // handleSaveOnly,
   } = useJobMatching();
 
-  // Use the flattened Redux state structure
-  const matchingResult = useSelector((state: RootState) => ({
-    selected_sections: state.matches.selected_sections,
-    coverage_gaps: state.matches.coverage_gaps
-  }));
+
+  if(!job_description.trim() || !profileSections?.length)  {
+    return <EmptyState
+      title="Setup required"
+      message="Please complete all required steps to start matching."
+      iconType="alert"
+      variant="card"
+    />;
+  }
+
+  // Separate selectors for matches slice
+  const selectedSections = useSelector((state: RootState) => state.matches.selected_sections);
+  const coverageGaps = useSelector((state: RootState) => state.matches.coverage_gaps);
 
   // Update `currentMatch` logic to work with simplified `HybridSelectionResult`
   const currentMatch = modalMatchId
-    ? matchingResult?.selected_sections.find(section => section.profile_section_id === modalMatchId)
+    ? selectedSections.find(section => section.profile_section_id === modalMatchId)
     : null;
 
   const handleFillGap = (gap: CoverageGap) => {
@@ -140,14 +149,15 @@ export const JobRequirementsMatching: React.FC = () => {
 
 
   if (!job_description.trim() || !profileSections?.length) {
-  return (
-    <Card>
-      <CardContent className="flex items-center justify-center py-12">
-        <p className="text-md text-gray-500">Please complete all required steps to match your profile sections with job requirements.</p>
-      </CardContent>
-    </Card>
-  );
-}
+    return (
+      <EmptyState
+        title="Setup required"
+        message="Please complete all required steps to match your profile sections with job requirements."
+        iconType="alert"
+        variant="card"
+      />
+    );
+  }
 
   if (isLoading) {
     return <LoadingState />;
@@ -157,9 +167,6 @@ export const JobRequirementsMatching: React.FC = () => {
     return <ErrorState onRetry={onRematch} />;
   }
 
-  if (!matchingResult) {
-    return <EmptyState />;
-  }
 
   return (
     <div className="space-y-6">
@@ -173,14 +180,16 @@ export const JobRequirementsMatching: React.FC = () => {
         />
       )}
 
+      {selectedSections.length > 0 && (
       <CoverageGaps
-        coverageGaps={matchingResult?.coverage_gaps || []}
+        coverageGaps={coverageGaps || []}
         onSeeSuggestions={handleSeeSuggestions}
         onFillGap={handleFillGap}
       />
+      )}
 
       <SelectedSections
-        selectedSections={matchingResult?.selected_sections || []}
+        selectedSections={selectedSections || []}
         profileSections={profileSections}
         onEnhanceSection={handleEnhanceSection}
       />
@@ -206,6 +215,6 @@ export const JobRequirementsMatching: React.FC = () => {
 
 export const JobRequirementsMatchingStep = createStep({
   id: 'job-requirements',
-  label: 'Job Requirements Matching',
+  label: 'Match Skills',
   description: 'Match your skills with job requirements'
 })(JobRequirementsMatching);

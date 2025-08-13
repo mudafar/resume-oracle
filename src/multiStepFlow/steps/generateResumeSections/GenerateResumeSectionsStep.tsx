@@ -11,6 +11,7 @@ import { useAutoRetrigger } from "@/hooks/useAutoRetrigger";
 import { createStep } from "@/utils/createStep";
 import { ResumeSectionsList, ResumeSectionsStates } from "./components";
 import { Card, CardContent } from "@/components/ui/card";
+import { EmptyState } from "@/components/shared";
 
 const GenerateResumeSections: React.FC = () => {
   const dispatch = useDispatch();
@@ -22,11 +23,12 @@ const GenerateResumeSections: React.FC = () => {
 
       if (!profileSections?.length || !selectedSections?.length) {
       return (
-        <Card>
-          <CardContent className="flex items-center justify-center py-12">
-            <p className="text-md text-gray-500">Please complete all required steps to generate resume sections.</p>
-          </CardContent>
-        </Card>
+        <EmptyState
+          title="Setup required"
+          message="Please complete all required steps to generate resume sections."
+          iconType="alert"
+          variant="card"
+        />
       );
     }
   // LLM service trigger
@@ -116,7 +118,7 @@ const GenerateResumeSections: React.FC = () => {
 
 export const GenerateResumeSectionsStep = createStep({
   id: "generate-resume-sections",
-  label: "Generate Resume Sections",
+  label: "Resume Sections",
   description: "AI-generated resume sections tailored to your profile and job matches."
 })(GenerateResumeSections);
 

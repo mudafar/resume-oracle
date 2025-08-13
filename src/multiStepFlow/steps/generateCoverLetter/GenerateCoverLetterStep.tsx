@@ -12,6 +12,7 @@ import { coverLetterGeneratorService } from "@/services/coverLetterGeneratorServ
 import type { GeneratedCoverLetterResult } from "@/schemas/coverLetter";
 import { createStep } from "@/utils/createStep";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { EmptyState  } from "@/components/shared";
 import {
   FileText,
   Mail
@@ -33,13 +34,14 @@ const GenerateCoverLetter: React.FC = () => {
   const [editMode, setEditMode] = useState(false);
   const [showRegenerateBanner, setShowRegenerateBanner] = useState(false);
 
-  if (!profileSections || !companyContext || !jobDescription) {
+  if (!profileSections || !jobDescription) {
     return (
-      <Card>
-        <CardContent className="flex items-center justify-center py-12">
-          <p className="text-md text-gray-500">Please complete all required steps to generate a cover letter.</p>
-        </CardContent>
-      </Card>
+      <EmptyState
+        title="Setup required"
+        message="Please complete all required steps to generate a cover letter."
+        iconType="alert"
+        variant="card"
+      />
     );
   }
 
@@ -195,6 +197,6 @@ const GenerateCoverLetter: React.FC = () => {
 
 export const GenerateCoverLetterStep = createStep({
   id: "generate-cover-letter",
-  label: "Generate Cover Letter",
+  label: "Cover Letter",
   description: "Generate a personalized cover letter tailored to the job requirements"
 })(GenerateCoverLetter);

@@ -16,13 +16,6 @@ export const LoadingState = () => (
   </div>
 );
 
-export const EmptyState = () => (
-  <div className="text-center py-12">
-    <FileWarning className="mx-auto h-12 w-12 text-gray-400" />
-    <h3 className="mt-2 text-lg font-semibold">No Job Requirements Found</h3>
-    <p className="mt-1 text-gray-500">Please check your job description to get started.</p>
-  </div>
-);
 
 interface ErrorStateProps {
   onRetry: () => void;
