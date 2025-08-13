@@ -2,6 +2,8 @@
 
 AI-driven resume and cover letter optimization platform that transforms job descriptions into tailored applications.
 
+[![Deploy to Pages](https://github.com/mudafar/resume-oracle/actions/workflows/nextjs.yml/badge.svg)](https://github.com/mudafar/resume-oracle/actions/workflows/nextjs.yml)
+
 ## Overview
 
 Resume Oracle is a guided, step-by-step workflow that helps job seekers create highly targeted resumes and cover letters by analyzing job descriptions and matching them with existing experience. Unlike traditional resume builders, it starts with the job requirements and optimizes your profile accordingly.

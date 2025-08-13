@@ -26,8 +26,10 @@ concurrency:
 
 jobs:
   # Build job
-  build:
+  build: 
     runs-on: ubuntu-latest
+    environment:
+      name: github-pages    
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -69,6 +71,8 @@ jobs:
         run: ${{ steps.detect-package-manager.outputs.manager }} ${{ steps.detect-package-manager.outputs.command }}
       - name: Build with Next.js
         run: ${{ steps.detect-package-manager.outputs.runner }} next build
+        env:
+          NEXT_PUBLIC_GEMINI_API_KEY: ${{ secrets.NEXT_PUBLIC_GEMINI_API_KEY }}        
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
