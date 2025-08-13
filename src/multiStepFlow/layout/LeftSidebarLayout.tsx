@@ -43,13 +43,15 @@ export function LeftSidebarLayout({ steps, currentStep, onStepChange, appName, a
   const hasKey = Boolean(config.apiKey);
   const accessText = hasKey
     ? 'Premium AI Active'
-      : 'Free • 5 calls/min';
+    : 'Free • 5 calls/min';
   const accessStyle = hasKey
     ? 'bg-purple-50 text-purple-700 border-purple-200'
     : 'bg-gray-50 text-gray-700 border-gray-200';
 
   return (
-    <Sidebar variant="inset">
+    <Sidebar variant="inset"
+      className="bg-slate-50 dark:bg-slate-900 border-r border-border"
+    >
       <SidebarHeader>
         <div className="flex items-center gap-2">
           <div className="flex items-center justify-center w-10 h-10 ">
@@ -102,11 +104,6 @@ export function LeftSidebarLayout({ steps, currentStep, onStepChange, appName, a
 
                       <div className="flex flex-col items-start flex-1 min-w-0">
                         <span className="font-medium whitespace-normal break-words leading-tight">{step.label}</span>
-                        {/* {step.description && !isCollapsed && (
-<span className="text-xs text-muted-foreground whitespace-normal break-words leading-tight mt-1">
-{step.description}
-</span>
-)} */}
                       </div>
                     </SidebarMenuButton>
                   </SidebarMenuItem>
@@ -118,32 +115,32 @@ export function LeftSidebarLayout({ steps, currentStep, onStepChange, appName, a
       </SidebarContent>
 
       <SidebarFooter>
- <SidebarMenu>
-   <SidebarMenuItem>
-     <div className="flex items-center w-full px-2 gap-1">
-       <Button
-         variant="ghost"
-         size="icon"
-         className="h-10 w-10"
-         onClick={() => dispatch(openConfigModal())}
-         aria-label="Model Config"
-       >
-         <Settings className="w-8! h-8!" />
-       </Button>
+        <SidebarMenu>
+          <SidebarMenuItem>
+            <div className="flex items-center w-full px-2 gap-1">
+              <Button
+                variant="ghost"
+                size="icon"
+                className="h-10 w-10"
+                onClick={() => dispatch(openConfigModal())}
+                aria-label="Model Config"
+              >
+                <Settings className="w-8! h-8!" />
+              </Button>
 
-      {/* Access Badge */}
-      {/* TODO: move to the left side bar? */}
-      <Button
-        onClick={() => dispatch(openConfigModal())}
-        className={`top-4 right-4 flex items-center gap-1 text-xs font-medium px-2 py-0.5 border rounded-full hover:bg-opacity-80 transition ${accessStyle}`}
-      >
-        {hasKey ? <User className="w-4 h-4" /> : <Key className="w-4 h-4" />} {accessText}
-      </Button>
-       
-     </div>
-   </SidebarMenuItem>
- </SidebarMenu>
-</SidebarFooter>
+              {/* Access Badge */}
+              {/* TODO: move to the left side bar? */}
+              <Button
+                onClick={() => dispatch(openConfigModal())}
+                className={`top-4 right-4 flex items-center gap-1 text-xs font-medium px-2 py-0.5 border rounded-full hover:bg-opacity-80 transition ${accessStyle}`}
+              >
+                {hasKey ? <User className="w-4 h-4" /> : <Key className="w-4 h-4" />} {accessText}
+              </Button>
+
+            </div>
+          </SidebarMenuItem>
+        </SidebarMenu>
+      </SidebarFooter>
     </Sidebar>
   );
 }
