@@ -43,6 +43,26 @@ export function useLlmError() {
       return;
     }
 
+    // Rate limit handling (429 or matching phrases)
+    const rateLimitPatterns = [
+      /rate\s*limit/i,
+      /too\s*many\s*requests/i,
+      /quota/i,
+      /exceeded/i,
+    ];
+    const isRateLimited = status === 429 || rateLimitPatterns.some((re) => re.test(message));
+    if (isRateLimited) {
+      toast.error("Rate limit exceeded.", {
+        description: "You’ve hit the model’s limit. Wait a bit and try again, or add your own API key in Settings.",
+        action: {
+          label: "Open Settings",
+          onClick: openSettings,
+        },
+        duration: 8000,
+      });
+      return;
+    }
+
     // Bad request or provider-side request errors
     if (status === 400 || /\b400\b/.test(message)) {
       toast.error("Request rejected by AI provider.", {
