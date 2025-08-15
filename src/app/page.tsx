@@ -1,5 +1,5 @@
-import { MultiStepFlow } from "@/multiStepFlow/MultiStepFlow";
+import { Landing } from './landing/Landing';
 
 export default function Page() {
-  return <MultiStepFlow />;
-} 
+  return <Landing />;
+}

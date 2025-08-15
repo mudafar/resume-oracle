@@ -22,6 +22,7 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from "@/components/ui/sidebar";
+import Link from 'next/link';
 
 import { useDispatch, useSelector } from "react-redux";
 import { openConfigModal } from "@/store/slices/llmConfigSlice";
@@ -54,13 +55,15 @@ export function LeftSidebarLayout({ steps, currentStep, onStepChange, appName, a
     >
       <SidebarHeader>
         <div className="flex items-center gap-2">
-          <div className="flex items-center justify-center w-10 h-10 ">
-            {appIcon}
-          </div>
-          <div className="grid flex-1 text-left text-sm leading-tight">
-            <span className="truncate font-semibold">{appName}</span>
-            <span className="truncate text-xs text-muted-foreground">v0.1</span>
-          </div>
+          <Link href="/" className="flex items-center gap-2" aria-label="Homepage">
+            <div className="flex items-center justify-center w-10 h-10 ">
+              {appIcon}
+            </div>
+            <div className="grid flex-1 text-left text-sm leading-tight">
+              <span className="truncate font-semibold">{appName}</span>
+              <span className="truncate text-xs text-muted-foreground">v0.1</span>
+            </div>
+          </Link>
         </div>
       </SidebarHeader>
 

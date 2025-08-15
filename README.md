@@ -75,3 +75,4 @@ This project follows strict TypeScript patterns and uses AI-assisted development
 - [ ] streaming LLM responses
 - [ ] add feature tests
 - [ ] add e2e tests
+- [ ] link sharing embedding preview 
