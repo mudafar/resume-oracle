@@ -40,7 +40,8 @@ export const Landing: React.FC = () => {
         <div className="min-h-screen bg-background overflow-x-clip animate-fade-in">
             <Header />
             
-            <FullBleedSection id="hero">
+            {/* Hero - Clean start with subtle gradient */}
+            <FullBleedSection id="hero" className="bg-gradient-to-b from-background to-slate-50/50">
                 <HeroSection
                     onAnalyze={handleAnalyze}
                     onSkip={handleSkip}
@@ -48,27 +49,33 @@ export const Landing: React.FC = () => {
                 />
             </FullBleedSection>
 
-            <FullBleedSection id="how-it-works" className="bg-muted/30">
+            {/* How It Works - Soft blue gradient for process explanation */}
+            <FullBleedSection id="how-it-works" className="bg-gradient-to-b from-blue-50/30 to-blue-100/40">
                 <HowItWorks />
             </FullBleedSection>
 
-            <FullBleedSection id="features">
+            {/* Features - Light with subtle accent */}
+            <FullBleedSection id="features" className="bg-gradient-to-b from-slate-50/50 to-purple-50/30">
                 <Features />
             </FullBleedSection>
 
-            <FullBleedSection id="problem-solution" className="bg-muted/30">
+            {/* Problem Solution - Warm attention-grabbing gradient */}
+            <FullBleedSection id="problem-solution" className="bg-gradient-to-b from-orange-50/40 to-red-50/30">
                 <ProblemSolution />
             </FullBleedSection>
 
-            <FullBleedSection id="competitive-advantage">
+            {/* Competitive Advantage - Professional blue tone */}
+            <FullBleedSection id="competitive-advantage" className="bg-gradient-to-b from-indigo-50/50 to-blue-50/40">
                 <CompetitiveAdvantage />
             </FullBleedSection>
 
-            <FullBleedSection id="open-source" className="bg-slate-900 text-white">
+            {/* Open Source - Bold dark with gradient */}
+            <FullBleedSection id="open-source" className="bg-gradient-to-b from-slate-900 via-slate-800 to-slate-900 text-white">
                 <OpenSource />
             </FullBleedSection>
 
-            <FullBleedSection id="call-to-action" className="bg-muted/30">
+            {/* Call to Action - Primary brand gradient */}
+            <FullBleedSection id="call-to-action" className="bg-gradient-to-b from-primary/5 via-primary/10 to-primary/5">
                 <CallToAction
                     onAnalyze={handleAnalyze}
                     onSkip={handleSkip}
@@ -76,15 +83,18 @@ export const Landing: React.FC = () => {
                 />
             </FullBleedSection>
 
-            <FullBleedSection id="privacy" className="bg-green-50/50">
+            {/* Privacy - Trust-building green gradient */}
+            <FullBleedSection id="privacy" className="bg-gradient-to-b from-emerald-50/60 to-green-50/50">
                 <Privacy />
             </FullBleedSection>
 
-            <FullBleedSection id="contact">
+            {/* Contact - Neutral transition to footer */}
+            <FullBleedSection id="contact" className="bg-gradient-to-b from-slate-50/40 to-slate-100/50">
                 <Contact />
             </FullBleedSection>
 
-            <FullBleedSection className="bg-slate-900">
+            {/* Footer - Deep dark with subtle gradient */}
+            <FullBleedSection className="bg-gradient-to-b from-slate-900 to-slate-950">
                 <Footer />
             </FullBleedSection>
 
@@ -106,7 +116,7 @@ export const Landing: React.FC = () => {
 
             <SettingsModalWrapper />
                 
-            <style jsx>{`    
+            <style>{`    
                 @keyframes fade-in {
                 from { opacity: 0; transform: translateY(20px); }
                 to { opacity: 1; transform: translateY(0); }

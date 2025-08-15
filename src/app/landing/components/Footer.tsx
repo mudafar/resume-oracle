@@ -49,7 +49,7 @@ export const Footer: React.FC = () => {
               Discover skills you forgot you had
             </p>
             <p className="text-slate-400 text-sm">
-              Built with ❤️ by the open source community
+              Built with ❤️
             </p>
           </div>
 

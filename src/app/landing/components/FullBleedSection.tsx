@@ -20,6 +20,8 @@ export function FullBleedSection({ id, className, innerClassName, children }: Fu
       className={cn(
         // Bleed the background to the viewport edges regardless of parent constraints
         'relative left-1/2 right-1/2 -mx-[50vw] w-screen scroll-mt-14',
+        // Add smooth transitions for better visual flow
+        'transition-all duration-300 ease-in-out',
         className,
       )}
     >
