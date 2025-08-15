@@ -4,27 +4,29 @@ import { AppIcon } from '@/multiStepFlow/layout/AppIcon';
 
 const footerSections = [
   {
+    title: "Product",
+    links: [
+      { label: "How It Works", href: "#how-it-works" },
+      { label: "Features", href: "#features" },
+      { label: "Privacy Details", href: "#privacy" },
+      { label: "Contact Support", href: "#contact" },
+    ],
+  },
+  {
+    title: "Open Source",
+    links: [
+      { label: "GitHub Repository", href: "https://github.com/mudafar/resume-oracle" },
+      { label: "Contributing Guide", href: "#" },
+      { label: "Issue Tracker", href: "#" },
+      { label: "Community Discussions", href: "#" },
+    ],
+  },
+  {
     title: "Legal",
     links: [
+      { label: "AGPL-3.0 License", href: "#" },
       { label: "Privacy Policy", href: "#" },
-      { label: "Cookie Policy", href: "#" },
-      { label: "AGPL License", href: "#" },
-    ],
-  },
-  {
-    title: "Project",
-    links: [
-      { label: "Documentation", href: "#" },
-      { label: "GitHub Repository", href: "#" },
-      { label: "Contributing", href: "#" },
-    ],
-  },
-  {
-    title: "Support",
-    links: [
-      { label: "Issues", href: "#" },
-      { label: "Discussions", href: "#" },
-      { label: "Roadmap", href: "#" },
+      { label: "Terms of Use", href: "#" },
     ],
   },
 ];
@@ -41,14 +43,14 @@ export const Footer: React.FC = () => {
                 <AppIcon size={24} />
               </div>
               <span className="font-semibold text-lg">Resume Oracle</span>
+              <span className="text-slate-400 text-sm">v0.1 Alpha</span>
             </div>
             <p className="text-slate-400 text-sm">
-              Open source AI-powered resume builder that respects your privacy.
+              Discover skills you forgot you had
             </p>
-            <div className="text-slate-400 text-sm">
-              <div>Version 0.1</div>
-              <div>Built with ❤️</div>
-            </div>
+            <p className="text-slate-400 text-sm">
+              Built with ❤️ by the open source community
+            </p>
           </div>
 
           {/* Links */}
@@ -61,6 +63,8 @@ export const Footer: React.FC = () => {
                     <a 
                       href={link.href} 
                       className="text-slate-400 hover:text-white text-sm transition-colors"
+                      target={link.href.startsWith('http') ? "_blank" : undefined}
+                      rel={link.href.startsWith('http') ? "noopener noreferrer" : undefined}
                     >
                       {link.label}
                     </a>
@@ -76,13 +80,12 @@ export const Footer: React.FC = () => {
         <div className="text-center">
           <div className="bg-amber-900/20 border border-amber-800/30 rounded-lg p-4 mb-6">
             <p className="text-amber-200 text-sm">
-              <strong>Disclaimer:</strong> This tool is provided as-is under AGPL license. 
-              AI suggestions are recommendations only—review all generated content before use. 
-              Data stored locally—clearing browser data will remove your resumes.
+              <strong>⚠️ Alpha Release:</strong> Resume Oracle v0.1 is in active development. 
+              AI suggestions are recommendations only. All data is stored locally in your browser - clearing browser data will remove your profiles.
             </p>
           </div>
           <p className="text-slate-400 text-sm">
-            © 2025 Resume Oracle. Open source under AGPL-3.0 license.
+            © 2025 Resume Oracle Contributors • Open source under AGPL-3.0 license
           </p>
         </div>
       </div>

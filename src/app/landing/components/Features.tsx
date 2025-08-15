@@ -1,30 +1,30 @@
 import React from 'react';
 import { Card } from '@/components/ui/card';
-import { ShieldCheck, Code, Brain, UserX } from 'lucide-react';
+import { Search, ShieldCheck, TrendingUp, Lock } from 'lucide-react';
 
 const features = [
   {
-    icon: ShieldCheck,
-    title: "Privacy-First",
-    description: "All data stored locally in your browser. No uploads, no tracking.",
+    icon: Search,
+    title: "Uncover What You Actually Know",
+    description: "Discover relevant skills from your past experience that you forgot to mention. Like finding money in old jacket pockets.",
     color: "text-green-600 bg-green-50",
   },
   {
-    icon: Code,
-    title: "Open Source",
-    description: "AGPL-licensed, community-driven, transparent development.",
-    color: "text-blue-600 bg-blue-50",
-  },
-  {
-    icon: Brain,
-    title: "AI-Powered",
-    description: "Smart resume optimization with intelligent suggestions.",
+    icon: ShieldCheck,
+    title: "Never Invents Fake Experience",
+    description: "Unlike chat tools, Resume Oracle only suggests what you actually have. No hallucinations, no made-up qualifications.",
     color: "text-purple-600 bg-purple-50",
   },
   {
-    icon: UserX,
-    title: "No Signup",
-    description: "Start immediately, no registration or account required.",
+    icon: TrendingUp,
+    title: "Each Job Application Gets Easier",
+    description: "Your profile learns and improves. What takes 2 hours the first time takes 20 minutes the fifth time.",
+    color: "text-blue-600 bg-blue-50",
+  },
+  {
+    icon: Lock,
+    title: "Your Data Never Leaves Your Browser",
+    description: "Everything runs locally. No uploads, no tracking, no data harvesting. AGPL-licensed and fully transparent.",
     color: "text-orange-600 bg-orange-50",
   },
 ];
@@ -35,10 +35,10 @@ export const Features: React.FC = () => {
       <div className="container mx-auto">
         <div className="text-center mb-16">
           <h2 className="text-3xl md:text-4xl font-bold mb-4">
-            Why Choose Resume Oracle?
+            Why Developers and Job Seekers Choose Resume Oracle
           </h2>
-          <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-            Built with privacy, transparency, and user experience in mind
+          <p className="text-lg text-muted-foreground max-w-2xl mx-auto italic">
+            Built by developers, for everyone who's tired of generic resume advice
           </p>
         </div>
 

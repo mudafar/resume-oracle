@@ -1,13 +1,13 @@
-// components/landing/Header.tsx
 import React from 'react';
 import { Button } from '@/components/ui/button';
-import { Github, Star } from 'lucide-react';
+import { Github } from 'lucide-react';
 import { AppIcon } from '@/multiStepFlow/layout/AppIcon';
 import Link from 'next/link';
 
 const navItems = [
   { label: "How It Works", href: "#how-it-works" },
   { label: "Features", href: "#features" },
+  { label: "Why Not ChatGPT?", href: "#competitive-advantage" },
   { label: "Open Source", href: "#open-source" },
   { label: "Privacy", href: "#privacy" },
   { label: "Contact", href: "#contact" },
@@ -23,12 +23,12 @@ export const Header: React.FC = () => {
         </Link>
 
         {/* Navigation Links */}
-        <nav className="hidden md:flex items-center space-x-6">
+        <nav className="hidden lg:flex items-center space-x-4">
           {navItems.map((item) => (
             <Link
               key={item.href}
               href={item.href}
-              className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
+              className="text-xs font-medium text-muted-foreground hover:text-foreground transition-colors"
             >
               {item.label}
             </Link>
@@ -37,8 +37,7 @@ export const Header: React.FC = () => {
         
         <Button variant="outline" size="sm" asChild>
           <a href="https://github.com/mudafar/resume-oracle" target="_blank" rel="noopener noreferrer">
-            <Github className=" h-4 w-4" />
-            {/* <Star className="mr-2 h-4 w-4" /> */}
+            <Github className="h-4 w-4" />
             GitHub
           </a>
         </Button>

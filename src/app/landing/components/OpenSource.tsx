@@ -1,32 +1,36 @@
 import React from 'react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Github, FileText, Users, MapPin, ExternalLink } from 'lucide-react';
+import { Code, Users, Shield, GitBranch, ExternalLink, Github } from 'lucide-react';
 import Link from 'next/link';
 
 const openSourceItems = [
   {
-    icon: Github,
-    title: "GitHub Repository",
-    description: "View source code, contribute, and report issues",
-    link: "#",
-  },
-  {
-    icon: FileText,
-    title: "AGPL-3.0 License",
-    description: "Free to use, modify, and distribute",
-    link: "#",
+    icon: Code,
+    title: "AGPL-Licensed & Auditable",
+    description: "Every line of code is public. No black boxes, no hidden algorithms, no vendor lock-in.",
+    cta: "View Source Code",
+    link: "https://github.com/mudafar/resume-oracle",
   },
   {
     icon: Users,
-    title: "Community Driven",
-    description: "Built by developers, for developers",
+    title: "Shaped by Real Users",
+    description: "Features prioritized by actual job seekers and developers. Join discussions and influence the roadmap.",
+    cta: "Join Community",
     link: "#",
   },
   {
-    icon: MapPin,
-    title: "Roadmap",
-    description: "See planned features and contribute ideas",
+    icon: Shield,
+    title: "Privacy by Design",
+    description: "No analytics, no cookies, no data collection. Your resume data stays in your browser, period.",
+    cta: "Read Privacy Details",
+    link: "#privacy",
+  },
+  {
+    icon: GitBranch,
+    title: "Help Build the Future",
+    description: "From bug fixes to new features, every contribution makes Resume Oracle better for everyone.",
+    cta: "Start Contributing",
     link: "#",
   },
 ];
@@ -37,10 +41,10 @@ export const OpenSource: React.FC = () => {
       <div className="container mx-auto text-center">
         <div className="mb-16">
           <h2 className="text-3xl md:text-4xl font-bold mb-4">
-            Open Source & Transparent
+            Built in the Open, Built to Last
           </h2>
-          <p className="text-lg text-slate-300 max-w-2xl mx-auto">
-            Built in the open, for the community. Every line of code is auditable and contributable.
+          <p className="text-lg text-slate-300 max-w-2xl mx-auto italic">
+            Transparent development, community-driven, and always free to use
           </p>
         </div>
 
@@ -55,10 +59,10 @@ export const OpenSource: React.FC = () => {
                   </div>
                 </div>
                 <h3 className="text-lg font-semibold mb-2 text-white">{item.title}</h3>
-                <p className="text-slate-300 text-sm mb-4">{item.description}</p>
+                <p className="text-slate-300 text-sm mb-4 leading-relaxed">{item.description}</p>
                 <Button variant="ghost" size="sm" className="text-slate-300 hover:text-white" asChild>
-                  <Link href={item.link} target="_blank" rel="noopener noreferrer">
-                    Learn more <ExternalLink className="ml-2 h-3 w-3" />
+                  <Link href={item.link} target={item.link.startsWith('http') ? "_blank" : undefined} rel={item.link.startsWith('http') ? "noopener noreferrer" : undefined}>
+                    {item.cta} <ExternalLink className="ml-2 h-3 w-3" />
                   </Link>
                 </Button>
               </Card>

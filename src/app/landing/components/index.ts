@@ -1,9 +1,12 @@
-export { HeroSection } from './HeroSection';
-export { Contact } from './Contact';
-export { Features } from './Features';
-export { Footer } from './Footer';
 export { Header } from './Header';
+export { HeroSection } from './HeroSection';
 export { HowItWorks } from './HowItWorks';
+export { Features } from './Features';
+export { ProblemSolution } from './ProblemSolution';
+export { CompetitiveAdvantage } from './CompetitiveAdvantage';
 export { OpenSource } from './OpenSource';
+export { CallToAction } from './CallToAction';
 export { Privacy } from './Privacy';
-
+export { Contact } from './Contact';
+export { Footer } from './Footer';
+export { FullBleedSection } from './FullBleedSection';

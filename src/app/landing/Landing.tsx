@@ -5,7 +5,10 @@ import { Header } from './components/Header';
 import { HeroSection } from './components/HeroSection';
 import { HowItWorks } from './components/HowItWorks';
 import { Features } from './components/Features';
+import { ProblemSolution } from './components/ProblemSolution';
+import { CompetitiveAdvantage } from './components/CompetitiveAdvantage';
 import { OpenSource } from './components/OpenSource';
+import { CallToAction } from './components/CallToAction';
 import { Privacy } from './components/Privacy';
 import { Contact } from './components/Contact';
 import { Footer } from './components/Footer';
@@ -17,8 +20,6 @@ import { setCurrentStep } from '@/store/slices/stepSlice';
 import { openConfigModal } from '@/store/slices/llmConfigSlice';
 import { useRouter } from 'next/navigation';
 import { SettingsModalWrapper } from '@/multiStepFlow/settingsModal/SettingsModalWrapper';
-
-
 
 export const Landing: React.FC = () => {
     const [importAIModalOpen, setImportAIModalOpen] = React.useState(false);
@@ -38,6 +39,7 @@ export const Landing: React.FC = () => {
     return (
         <div className="min-h-screen bg-background overflow-x-clip animate-fade-in">
             <Header />
+            
             <FullBleedSection id="hero">
                 <HeroSection
                     onAnalyze={handleAnalyze}
@@ -54,8 +56,24 @@ export const Landing: React.FC = () => {
                 <Features />
             </FullBleedSection>
 
+            <FullBleedSection id="problem-solution" className="bg-muted/30">
+                <ProblemSolution />
+            </FullBleedSection>
+
+            <FullBleedSection id="competitive-advantage">
+                <CompetitiveAdvantage />
+            </FullBleedSection>
+
             <FullBleedSection id="open-source" className="bg-slate-900 text-white">
                 <OpenSource />
+            </FullBleedSection>
+
+            <FullBleedSection id="call-to-action" className="bg-muted/30">
+                <CallToAction
+                    onAnalyze={handleAnalyze}
+                    onSkip={handleSkip}
+                    onOpenSettings={handleOpenSettings}
+                />
             </FullBleedSection>
 
             <FullBleedSection id="privacy" className="bg-green-50/50">
@@ -70,8 +88,7 @@ export const Landing: React.FC = () => {
                 <Footer />
             </FullBleedSection>
 
-
-            {/* TODO: move modals -- share with multiStepFlow page */}
+            {/* Modals */}
             <ProfileSectionImportAIModal
                 open={importAIModalOpen}
                 onClose={() => setImportAIModalOpen(false)}
@@ -79,7 +96,6 @@ export const Landing: React.FC = () => {
                     sections.forEach(sec => dispatch(addSection(sec)));
                     setImportAIModalOpen(false);
                     dispatch(setCurrentStep(1));
-                    // navigate to /wizard
                     router.push('/wizard');
                 }}
                 onToast={(msg, type = "success") => {
@@ -90,7 +106,6 @@ export const Landing: React.FC = () => {
 
             <SettingsModalWrapper />
                 
-
             <style jsx>{`    
                 @keyframes fade-in {
                 from { opacity: 0; transform: translateY(20px); }

@@ -1,36 +1,40 @@
 import React from 'react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Linkedin, Github, MessageCircle, Bug } from 'lucide-react';
+import { HelpCircle, Bug, Lightbulb, Code } from 'lucide-react';
 
 const contactItems = [
   {
-    icon: Linkedin,
-    title: "LinkedIn",
-    description: "Professional contact",
+    icon: HelpCircle,
+    title: "General Support",
+    description: "Questions about features, usage, or getting started with Resume Oracle.",
+    cta: "Ask in Discussions",
     link: "#",
     color: "text-blue-600 bg-blue-50 hover:bg-blue-100",
   },
   {
-    icon: Github,
-    title: "GitHub",
-    description: "Repository & issues",
-    link: "#",
-    color: "text-gray-900 bg-gray-50 hover:bg-gray-100",
-  },
-  {
-    icon: MessageCircle,
-    title: "Discussions",
-    description: "GitHub Discussions",
-    link: "#",
-    color: "text-green-600 bg-green-50 hover:bg-green-100",
-  },
-  {
     icon: Bug,
-    title: "Bug Reports",
-    description: "Feature requests",
+    title: "Found an Issue?",
+    description: "Help make Resume Oracle better by reporting bugs or unexpected behavior.",
+    cta: "Report on GitHub",
     link: "#",
     color: "text-red-600 bg-red-50 hover:bg-red-100",
+  },
+  {
+    icon: Lightbulb,
+    title: "Suggest Improvements",
+    description: "Have ideas for new features or workflow improvements? We'd love to hear them.",
+    cta: "Share Your Ideas",
+    link: "#",
+    color: "text-yellow-600 bg-yellow-50 hover:bg-yellow-100",
+  },
+  {
+    icon: Code,
+    title: "Want to Contribute Code?",
+    description: "Join the development community and help build the future of AI-powered resume tools.",
+    cta: "See Contributing Guide",
+    link: "#",
+    color: "text-green-600 bg-green-50 hover:bg-green-100",
   },
 ];
 
@@ -40,10 +44,10 @@ export const Contact: React.FC = () => {
       <div className="container mx-auto">
         <div className="text-center mb-16">
           <h2 className="text-3xl md:text-4xl font-bold mb-4">
-            Get in Touch
+            Questions, Ideas, or Want to Contribute?
           </h2>
-          <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-            Questions, suggestions, or want to contribute? We'd love to hear from you.
+          <p className="text-lg text-muted-foreground max-w-2xl mx-auto italic">
+            Built by the community, supported by the community
           </p>
         </div>
 
@@ -58,9 +62,9 @@ export const Contact: React.FC = () => {
                   </div>
                 </div>
                 <h3 className="text-lg font-semibold mb-2">{item.title}</h3>
-                <p className="text-muted-foreground text-sm mb-4">{item.description}</p>
+                <p className="text-muted-foreground text-sm mb-4 leading-relaxed">{item.description}</p>
                 <Button variant="ghost" size="sm">
-                  Contact
+                  {item.cta}
                 </Button>
               </Card>
             );
