@@ -60,7 +60,7 @@ export function useLlmService<T = any>(serviceFn: ServiceFunction<T>): UseLlmSer
   const trigger = useCallback(
     async (...params: any[]) => {
       // Check cache first
-      if (cacheRef.current && areParamsEqual(params, cacheRef.current.params, llmConfig, cacheRef.current.llmConfig)) {
+      if (cacheRef.current && cacheRef.current.result && areParamsEqual(params, cacheRef.current.params, llmConfig, cacheRef.current.llmConfig)) {
         console.log("[CACHE] Using cached result for LLM service call");
         setData(cacheRef.current.result);
         return cacheRef.current.result;

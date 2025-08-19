@@ -72,10 +72,12 @@ export function useAutoRetrigger({
   // auto-detect on mount/changes
   useEffect(() => {
     if (!changed) {
-      setShowBanner(false);
+      if (showBanner) {
+        setShowBanner(false);
+      }
+      
       return;
     }
-
     // Prevent re-entrancy loops while a run is in progress
     if (isRunning) {
       return;
