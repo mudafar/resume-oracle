@@ -26,7 +26,7 @@ export const metadata: Metadata = {
     siteName: "Resume Oracle",
     images: [
       {
-        url: "https://resumeoracle.app/og-image.svg",
+        url: "https://resumeoracle.app/og-image.jpg",
         width: 1200,
         height: 630,
         alt: "Resume Oracle - Discover Skills You Forgot You Had",
@@ -41,9 +41,9 @@ export const metadata: Metadata = {
     description: "Stop losing jobs to incomplete resumes. AI finds hidden skills in your experience and creates targeted resumes that get noticed.",
     images: [
       { 
-        url: "https://resumeoracle.app/og-image.svg", 
+        url: "https://resumeoracle.app/og-image.jpg", 
         width: 1200, 
-        height: 675, 
+        height: 630, 
         alt: "Resume Oracle - Discover Skills You Forgot You Had" 
       },
     ],
