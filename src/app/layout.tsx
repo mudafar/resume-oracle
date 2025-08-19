@@ -15,8 +15,59 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Resume Oracle",
-  description: "Resume Oracle is an AI-powered resume and cover letter optimization platform that analyzes job descriptions and tailors your applications for maximum impact, helping you land interviews faster.",
+  title: "Resume Oracle - Discover Skills You Forgot You Had",
+  description: "Stop losing jobs to incomplete resumes. AI finds hidden skills in your experience and creates targeted resumes that get noticed. No signup required, privacy-first.",
+
+  // Open Graph
+  openGraph: {
+    title: "Resume Oracle - Discover Skills You Forgot You Had",
+    description: "Stop losing jobs to incomplete resumes. AI finds hidden skills and creates targeted resumes that get interviews. No signup required.",
+    url: "https://resumeoracle.app",
+    siteName: "Resume Oracle",
+    images: [
+      {
+        url: "/og-image.svg",
+        width: 1200,
+        height: 630,
+        alt: "Resume Oracle - Discover Skills You Forgot You Had",
+      },
+    ],
+    locale: "en_US",
+    type: "website",
+  },  // Twitter Cards
+  twitter: {
+    card: "summary_large_image",
+    title: "Resume Oracle - Discover Skills You Forgot You Had",
+    description: "Stop losing jobs to incomplete resumes. AI finds hidden skills in your experience and creates targeted resumes that get noticed.",
+    images: [
+      { 
+        url: "/og-image.svg", 
+        width: 1200, 
+        height: 675, 
+        alt: "Resume Oracle - Discover Skills You Forgot You Had" 
+      },
+    ],
+    creator: "@resumeoracle",
+  },
+
+  // Additional meta
+  keywords: ["resume builder", "AI resume", "job application", "career tools", "resume optimization", "skills discovery"],
+  authors: [{ name: "Resume Oracle" }],
+  creator: "Resume Oracle",
+  publisher: "Resume Oracle",
+
+  // Verification and robots
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-video-preview": -1,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+    },
+  },
 };
 
 export default function RootLayout({

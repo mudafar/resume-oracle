@@ -1,0 +1,113 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" width="1200" height="630">
+  <!-- Background Gradient -->
+  <defs>
+    <linearGradient id="bgGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#0f172a;stop-opacity:1" />
+      <stop offset="50%" style="stop-color:#1e293b;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#334155;stop-opacity:1" />
+    </linearGradient>
+    
+    <linearGradient id="accentGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#3b82f6;stop-opacity:0.8" />
+      <stop offset="50%" style="stop-color:#8b5cf6;stop-opacity:0.8" />
+      <stop offset="100%" style="stop-color:#06b6d4;stop-opacity:0.8" />
+    </linearGradient>
+    
+    <!-- Glow effect -->
+    <filter id="glow">
+      <feGaussianBlur stdDeviation="4" result="coloredBlur"/>
+      <feMerge> 
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+  
+  <!-- Background -->
+  <rect width="1200" height="630" fill="url(#bgGradient)"/>
+  
+  <!-- Subtle geometric patterns -->
+  <circle cx="1100" cy="100" r="80" fill="#3b82f6" opacity="0.1"/>
+  <circle cx="100" cy="530" r="60" fill="#8b5cf6" opacity="0.15"/>
+  <rect x="950" y="450" width="120" height="120" rx="20" fill="#06b6d4" opacity="0.1" transform="rotate(15 1010 510)"/>
+  
+  <!-- Main Content Container -->
+  <g transform="translate(80, 120)">
+    
+    <!-- App Icon (Scaled up version) -->
+    <g transform="translate(0, 80) scale(3)">
+      <rect fill="#1B3A57" rx="8" height="32" width="32"/>
+      <rect fill="#1B3A57" rx="4" height="24" width="24" y="4" x="4"/>
+      <rect fill="#F8FAFC" rx="1" height="3" width="16" y="5.15103" x="8"/>
+      <rect fill="#F8FAFC" rx="1" height="3" width="12" y="11.23461" x="8"/>
+      <path stroke-linecap="round" stroke-width="4" stroke="#FFD700" fill="none" d="m8,19.5c4,3.5 12,3.5 16,0"/>
+    </g>
+    
+    <!-- Main Headline -->
+    <text x="140" y="60" font-family="system-ui, -apple-system, sans-serif" font-size="52" font-weight="bold" fill="white">
+      Resume Oracle
+    </text>
+    
+    <!-- Tagline with gradient -->
+    <text x="140" y="120" font-family="system-ui, -apple-system, sans-serif" font-size="36" font-weight="600" fill="url(#accentGradient)" filter="url(#glow)">
+      Discover Skills You Forgot You Had
+    </text>
+    
+    <!-- Description -->
+    <text x="140" y="180" font-family="system-ui, -apple-system, sans-serif" font-size="24" fill="#cbd5e1" opacity="0.9">
+      Stop losing jobs to incomplete resumes.
+    </text>
+    <text x="140" y="215" font-family="system-ui, -apple-system, sans-serif" font-size="24" fill="#cbd5e1" opacity="0.9">
+      AI finds hidden skills in your experience
+    </text>
+    <text x="140" y="250" font-family="system-ui, -apple-system, sans-serif" font-size="24" fill="#cbd5e1" opacity="0.9">
+      and creates targeted resumes that get noticed.
+    </text>
+    
+    <!-- Key Features -->
+    <g transform="translate(140, 300)">
+      <!-- No Signup Required -->
+      <g>
+        <circle cx="8" cy="8" r="4" fill="#10b981"/>
+        <text x="25" y="13" font-family="system-ui, -apple-system, sans-serif" font-size="18" fill="#e2e8f0">No signup required</text>
+      </g>
+      
+      <!-- Privacy First -->
+      <g transform="translate(200, 0)">
+        <circle cx="8" cy="8" r="4" fill="#10b981"/>
+        <text x="25" y="13" font-family="system-ui, -apple-system, sans-serif" font-size="18" fill="#e2e8f0">Privacy-first</text>
+      </g>
+      
+      <!-- Open Source -->
+      <g transform="translate(340, 0)">
+        <circle cx="8" cy="8" r="4" fill="#10b981"/>
+        <text x="25" y="13" font-family="system-ui, -apple-system, sans-serif" font-size="18" fill="#e2e8f0">Open source</text>
+      </g>
+    </g>
+    
+    <!-- Call to Action -->
+    <rect x="140" y="350" width="200" height="50" rx="25" fill="url(#accentGradient)" filter="url(#glow)"/>
+    <text x="240" y="380" font-family="system-ui, -apple-system, sans-serif" font-size="18" font-weight="600" fill="white" text-anchor="middle">
+      Try it now →
+    </text>
+    
+    <!-- Domain -->
+    <text x="140" y="430" font-family="system-ui, -apple-system, sans-serif" font-size="20" fill="#64748b">
+      resumeoracle.app
+    </text>
+  </g>
+  
+  <!-- Decorative AI-ish elements -->
+  <g opacity="0.3">
+    <!-- Neural network dots -->
+    <circle cx="900" cy="200" r="3" fill="#3b82f6"/>
+    <circle cx="950" cy="180" r="2" fill="#8b5cf6"/>
+    <circle cx="980" cy="220" r="2" fill="#06b6d4"/>
+    <circle cx="920" cy="240" r="2" fill="#3b82f6"/>
+    
+    <!-- Connection lines -->
+    <line x1="900" y1="200" x2="950" y2="180" stroke="#3b82f6" stroke-width="1"/>
+    <line x1="950" y1="180" x2="980" y2="220" stroke="#8b5cf6" stroke-width="1"/>
+    <line x1="900" y1="200" x2="920" y2="240" stroke="#06b6d4" stroke-width="1"/>
+  </g>
+</svg>
