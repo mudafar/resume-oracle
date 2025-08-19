@@ -32,7 +32,6 @@ const GenerateCoverLetter: React.FC = () => {
   const coverLetter = useSelector((state: RootState) => state.coverLetter.coverLetter);
   const optimizationSummary = useSelector((state: RootState) => state.coverLetter.optimizationSummary);
   const [editMode, setEditMode] = useState(false);
-  const [showRegenerateBanner, setShowRegenerateBanner] = useState(false);
 
   if (!profileSections || !jobDescription) {
     return (

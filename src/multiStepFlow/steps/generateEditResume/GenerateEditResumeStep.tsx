@@ -24,7 +24,6 @@ const GenerateEditResume: React.FC = () => {
   const optimizationSummary = useSelector((state: RootState) => state.resume.optimizationSummary);
   const [editMode, setEditMode] = useState(false);
   const [isExportingPdf, setIsExportingPdf] = useState(false);
-  const [showRegenerateBanner, setShowRegenerateBanner] = useState(false);
   const [draftSaved, setDraftSaved] = useState(false);
   const [editedResume, setEditedResume] = useState("");
   const markdownContentRef = useRef<HTMLDivElement>(null);

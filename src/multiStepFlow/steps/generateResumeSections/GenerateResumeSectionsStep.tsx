@@ -81,7 +81,7 @@ const GenerateResumeSections: React.FC = () => {
     <div className="max-w-5xl mx-auto py-8 px-4 space-y-6">
 
       {/* Regeneration Banner */}
-      {(showRegenerateBanner || !resumeSections?.length) && (
+      {(showRegenerateBanner) && (
         <ChangeAlertBanner
           message="Your inputs changed slightly. Regenerate sections to refresh results."
           subtitle="Major changes regenerate automatically; minor changes let you choose."

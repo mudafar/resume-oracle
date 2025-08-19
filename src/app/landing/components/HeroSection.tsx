@@ -1,6 +1,6 @@
 import React from 'react';
 import { Button } from '@/components/ui/button';
-import { Upload, ArrowRight, Key } from 'lucide-react';
+import { Upload, ArrowRight, Key, Sparkle, Sparkles } from 'lucide-react';
 import { ResumeOracleIcon } from '@/multiStepFlow/ResumeOracleIcon';
 
 interface HeroSectionProps {
@@ -47,11 +47,11 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
           <Button
             size="lg"
             onClick={onAnalyze}
-            className="px-8 py-3 text-lg font-semibold"
+            className="px-8 py-3 text-lg font-semibold "
           >
-            <Upload className="mr-2 h-5 w-5" />
+            <Sparkles className="mr-2 h-5 w-5 animate-pulse " />
             Import Your Current Resume
-            <ArrowRight className="ml-2 h-5 w-5" />
+            {/* <ArrowRight className="ml-2 h-5 w-5" /> */}
           </Button>
 
           <Button
