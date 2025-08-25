@@ -1,17 +1,22 @@
 {
 	"servers": {
-		"spec-driven-dev-mcp": {
+		"spec-workflow": {
 			"command": "npx",
 			"args": [
-				"spec-driven-dev-mcp@latest"
-			],
-			"env": {},
-			"type": "stdio"
+				"-y",
+				"@pimzino/spec-workflow-mcp@latest"
+			]
 		},
 		"Context7": {
-		"type": "stdio",
-		"command": "npx",
-		"args": ["-y", "@upstash/context7-mcp@latest"]
+			"type": "stdio",
+			"command": "npx",
+			"args": [
+				"-y",
+				"@upstash/context7-mcp@latest"
+			]
+		},
+		"figma-p8ql5m-51": {
+			"url": "https://mcp.composio.dev/partner/composio/figma/mcp?customerId=eb28adee-ee54-4737-bf5c-9b01cee0ae95&agent=cursor"
 		}
 	},
 	"inputs": []

@@ -54,6 +54,13 @@ export class ResumeSectionsGeneratorService {
             - Use strong action verbs and professional resume language
             - Optimize for ATS scanning with standard terminology and clean formatting
             - Ensure content fits within typical resume space constraints (2-page limit)
+            - **Apply Bold Formatting**: Use **bold** text to highlight key elements following standard resume conventions:
+              • **Job titles** and **position names** in experience sections
+              • **Company names** and **organization names**
+              • **Project titles** and **project names**
+              • **Skill group categories** and **technology clusters**
+              • **Degree names** and **certification titles**
+              • **Award names** and **achievement titles**
 
             ### Quality Standards
             - **Authenticity**: Only use information present in the original profile section
