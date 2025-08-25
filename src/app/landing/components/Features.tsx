@@ -38,7 +38,7 @@ export const Features: React.FC = () => {
             Why Developers and Job Seekers Choose Resume Oracle
           </h2>
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto italic">
-            Built by developers, for everyone who's tired of generic resume advice
+            Built by developers, for everyone who&apos;s tired of generic resume advice
           </p>
         </div>
 

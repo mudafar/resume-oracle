@@ -30,8 +30,8 @@ export const CallToAction: React.FC<CallToActionProps> = ({
           </h2>
           
           <p className="text-lg text-muted-foreground mb-8 max-w-2xl mx-auto">
-            Join thousands of job seekers who've stopped losing opportunities to incomplete resumes. 
-            Import your profile in 2 minutes and see what you've been missing.
+            Join thousands of job seekers who&apos;ve stopped losing opportunities to incomplete resumes. 
+            Import your profile in 2 minutes and see what you&apos;ve been missing.
           </p>
 
           {/* Primary CTA */}

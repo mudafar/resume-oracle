@@ -1,6 +1,6 @@
 import React from 'react';
 import { Button } from '@/components/ui/button';
-import { Upload, ArrowRight, Key, Sparkle, Sparkles } from 'lucide-react';
+import { Key, Sparkles } from 'lucide-react';
 import { ResumeOracleIcon } from '@/multiStepFlow/ResumeOracleIcon';
 
 interface HeroSectionProps {
@@ -39,7 +39,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
 
         {/* Supporting Copy */}
         <p className="text-base md:text-lg text-muted-foreground mb-10 max-w-3xl mx-auto leading-relaxed">
-          Stop losing opportunities because your resume doesn't show what you're actually capable of. Resume Oracle finds the relevant skills buried in your background and creates targeted resumes that get noticed.
+          Stop losing opportunities because your resume doesn&apos;t show what you&apos;re actually capable of. Resume Oracle finds the relevant skills buried in your background and creates targeted resumes that get noticed.
         </p>
 
         {/* Action Buttons */}

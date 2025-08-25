@@ -20,7 +20,7 @@ export const CoverageGaps: React.FC<CoverageGapsProps> = ({
           🎉 All Coverage Gaps Addressed!
         </div>
         <p className="text-green-700 text-sm">
-          You've successfully filled all identified gaps. Your profile now better matches the job requirements.
+          You&apos;ve successfully filled all identified gaps. Your profile now better matches the job requirements.
         </p>
       </div>
     );
