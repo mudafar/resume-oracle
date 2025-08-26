@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { ProfileSection } from "@/store/slices/profileSectionsSlice";
+import type { ProfileSection } from "@/schemas/profile";
 import { Check, Edit3, Trash2 } from "lucide-react";
 import { useState } from "react";
 

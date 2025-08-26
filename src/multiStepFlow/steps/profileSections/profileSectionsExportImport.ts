@@ -1,4 +1,4 @@
-import { ProfileSection } from "@/store/slices/profileSectionsSlice";
+import type { ProfileSection } from "@/schemas/profile";
 
 // Export sections to JSON and trigger download
 export function exportSectionsToJson(sections: ProfileSection[], filename = "profile_sections.json") {

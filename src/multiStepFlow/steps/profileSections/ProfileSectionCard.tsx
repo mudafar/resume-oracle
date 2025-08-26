@@ -24,8 +24,8 @@ import {
   FileBadge,
   Folder
 } from "lucide-react";
+import type { ProfileSection } from "@/schemas/profile";
 import {
-  ProfileSection,
   SectionTypeEnum,
   sectionTypes
 } from "@/types/store";
@@ -123,7 +123,7 @@ export const ProfileSectionCard: React.FC<ProfileSectionCardProps> = ({
             <div className="flex items-center gap-2">
               {getSectionIcon(section.type)}
               <CardTitle className="text-lg font-semibold text-gray-800 capitalize tracking-tight">
-                {sectionTypes[section.type as SectionTypeEnum] || section.type}
+                {section.type}
               </CardTitle>
               {isEditing && (
                 <span className="px-2 py-1 bg-blue-100 text-blue-700 text-xs font-medium rounded-full">
@@ -180,7 +180,7 @@ export const ProfileSectionCard: React.FC<ProfileSectionCardProps> = ({
                   onChange={(e) => setEditType(e.target.value as SectionTypeEnum)}
                   className="w-full px-4 py-3 border border-gray-300 bg-white rounded-lg shadow-sm text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 appearance-none cursor-pointer"
                 >
-                  {sectionTypes.map((sectionType) => (
+                  {Object.values(sectionTypes).map((sectionType) => (
                     <option key={sectionType} value={sectionType}>
                       {sectionType}
                     </option>

@@ -19,6 +19,13 @@ type UseLlmServiceReturn<T> = [
   }
 ];
 
+type CacheEntry<T> = {
+  params: any[];
+  llmConfig: any;
+  result: T;
+  timestamp: number;
+};
+
 
 export function useLlmStreamingService<T>(serviceFn: ServiceFunction<T>): UseLlmServiceReturn<T> {
   const llmConfig = useSelector(selectLlmConfig);
@@ -26,7 +33,7 @@ export function useLlmStreamingService<T>(serviceFn: ServiceFunction<T>): UseLlm
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<any>(null);
   const [data, setData] = useState<T | null>(null);
-  const cacheRef = useRef(null);
+  const cacheRef = useRef<CacheEntry<T> | null>(null);
 
   const areParamsEqual = useCallback((params1: any[], params2: any[], config1: LLMConfig, config2: LLMConfig) => {
     try {
@@ -48,7 +55,7 @@ export function useLlmStreamingService<T>(serviceFn: ServiceFunction<T>): UseLlm
   }, []);
 
   const trigger = useCallback(
-    async (...params) => {
+    async (...params: any[]) => {
       if (cacheRef.current && cacheRef.current.result && areParamsEqual(params, cacheRef.current.params, llmConfig, cacheRef.current.llmConfig)) {
         console.log("[CACHE] Using cached result for LLM streaming service call");
         setData(cacheRef.current.result);

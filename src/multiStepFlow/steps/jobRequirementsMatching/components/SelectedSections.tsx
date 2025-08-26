@@ -1,5 +1,5 @@
 import React from "react";
-import  { ProfileSection } from "@/types/store";
+import type { ProfileSection } from "@/schemas/profile";
 import { SelectedSectionCard } from "../SelectedSectionCard";
 import { SelectedSection } from "@/schemas/matching";
 

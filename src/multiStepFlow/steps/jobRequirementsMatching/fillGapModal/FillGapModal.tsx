@@ -1,11 +1,12 @@
 "use client";
 import React, { useState } from "react";
-import type { ProfileSection } from "@/types/store";
+import type { ProfileSection } from "@/schemas/profile";
 import { GapContextPanel } from "./GapContextPanel";
 import { SolutionBuilderPanel } from "./SolutionBuilderPanel";
 import { useLlmService } from "@/hooks/useLlmService";
 import { profileSectionEnhancerService, EnhancedProfileSection } from "@/services/profileSectionEnhancerService";
-import { profileSectionGeneratorService, NewProfileSection } from "@/services/profileSectionGeneratorService";
+import { profileSectionGeneratorService } from "@/services/profileSectionGeneratorService";
+import type { NewProfileSection } from "@/schemas/profile";
 import { WizardModal } from "../../../../components/shared/modal";
 import { Search } from "lucide-react";
 import { CoverageGap } from "@/schemas/matching";

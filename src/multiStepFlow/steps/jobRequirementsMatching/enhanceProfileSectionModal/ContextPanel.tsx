@@ -3,7 +3,7 @@ import React from "react";
 import { CurrentSectionOverview } from "./CurrentSectionOverview";
 import { MissingRequirements } from "./MissingRequirements";
 import { EnhancementTips } from "./EnhancementTips";
-import { ProfileSection } from "@/types/store";
+import type { ProfileSection } from "@/schemas/profile";
 import { SelectedSection } from "@/schemas/matching";
 
 interface ContextPanelProps {

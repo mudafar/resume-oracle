@@ -25,7 +25,8 @@ import {
   CheckCircle2,
   Info,
   ChevronDown,
-  ChevronRight
+  ChevronRight,
+  Brain
 } from "lucide-react";
 import { SharedModal, ModalAction } from "@/components/shared";
 
@@ -47,8 +48,8 @@ const PROVIDERS: { value: LLMProvider; label: string; icon: React.ReactNode }[] 
   },
   { 
     value: "openai", 
-    label: "OpenRouter", 
-    icon: <Shield className="w-4 h-4 text-green-500" />
+    label: "OpenAI", 
+    icon: <Brain className="w-4 h-4 text-green-500" />
   },
 ];
 
@@ -56,7 +57,7 @@ const PROVIDER_VARIANTS: Record<LLMProvider, { value: LLMVariant; label: string 
   free: [
     { value: "default", label: "Default (small, cost‑efficient)" },
   ],
-  ['google-genai']: [
+  'google-genai': [
     { value: "gemini-2.5-flash-lite", label: "Gemini 2.5 Flash Light" },
     { value: "gemini-2.5-flash", label: "Gemini 2.5 Flash" },
     { value: "gemini-2.5-pro", label: "Gemini 2.5 PRO" },
@@ -67,7 +68,9 @@ const PROVIDER_VARIANTS: Record<LLMProvider, { value: LLMVariant; label: string 
     { value: "meta-llama/llama-4-maverick-17b-128e-instruct", label: "llama 4 Maverick" },
   ],
   openai: [
-    { value: "deepseek/deepseek-r1-0528:free", label: "Deepseek R1" },
+    { value: "gpt-4o", label: "GPT-4o" },
+    { value: "gpt-4-turbo", label: "GPT-4 Turbo" },
+    { value: "gpt-3.5-turbo", label: "GPT-3.5 Turbo" },
   ],
 };
 

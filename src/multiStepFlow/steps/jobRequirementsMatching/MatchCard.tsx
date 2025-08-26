@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
 import { CheckCircle, XCircle, ChevronDown, ChevronUp, Sparkle, Sparkles } from 'lucide-react';
-import { ProfileSection } from "@/types/store";
+import type { ProfileSection } from "@/schemas/profile";
 
 interface MatchCardProps {
   match: any;

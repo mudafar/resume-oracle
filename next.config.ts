@@ -7,12 +7,6 @@ const nextConfig: NextConfig = {
   output: "export",
   basePath: process.env.PAGES_BASE_PATH,
   typescript: {
-    // TODO: remove the ignoreBuildErrors option after fixing the type errors.
-    // !! WARN !!
-    // Dangerously allow production builds to successfully complete even if
-    // your project has type errors.
-    // !! WARN !!
-    ignoreBuildErrors: true,
   },
   eslint: {
     // TODO: remove the ignoreDuringBuilds option after fixing the lint errors.

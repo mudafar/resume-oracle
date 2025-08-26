@@ -38,4 +38,4 @@ export enum SectionTypeEnum {
   Custom = "Custom Section",
 }
 
-export const sectionTypes = Object.values(SectionTypeEnum);
+export const sectionTypes = SectionTypeEnum;

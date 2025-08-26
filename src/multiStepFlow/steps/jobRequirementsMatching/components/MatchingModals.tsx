@@ -1,7 +1,7 @@
 import React from "react";
 import { FillGapModal } from "../fillGapModal/FillGapModal";
 import { CoverageGap, SelectedSection } from "@/schemas/matching";
-import { ProfileSection } from "@/types/store";
+import { ProfileSection } from "@/schemas/profile";
 import { EnhanceProfileSectionModal } from "../enhanceProfileSectionModal";
 
 interface MatchingModalsProps {

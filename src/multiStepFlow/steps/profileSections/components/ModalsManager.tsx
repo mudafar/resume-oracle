@@ -1,5 +1,5 @@
 import React from "react";
-import { ProfileSection } from "@/store/slices/profileSectionsSlice";
+import type { ProfileSection } from "@/schemas/profile";
 import { NewProfileSectionModal } from "../NewProfileSectionModal";
 import { ProfileSectionsExportModal } from "../ProfileSectionsExportModal";
 import { DeleteAllProfileSectionsModal } from "../DeleteAllProfileSectionsModal";

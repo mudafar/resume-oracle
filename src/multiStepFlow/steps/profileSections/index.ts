@@ -1,5 +1,5 @@
 export { ProfileSectionsStep } from "./ProfileSectionsStep";
-export { ProfileSectionsImportModal } from "./ProfileSectionsImportModal";
+export { ProfileSectionImportAIModal } from "./ProfileSectionsImportAIModal";
 export { ProfileSectionsHeroPanel } from "./ProfileSectionsHeroPanel";
 export { ProfileSectionsActionBar } from "./ProfileSectionsActionBar";
 export { NewProfileSectionModal } from "./NewProfileSectionModal";

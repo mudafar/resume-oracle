@@ -4,7 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Target } from 'lucide-react';
 import { generateTextPreview } from "@/utils/textPreview";
 import { SelectedSection } from "@/schemas/matching";
-import { ProfileSection } from "@/types/store";
+import type { ProfileSection } from "@/schemas/profile";
 
 interface CurrentSectionOverviewProps {
   profileSection: ProfileSection;

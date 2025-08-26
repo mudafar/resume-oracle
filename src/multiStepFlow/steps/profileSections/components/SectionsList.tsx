@@ -1,5 +1,5 @@
 import React from "react";
-import { ProfileSection } from "@/store/slices/profileSectionsSlice";
+import type { ProfileSection } from "@/schemas/profile";
 import { ProfileSectionCard } from "../ProfileSectionCard";
 
 interface SectionsListProps {

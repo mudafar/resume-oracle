@@ -1,7 +1,7 @@
 "use client";
 import React, { useState } from "react";
 import { Sparkles } from 'lucide-react';
-import type { ProfileSection } from "@/types/store";
+import type { ProfileSection } from "@/schemas/profile";
 import { useLlmService } from "@/hooks/useLlmService";
 import { profileSectionEnhancerService, EnhancedProfileSection } from "@/services/profileSectionEnhancerService";
 import { ContextPanel } from "./ContextPanel";

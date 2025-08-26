@@ -96,7 +96,7 @@ export class LLMService {
      */
   const llm = await this.getLLM(config);
     const chain = promptTemplate.pipe(llm.withStructuredOutput(outputSchema));
-    return await chain.invoke(inputs);
+    return await chain.invoke(inputs) as z.infer<T>;
   }
 
   async streamStructuredOutput<T extends z.ZodType>(
@@ -104,7 +104,7 @@ export class LLMService {
     outputSchema: T,
     inputs: Record<string, any>,
     config?: LLMConfig
-  ) {
+  ): Promise<IterableReadableStream<z.infer<T>>> {
     /**
      * Stream LLM response with prompt template and structured output
      */
