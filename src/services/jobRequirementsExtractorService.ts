@@ -1,6 +1,7 @@
 import { ChatPromptTemplate } from "@langchain/core/prompts";
 import { RequirementCluster, JobRequirementClustersSchema } from "@/schemas/job";
 import { llmService } from "./llmService";
+import { IterableReadableStream } from "@langchain/core/utils/stream";
 
 export class JobRequirementsExtractorService {
   /**
@@ -10,7 +11,7 @@ export class JobRequirementsExtractorService {
     jobDescription: string,
     companyContext: string = "",
     llmConfig?: any
-  ): Promise<RequirementCluster[]> {
+  ): Promise<IterableReadableStream<{ requirement_clusters: RequirementCluster[] }>> {
     /**
      * Extract requirements from a job description
      * @param jobDescription - The job description text
@@ -108,7 +109,7 @@ export class JobRequirementsExtractorService {
       Focus on creating clusters that would benefit from being matched to the same profile evidence source.
 
             `);
-    const result = await llmService.invokeWithStructuredOutput(
+    const result = await llmService.streamStructuredOutput(
       prompt,
       JobRequirementClustersSchema,
       {
@@ -118,7 +119,7 @@ export class JobRequirementsExtractorService {
       },
       llmConfig
     );
-    return result.requirement_clusters;
+    return result;
   }
 }
 

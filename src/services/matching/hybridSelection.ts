@@ -1,7 +1,6 @@
 import { RequirementCluster } from "@/schemas/job";
 import { CoverageGap, HybridSelectionResult, ScoredPair, SelectedSection } from "@/schemas/matching";
 import { SelectionConstraints } from "@/types/matching/selection.types";
-import { ProfileSection } from "@/types/store";
 
 
 
@@ -20,7 +19,6 @@ export class HybridSelectionService {
   async selectOptimalSections(
     scoredPairs: ScoredPair[],
     clusters: RequirementCluster[],
-    profileSections: ProfileSection[],
     constraints?: Partial<SelectionConstraints>
   ): Promise<HybridSelectionResult> {
     const config = { ...this.DEFAULT_CONSTRAINTS, ...constraints };

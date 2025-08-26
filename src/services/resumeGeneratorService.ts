@@ -2,6 +2,7 @@ import { ChatPromptTemplate } from "@langchain/core/prompts";
 import { llmService } from "./llmService";
 import { ResumeSection } from "@/types/store";
 import { ResumeOutput, ResumeOutputSchema } from "@/schemas/resume";
+import { IterableReadableStream } from "@langchain/core/utils/stream";
 
 
 export class ResumeGeneratorService {
@@ -15,7 +16,7 @@ export class ResumeGeneratorService {
   async buildResume(
     resumeSections: ResumeSection[],
     llmConfig?: any
-  ): Promise<ResumeOutput> {
+  ): Promise<IterableReadableStream<ResumeOutput>> {
     const prompt = ChatPromptTemplate.fromTemplate(`
       You are a Senior Resume Architect and Document Organizer specializing in structuring pre-formatted resume sections into cohesive, professionally organized resumes.
       
@@ -68,12 +69,14 @@ export class ResumeGeneratorService {
     `);
 
     const sections_content = this._buildSectionsContent(resumeSections);
-    return await llmService.invokeWithStructuredOutput(
+    const stream = await llmService.streamStructuredOutput(
       prompt,
       ResumeOutputSchema,
       { sections_content },
       llmConfig
     );
+    
+    return stream;
   };
 
   private _buildSectionsContent(resumeSections: ResumeSection[]): string {

@@ -3,10 +3,9 @@ import { useSelector, useDispatch } from "react-redux";
 import { RootState } from "@/store/store";
 import {
   setResume,
-  setOptimizationSummary,
-  updateResume
+  setOptimizationSummary
 } from "@/store/slices/resumeSlice";
-import { useLlmService } from "@/hooks/useLlmService";
+import { useLlmStreamingService } from "@/hooks/useLlmStreamingService";
 import { resumeGeneratorService } from "@/services/resumeGeneratorService";
 import jsPDF from "jspdf";
 import { createStep } from "@/utils/createStep";
@@ -14,8 +13,8 @@ import { ChangeAlertBanner, EmptyState } from "@/components/shared";
 import { OptimizationSummaryCard } from '../../../components/shared/OptimizationSummaryCard';
 import { ResumeEditor, ResumeActions, ResumeStates } from './components';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import type { ResumeOutput } from "@/schemas/resume";
 import { useAutoRetrigger } from "@/hooks/useAutoRetrigger";
+import type { ResumeOutput } from "@/schemas/resume";
 
 const GenerateEditResume: React.FC = () => {
   const dispatch = useDispatch();
@@ -40,32 +39,48 @@ const GenerateEditResume: React.FC = () => {
       );
     }
 
-  const [triggerGenerateResume, { isLoading, error }] = useLlmService<ResumeOutput>(
-    resumeGeneratorService.buildResume
-  );
+  const [
+    triggerGenerateResume,
+    { isLoading, error, data: streamingData, reset }
+  ] = useLlmStreamingService(resumeGeneratorService.buildResume);
+
+  // Effect to dispatch updates to Redux store as data streams in
+  useEffect(() => {
+    if (streamingData) {
+      const markdown = convertToMarkdown(streamingData);
+      
+      // Only dispatch if the content has actually changed
+      if (markdown && markdown !== resume) {
+        dispatch(setResume(markdown));
+        setEditedResume(markdown);
+      }
+      if (streamingData.optimization_summary && streamingData.optimization_summary !== optimizationSummary) {
+        dispatch(setOptimizationSummary(streamingData.optimization_summary));
+      }
+    }
+  }, [streamingData, dispatch, resume, optimizationSummary]);
 
   // Auto-retrigger integration
-  const onAutoRun = useCallback(async (isLatest: () => boolean) => {
-    const data = await triggerGenerateResume(resumeSections);
-    if (!isLatest() || !data) return;
-    const markdown = convertToMarkdown(data);
-    dispatch(setResume(markdown));
-    setEditedResume(markdown);
-    dispatch(setOptimizationSummary(data.optimization_summary || null));
+  const onAutoRun = useCallback(async () => {
+    // Reset redux state before triggering
+    dispatch(setResume(""));
+    dispatch(setOptimizationSummary(""));
+    setEditedResume("");
+    triggerGenerateResume(resumeSections);
   }, [triggerGenerateResume, resumeSections, dispatch]);
 
   const convertToMarkdown = (data: ResumeOutput) => {
     const resume = data.resume;
     let md = "";
-    if (resume.summary) md += `${resume.summary}\n\n---\n\n`;
-    if (resume.experience) md += `${resume.experience}\n\n---\n\n`;
-    if (resume.skills) md += `${resume.skills}\n\n---\n\n`;
-    if (resume.education) md += `${resume.education}\n\n---\n\n`;
-    if (resume.certifications) md += `${resume.certifications}\n\n---\n\n`;
-    if (resume.projects) md += `${resume.projects}\n\n---\n\n`;
-    if (resume.achievements) md += `${resume.achievements}\n\n---\n\n`;
-    if (resume.volunteering) md += `${resume.volunteering}\n\n---\n\n`;
-    if (resume.languages) md += `${resume.languages}\n\n---\n\n`;
+    if (resume?.summary) md += `${resume.summary}\n\n---\n\n`;
+    if (resume?.experience) md += `${resume.experience}\n\n---\n\n`;
+    if (resume?.skills) md += `${resume.skills}\n\n---\n\n`;
+    if (resume?.education) md += `${resume.education}\n\n---\n\n`;
+    if (resume?.certifications) md += `${resume.certifications}\n\n---\n\n`;
+    if (resume?.projects) md += `${resume.projects}\n\n---\n\n`;
+    if (resume?.achievements) md += `${resume.achievements}\n\n---\n\n`;
+    if (resume?.volunteering) md += `${resume.volunteering}\n\n---\n\n`;
+    if (resume?.languages) md += `${resume.languages}\n\n---\n\n`;
     return md.trim();
   };
 
@@ -80,10 +95,18 @@ const GenerateEditResume: React.FC = () => {
     onAutoRun,
   });
 
+  const handleRegenerate = () => {
+    reset(); // Reset hook state
+    onRegenerate(); // Trigger auto-retrigger's manual run
+  };
+
+  const finalIsLoading = isLoading || isRunning;
+  const finalError = error || autoError;
+
 
 
   const saveDraft = () => {
-    dispatch(updateResume(editedResume));
+    dispatch(setResume(editedResume));
     setDraftSaved(true);
     setTimeout(() => setDraftSaved(false), 2000);
   };
@@ -173,7 +196,7 @@ const GenerateEditResume: React.FC = () => {
             message="Your inputs changed slightly since the last resume build."
             subtitle="Major changes regenerate automatically; minor changes let you choose."
             ctaText="Regenerate now"
-            onCta={onRegenerate}
+            onCta={handleRegenerate}
             onDismiss={() => setShowBanner(false)}
           />
         )}
@@ -181,12 +204,12 @@ const GenerateEditResume: React.FC = () => {
         <div className="flex gap-8 py-6">
           <div className="flex-1">
             <ResumeStates
-              isLoading={isLoading || isRunning}
-              error={error || autoError}
+              isLoading={finalIsLoading && !resume}
+              error={finalError}
               hasResume={!!resume}
             />
 
-            {resume && !(isLoading || isRunning) && (
+            {resume && !finalError && (
               <Card className="shadow-sm min-h-[800px]">
                 <CardHeader className="pb-6">
                   <div className="flex items-center justify-between">
@@ -194,12 +217,12 @@ const GenerateEditResume: React.FC = () => {
                     <ResumeActions
                       editMode={editMode}
                       draftSaved={draftSaved}
-                      isLoading={isLoading}
+                      isLoading={finalIsLoading}
                       isExportingPdf={isExportingPdf}
                       onToggleEdit={() => setEditMode(!editMode)}
                       onSaveDraft={saveDraft}
                       onExportMarkdown={exportMarkdown}
-                      onRegenerate={onRegenerate}
+                      onRegenerate={handleRegenerate}
                     />
                   </div>
                 </CardHeader>

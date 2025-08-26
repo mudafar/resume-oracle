@@ -4,9 +4,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
-import { CheckCircle, ChevronDown, ChevronUp, Star, Sparkles } from 'lucide-react';
-import { ProfileSection } from "@/types/store";
+import { CheckCircle, ChevronDown, ChevronUp, Sparkles } from 'lucide-react';
+import { ProfileSection } from "@/schemas/profile";
 import { generateTextPreview } from "@/utils/textPreview";
 import { SelectedSection } from "@/schemas/matching";
 
@@ -38,48 +37,49 @@ export const SelectedSectionCard: React.FC<SelectedSectionCardProps> = ({
   );
 
   return (
-    <Card className="border-l-4 border-green-500 bg-green-50">
-      <CardHeader>
-        <CardTitle className="text-lg flex items-center justify-between">
-          <div className="flex items-center">
-            <CheckCircle className="mr-2 h-5 w-5 text-green-500" />
-            <span>Selected Profile Section</span>
-          </div>
+    <Card className="border-l-4 border-green-500 bg-green-50/30">
+      <CardHeader className="pb-3">
+        <CardTitle className="text-base flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <Star className="h-4 w-4 text-yellow-500" />
-            <span className="text-sm font-bold">{totalWeightedScore} pts</span>
+            <CheckCircle className="h-4 w-4 text-green-600" />
+            <span className="font-medium">Selected Section</span>
           </div>
+          <Badge variant="secondary" className="bg-green-100 text-green-800">
+            {totalWeightedScore} pts
+          </Badge>
         </CardTitle>
       </CardHeader>
-      <CardContent>
+      <CardContent className="pt-0">
         <div className="space-y-4">
           {/* Section Details */}
           <div>
-            <div className="flex items-center gap-2 mb-2">
-              <h4 className="font-semibold text-lg">{profileSection?.type || 'Unknown Section'}</h4>
-              <Badge variant="outline">{profileSection?.type || 'Unknown Type'}</Badge>
+            <div className="flex items-center gap-2 mb-3">
+              <h4 className="font-semibold text-base">{profileSection?.type || 'Unknown Section'}</h4>
             </div>
             
             {/* Section Content */}
             {profileSection && (
               <div>
-                <pre className="bg-white rounded p-3 text-sm whitespace-pre-line border">
-                  {expanded ? profileSection.content : preview}
-                </pre>
+                <div className="bg-white rounded-md border p-3 text-sm">
+                  <pre className="whitespace-pre-wrap font-sans">
+                    {expanded ? profileSection.content : preview}
+                  </pre>
+                </div>
                 {isExpandable && (
                   <Button 
-                    variant="link" 
+                    variant="ghost" 
+                    size="sm"
                     onClick={() => setExpanded(!expanded)} 
-                    className="px-0 mt-2"
+                    className="mt-2 p-0 h-auto text-xs text-gray-600 hover:text-gray-900"
                   >
                     {expanded ? (
                       <>
-                        <ChevronUp className="mr-2 h-4 w-4" />
+                        <ChevronUp className="mr-1 h-3 w-3" />
                         Show Less
                       </>
                     ) : (
                       <>
-                        <ChevronDown className="mr-2 h-4 w-4" />
+                        <ChevronDown className="mr-1 h-3 w-3" />
                         Show More
                       </>
                     )}
@@ -89,126 +89,113 @@ export const SelectedSectionCard: React.FC<SelectedSectionCardProps> = ({
             )}
           </div>
 
-          {/* Enhancement CTA */}
-          {hasMissingRequirements && onEnhanceSection && (
-            <div className="bg-orange-50 border border-orange-200 rounded-lg p-4">
-              <div className="flex items-center justify-between">
-                <div className="flex-1">
-                  <h5 className="font-medium text-orange-800 mb-1">Section Can Be Enhanced</h5>
-                  <p className="text-sm text-orange-700">
-                    This section has some missing requirements that could be addressed through enhancement.
-                  </p>
-                </div>
-                <Button 
-                  onClick={() => {
-                    console.log('Enhance Section button clicked for:', selectedSection);
-                    onEnhanceSection?.(selectedSection);
-                  }}
-                  size="sm"
-                  className="bg-orange-600 hover:bg-orange-700 ml-4"
-                >
-                  <Sparkles className="mr-2 h-4 w-4" />
-                  Enhance Section
-                </Button>
-              </div>
+          {/* Action Buttons Row */}
+          <div className="flex items-center gap-3 pt-2">
+            {/* Enhancement CTA */}
+            {hasMissingRequirements && onEnhanceSection && (
+              <Button 
+                onClick={() => onEnhanceSection?.(selectedSection)}
+                size="sm"
+                className="bg-orange-600 hover:bg-orange-700 text-white"
+              >
+                <Sparkles className="mr-1 h-3 w-3" />
+                Enhance
+              </Button>
+            )}
+
+            {/* View Details Toggle */}
+            <Button 
+              variant="outline" 
+              size="sm"
+              onClick={() => setDetailsExpanded(!detailsExpanded)}
+              className="border-gray-300"
+            >
+              {detailsExpanded ? (
+                <>
+                  <ChevronUp className="mr-1 h-3 w-3" />
+                  Hide Details
+                </>
+              ) : (
+                <>
+                  <ChevronDown className="mr-1 h-3 w-3" />
+                  View Details
+                </>
+              )}
+            </Button>
+          </div>
+
+          {/* Missing Requirements Indicator */}
+          {hasMissingRequirements && (
+            <div className="text-xs text-orange-600 bg-orange-50 rounded px-2 py-1 border border-orange-200">
+              Some requirements missing • Enhancement recommended
             </div>
           )}
 
-          {/* Selection Details - Grouped in Collapsible */}
-          <Collapsible open={detailsExpanded} onOpenChange={setDetailsExpanded}>
-            <CollapsibleTrigger asChild>
-              <Button variant="outline" className="w-full justify-between">
-                <span>Selection Details</span>
-                {detailsExpanded ? (
-                  <ChevronUp className="h-4 w-4" />
-                ) : (
-                  <ChevronDown className="h-4 w-4" />
-                )}
-              </Button>
-            </CollapsibleTrigger>
-            <CollapsibleContent className="space-y-4 mt-3">
-              {/* Selection Rationale */}
-              <div className="bg-blue-50 rounded p-3">
-                <h5 className="font-medium mb-1 text-blue-800">Why This Section Was Selected</h5>
-                <p className="text-sm text-blue-700">{selectedSection.rationale}</p>
-              </div>
+          {/* Selection Details */}
+          {detailsExpanded && (
+            <div className="border-t pt-4 mt-4">
+              <div className="space-y-4">
+                {/* Selection Rationale */}
+                <div>
+                  <h5 className="text-sm font-medium text-gray-900 mb-2">Why Selected</h5>
+                  <p className="text-sm text-gray-700 bg-gray-50 rounded-md p-3">{selectedSection.rationale}</p>
+                </div>
 
-              {/* Matched Requirements */}
-              <div>
-                <h5 className="font-medium mb-3 text-gray-800">
-                  Matched Requirements ({selectedSection.matched_scored_pairs.length})
-                </h5>
-                <div className="space-y-3">
-                  {selectedSection.matched_scored_pairs.map((pair, index) => (
-                    <div key={index} className="border rounded p-3 bg-white">
-                      <div className="flex items-center justify-between mb-2">
-                        <div className="flex items-center gap-2">
-                          <span>📋</span>
-                          <h6 className="font-semibold">Job Requirement Match</h6>
+                {/* Matched Requirements */}
+                <div>
+                  <h5 className="text-sm font-medium text-gray-900 mb-2">
+                    Requirement Matches ({selectedSection.matched_scored_pairs.length})
+                  </h5>
+                  <div className="space-y-3">
+                    {selectedSection.matched_scored_pairs.map((pair, index) => (
+                      <div key={index} className="bg-white border rounded-md p-3">
+                        <div className="flex items-center justify-between mb-2">
+                          <span className="text-sm font-medium text-gray-900">{pair.cluster_name}</span>
+                          <div className="flex items-center gap-2">
+                            <Progress value={pair.raw_score} className="w-16 h-2" />
+                            <span className="text-xs font-medium text-gray-600 w-8">{Math.round(pair.raw_score)}%</span>
+                          </div>
                         </div>
-                        <div className="flex items-center gap-2 flex-1 max-w-xs">
-                          <span className="text-sm font-medium">Score:</span>
-                          <Progress value={pair.raw_score} className="flex-1" />
-                          <span className="text-sm">{Math.round(pair.raw_score)}%</span>
-                        </div>
-                      </div>
 
-                      {/* Coverage Details */}
-                      <div className="space-y-2">
-
-
-                        {pair.coverage.length > 0 && (
-                          <div>
-                            <span className="text-sm font-medium text-green-700">✓ Covered:</span>
-                            <div className="flex flex-wrap gap-1 mt-1">
-                              {pair.coverage.map((item: string, idx: number) => (
+                        {/* Coverage/Missing */}
+                        <div className="space-y-2">
+                          {pair.coverage.length > 0 && (
+                            <div className="flex flex-wrap gap-1">
+                              {pair.coverage.slice(0, 3).map((item: string, idx: number) => (
                                 <Badge key={idx} variant="secondary" className="text-xs bg-green-100 text-green-800">
                                   {item}
                                 </Badge>
                               ))}
+                              {pair.coverage.length > 3 && (
+                                <Badge variant="outline" className="text-xs">
+                                  +{pair.coverage.length - 3} more
+                                </Badge>
+                              )}
                             </div>
-                          </div>
-                        )}
+                          )}
 
-                        {pair.missing.length > 0 && (
-                          <div>
-                            <span className="text-sm font-medium text-orange-700">⚠ Missing:</span>
-                            <div className="flex flex-wrap gap-1 mt-1">
-                              {pair.missing.map((item: string, idx: number) => (
-                                <Badge key={idx} variant="secondary" className="text-xs bg-orange-100 text-orange-800">
+                          {pair.missing.length > 0 && (
+                            <div className="flex flex-wrap gap-1">
+                              {pair.missing.slice(0, 2).map((item: string, idx: number) => (
+                                <Badge key={idx} variant="outline" className="text-xs bg-red-50 text-red-700 border-red-200">
                                   {item}
                                 </Badge>
                               ))}
-                            </div>
-                          </div>
-                        )}
-
-                        {/* {pair.strength_indicators.length > 0 && (
-                          <div>
-                            <span className="text-sm font-medium text-blue-700">💪 Strengths:</span>
-                            <div className="flex flex-wrap gap-1 mt-1">
-                              {pair.strength_indicators.map((item: string, idx: number) => (
-                                <Badge key={idx} variant="secondary" className="text-xs bg-blue-100 text-blue-800">
-                                  {item}
+                              {pair.missing.length > 2 && (
+                                <Badge variant="outline" className="text-xs text-red-600">
+                                  +{pair.missing.length - 2} missing
                                 </Badge>
-                              ))}
+                              )}
                             </div>
-                          </div>
-                        )} */}
-
-                        {/* {pair.evidence && (
-                          <div className="mt-2">
-                            <span className="text-sm font-medium text-gray-700">Evidence:</span>
-                            <p className="text-sm text-gray-600 mt-1">{pair.evidence}</p>
-                          </div>
-                        )} */}
+                          )}
+                        </div>
                       </div>
-                    </div>
-                  ))}
+                    ))}
+                  </div>
                 </div>
               </div>
-            </CollapsibleContent>
-          </Collapsible>
+            </div>
+          )}
         </div>
       </CardContent>
     </Card>

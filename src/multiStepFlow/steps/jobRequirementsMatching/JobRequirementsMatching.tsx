@@ -5,7 +5,7 @@ import { createStep } from "@/utils/createStep";
 // import { SuggestedSectionModal } from "./suggestedSectionModal";
 import { MatchCard, useJobMatching } from ".";
 import { ChangeAlertBanner } from "@/components/shared";
-import { LoadingState, ErrorState, CoverageGaps, SelectedSections, MatchingModals } from "./components";
+import { LoadingState, ErrorState, CoverageGaps, SelectedSections, MatchingModals, MatchingProgress, ExtractedRequirements, RawMatchingResults } from "./components";
 import { useSelector, useDispatch } from "react-redux";
 import { RootState } from "@/store/store";
 import type { ProfileSection } from "@/schemas/profile";
@@ -13,7 +13,6 @@ import { addProfileSectionReturnId } from "../../../utils/createProfileSection";
 import { editSection } from "@/store/slices/profileSectionsSlice";
 import { markGapAsFilled } from "@/store/slices/matchesSlice";
 import { CoverageGap, HybridSelectionResult, SelectedSection } from "@/schemas/matching";
-import { Card, CardContent } from "@/components/ui/card";
 import { EmptyState } from "@/components/shared";
 
 
@@ -47,6 +46,13 @@ export const JobRequirementsMatching: React.FC = () => {
     showRematchBanner,
     // modalOpen,
     modalMatchId,
+    currentPhase,
+    // Streaming intermediate data
+    matchScoredPairs,
+    requirementClusters,
+    isExtracting,
+    isMatching,
+    isOptimizing,
     onRematch,
     setShowRematchBanner,
     handleSeeSuggestions,
@@ -159,9 +165,9 @@ export const JobRequirementsMatching: React.FC = () => {
     );
   }
 
-  if (isLoading) {
-    return <LoadingState />;
-  }
+  // if (isLoading ) {
+  //   return <LoadingState />;
+  // }
 
   if (error) {
     return <ErrorState onRetry={onRematch} />;
@@ -170,6 +176,8 @@ export const JobRequirementsMatching: React.FC = () => {
 
   return (
     <div className="space-y-6">
+      <MatchingProgress currentPhase={currentPhase} isLoading={isLoading} />
+
       {showRematchBanner && (
         <ChangeAlertBanner
           message="Your inputs changed slightly. Rerun matching to refresh results."
@@ -180,19 +188,40 @@ export const JobRequirementsMatching: React.FC = () => {
         />
       )}
 
-      {selectedSections.length > 0 && (
-      <CoverageGaps
-        coverageGaps={coverageGaps || []}
-        onSeeSuggestions={handleSeeSuggestions}
-        onFillGap={handleFillGap}
-      />
+      {/* Show extracted requirements during extraction and after */}
+      {(currentPhase === 'extracting' && requirementClusters.length > 0) && (
+        <ExtractedRequirements 
+          requirementClusters={requirementClusters}
+          isExtracting={isExtracting}
+        />
       )}
 
-      <SelectedSections
-        selectedSections={selectedSections || []}
-        profileSections={profileSections}
-        onEnhanceSection={handleEnhanceSection}
-      />
+      {/* Show raw matching results during matching phase */}
+      {(currentPhase === 'matching' && matchScoredPairs?.scored_pairs) && requirementClusters.length > 0 && (
+        <RawMatchingResults
+          matchScoredPairs={matchScoredPairs}
+          requirementClusters={requirementClusters}
+          profileSections={profileSections}
+          isMatching={isMatching}
+        />
+      )}
+
+      {/* Show coverage gaps only after optimization is complete */}
+      {selectedSections.length > 0 && (
+        <CoverageGaps
+          coverageGaps={coverageGaps || []}
+          onSeeSuggestions={handleSeeSuggestions}
+          onFillGap={handleFillGap}
+        />
+      )}
+
+      {/* Show selected sections after optimization starts */}
+        <SelectedSections
+          selectedSections={selectedSections || []}
+          profileSections={profileSections}
+          onEnhanceSection={handleEnhanceSection}
+        />
+
 
       <MatchingModals
         selectedGap={selectedGap}

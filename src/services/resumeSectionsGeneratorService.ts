@@ -7,6 +7,7 @@ import {
 
 import { buildSectionsContext } from "./utils";
 import { ProfileSectionWithRequirements } from "@/schemas/profile";
+import { IterableReadableStream } from "@langchain/core/utils/stream";
 
 export class ResumeSectionsGeneratorService {
   /**
@@ -15,7 +16,7 @@ export class ResumeSectionsGeneratorService {
   async generateResumeSection(
     profileSectionsWithRequirements: ProfileSectionWithRequirements[],
     llmConfig?: any
-  ): Promise<GeneratedResumeSectionResult[]> {
+  ): Promise<IterableReadableStream<{ generated_resume_section_result_list: GeneratedResumeSectionResult[] }>> {
     // Build context string for prompt
     const sections_context = buildSectionsContext(profileSectionsWithRequirements)
     const prompt = ChatPromptTemplate.fromTemplate(`
@@ -71,7 +72,7 @@ export class ResumeSectionsGeneratorService {
 
             Generate concise, professionally formatted resume sections that effectively communicate the candidate's qualifications for the matched requirements without adding any new information.
     `);
-    const result = await llmService.invokeWithStructuredOutput(
+    const result = await llmService.streamStructuredOutput(
       prompt,
       GeneratedResumeSectionResultListSchema,
       {
@@ -79,7 +80,7 @@ export class ResumeSectionsGeneratorService {
       },
       llmConfig
     );
-    return result.generated_resume_section_result_list;
+    return result;
   }
 }
 

@@ -1,12 +1,11 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState, useCallback } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { RootState } from "@/store/store";
 import { getMatchedProfileSectionWithRequirements } from "../../../utils/getMatchedProfileSectionWithRequirements";
 import { ChangeAlertBanner } from "@/components/shared";
 import { setResumeSections } from "@/store/slices/resumeSectionsSlice";
-import { useLlmService } from "@/hooks/useLlmService";
+import { useLlmStreamingService } from "@/hooks/useLlmStreamingService";
 import { resumeSectionsGeneratorService } from "@/services/resumeSectionsGeneratorService";
-import type { GeneratedResumeSectionResult } from "@/schemas/resume";
 import { useAutoRetrigger } from "@/hooks/useAutoRetrigger";
 import { createStep } from "@/utils/createStep";
 import { ResumeSectionsList, ResumeSectionsStates } from "./components";
@@ -32,9 +31,17 @@ const GenerateResumeSections: React.FC = () => {
       );
     }
   // LLM service trigger
-  const [triggerGenerate, { isLoading, error }] = useLlmService<GeneratedResumeSectionResult[]>(
-    resumeSectionsGeneratorService.generateResumeSection
-  );
+  const [
+    triggerGenerate,
+    { isLoading, error, data: streamingData, reset }
+  ] = useLlmStreamingService(resumeSectionsGeneratorService.generateResumeSection);
+
+  // Effect to dispatch updates to Redux store as data streams in
+  useEffect(() => {
+    if (streamingData?.generated_resume_section_result_list) {
+      dispatch(setResumeSections(streamingData.generated_resume_section_result_list));
+    }
+  }, [streamingData, dispatch]);
 
   // Prepare payload for API - memoize to prevent unnecessary re-computations
   const apiPayload = useMemo(() => {
@@ -43,15 +50,26 @@ const GenerateResumeSections: React.FC = () => {
 
   // Auto-retrigger integration using generic hook
   const inputs = useMemo(() => ({ payload: apiPayload }), [apiPayload]);
+  
+  const onAutoRun = useCallback(async () => {
+    // Reset redux state before triggering
+    dispatch(setResumeSections([]));
+    triggerGenerate(apiPayload);
+  }, [triggerGenerate, apiPayload, dispatch]);
+
   const { showBanner: showRegenerateBanner, setShowBanner: setShowRegenerateBanner, onManualRun: onRegenerate, isRunning, error: autoError } = useAutoRetrigger({
     stepKey: "generate-resume-sections",
     inputs,
-    onAutoRun: async (isLatest) => {
-      const result = await triggerGenerate(apiPayload);
-      if (!isLatest()) return;
-      dispatch(setResumeSections(result));
-    },
+    onAutoRun,
   });
+
+  const handleRegenerate = () => {
+    reset(); // Reset hook state
+    onRegenerate(); // Trigger auto-retrigger's manual run
+  };
+
+  const finalIsLoading = isLoading || isRunning;
+  const finalError = error || autoError;
 
   // Reference requirements for each section - memoize to prevent unnecessary re-computations
   const referenceMap = useMemo(() => {
@@ -86,7 +104,7 @@ const GenerateResumeSections: React.FC = () => {
           message="Your inputs changed slightly. Regenerate sections to refresh results."
           subtitle="Major changes regenerate automatically; minor changes let you choose."
           ctaText="Regenerate now"
-          onCta={onRegenerate}
+          onCta={handleRegenerate}
           onDismiss={() => setShowRegenerateBanner(false)}
         />
       )}
@@ -94,13 +112,13 @@ const GenerateResumeSections: React.FC = () => {
       {/* Main Content */}
       <main className="space-y-6">
         <ResumeSectionsStates
-          isLoading={isLoading || isRunning}
-          error={error || autoError}
+          isLoading={finalIsLoading && resumeSections.length === 0}
+          error={finalError}
           hasResumeSections={resumeSections.length > 0}
-          onRetry={onRegenerate}
+          onRetry={handleRegenerate}
         />
         
-        {resumeSections.length > 0 && !isLoading && !error && (
+        {resumeSections.length > 0 && !finalError && (
           <ResumeSectionsList
             resumeSections={resumeSections}
             editing={editing}

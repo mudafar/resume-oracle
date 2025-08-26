@@ -1,25 +1,29 @@
 import { ChatPromptTemplate } from "@langchain/core/prompts";
 import { llmService } from "./llmService";
 import { ProfileSection } from "@/schemas/profile";
-import { HybridSelectionResult, LLMScoringResultSchema } from "@/schemas/matching/scoring.schema";
+import { HybridSelectionResult, LLMScoringResult, LLMScoringResultSchema } from "@/schemas/matching/scoring.schema";
 import { RequirementCluster } from "@/schemas/job/requirementCluster.schema";
 import { hybridSelectionService } from "./matching/hybridSelection";
+import { IterableReadableStream } from "@langchain/core/utils/stream";
 
 export class JobRequirementsMatchingService {
 
   /**
-   * Find optimal profile section matches with emphasis on reuse and quality
+   * Stream raw LLM scoring results without optimization
    */
   constructor() {
-    this.findOptimalMatches = this.findOptimalMatches.bind(this);
+    this.streamRawLlmMatching = this.streamRawLlmMatching.bind(this);
   }
 
-  async findOptimalMatches(
+  /**
+   * Stream raw LLM matching scores (without hybrid optimization)
+   */
+  async streamRawLlmMatching(
     requirementClusters: RequirementCluster[],
     profileSections: ProfileSection[],
     companyContext: string = "",
     llmConfig?: any
-  ): Promise<HybridSelectionResult> {
+  ): Promise<IterableReadableStream<LLMScoringResult>> {
 
     const clusters_formatted = this.formatClustersForMatching(requirementClusters);
     const profile_sections_formatted = this.formatProfileSections(profileSections);
@@ -98,7 +102,7 @@ export class JobRequirementsMatchingService {
     Return only pairs you're confident about scoring accurately.
     `);
 
-    const llmResult = await llmService.invokeWithStructuredOutput(
+    return await llmService.streamStructuredOutput(
       prompt,
       LLMScoringResultSchema,
       {
@@ -108,17 +112,6 @@ export class JobRequirementsMatchingService {
       },
         llmConfig
     );
-
-
-    // 2. TS: Apply hybrid selection algorithm (existing code)
-    const optimalSelection = await hybridSelectionService.selectOptimalSections(
-      llmResult.scored_pairs,
-      requirementClusters,
-      profileSections,
-      { max_sections: 8, critical_threshold: 50 }
-    );
-
-    return optimalSelection;
   }
 
   /**
