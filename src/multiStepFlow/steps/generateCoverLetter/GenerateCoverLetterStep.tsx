@@ -5,24 +5,19 @@ import { getMatchedProfileSectionWithRequirements } from "../../../utils/getMatc
 import {
   setCoverLetter,
   setOptimizationSummary,
-  updateCoverLetter
 } from "@/store/slices/coverLetterSlice";
-import { useLlmService } from "@/hooks/useLlmService";
 import { coverLetterGeneratorService } from "@/services/coverLetterGeneratorService";
-import type { GeneratedCoverLetterResult } from "@/schemas/coverLetter";
 import { createStep } from "@/utils/createStep";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { EmptyState  } from "@/components/shared";
-import {
-  FileText,
-  Mail
-} from "lucide-react";
+import { Card, CardContent } from "@/components/ui/card";
+import { EmptyState } from "@/components/shared";
+import { FileText, Mail } from "lucide-react";
 import { OptimizationSummaryCard } from '../../../components/shared/OptimizationSummaryCard';
 import { ChangeAlertBanner } from "@/components/shared";
 import { LoadingState } from '@/components/shared';
 import { ErrorState } from '@/components/shared';
 import { CoverLetterEditor } from './components';
 import { useAutoRetrigger } from "@/hooks/useAutoRetrigger";
+import { useLlmStreamingService } from "@/hooks/useLlmStreamingService";
 
 const GenerateCoverLetter: React.FC = () => {
   const dispatch = useDispatch();
@@ -31,7 +26,59 @@ const GenerateCoverLetter: React.FC = () => {
   const jobDescription = useSelector((state: RootState) => state.jobContext.job_description);
   const coverLetter = useSelector((state: RootState) => state.coverLetter.coverLetter);
   const optimizationSummary = useSelector((state: RootState) => state.coverLetter.optimizationSummary);
+  const selectedSections = useSelector((state: RootState) => state.matches.selected_sections || []);
+
   const [editMode, setEditMode] = useState(false);
+
+  const toneGuidance = useMemo(() => {
+    if (!jobDescription) return "";
+    const sentences = jobDescription.match(/[^.!?]+[.!?]+/g) || [];
+    const guidanceText = sentences.slice(0, 3).join(" ").trim();
+    return guidanceText || jobDescription.slice(0, 300);
+  }, [jobDescription]);
+
+  const apiPayload = useMemo(() => {
+    return {
+      profileSectionsWithRequirements: getMatchedProfileSectionWithRequirements(selectedSections, profileSections || []),
+      companyContext: companyContext || "",
+      toneGuidance: toneGuidance
+    };
+  }, [selectedSections, profileSections, companyContext, toneGuidance]);
+
+  const [
+    generateCoverLetter,
+    { isLoading, error, data: streamingData, reset }
+  ] = useLlmStreamingService(coverLetterGeneratorService.generateCoverLetter);
+
+  // Effect to dispatch updates to Redux store as data streams in
+  useEffect(() => {
+    if (streamingData) {
+      // Only dispatch if the content has actually changed
+      if (streamingData.cover_letter_markdown && streamingData.cover_letter_markdown !== coverLetter) {
+        dispatch(setCoverLetter(streamingData.cover_letter_markdown));
+      }
+      if (streamingData.optimization_summary && streamingData.optimization_summary !== optimizationSummary) {
+        dispatch(setOptimizationSummary(streamingData.optimization_summary));
+      }
+    }
+  }, [streamingData, dispatch, coverLetter, optimizationSummary]);
+
+  const onAutoRun = useCallback(async () => {
+    // Reset redux state before triggering
+    dispatch(setCoverLetter(""));
+    dispatch(setOptimizationSummary(""));
+    generateCoverLetter(
+      apiPayload.profileSectionsWithRequirements,
+      apiPayload.companyContext,
+      apiPayload.toneGuidance
+    );
+  }, [generateCoverLetter, apiPayload, dispatch]);
+
+  const { showBanner, setShowBanner, onManualRun: onRegenerate, isRunning, error: autoError } = useAutoRetrigger({
+    stepKey: "generate-cover-letter",
+    inputs: apiPayload,
+    onAutoRun,
+  });
 
   if (!profileSections || !jobDescription) {
     return (
@@ -44,65 +91,27 @@ const GenerateCoverLetter: React.FC = () => {
     );
   }
 
-  const [generateCoverLetter, { isLoading, error, data, reset }] = useLlmService<GeneratedCoverLetterResult>(
-    coverLetterGeneratorService.generateCoverLetter
-  );
+  const handleRegenerate = () => {
+    reset(); // Reset hook state
+    onRegenerate(); // Trigger auto-retrigger's manual run
+  };
 
-  // Use first 2-3 sentences of job description for tone_guidance
-  const toneGuidance = useMemo(() => {
-    if (!jobDescription) return "";
-    const sentences = jobDescription.match(/[^.!?]+[.!?]+/g) || [];
-    const guidanceText = sentences.slice(0, 3).join(" ").trim();
-    return guidanceText || jobDescription.slice(0, 300);
-  }, [jobDescription]);
-
-  // Update `matches` selector to use `selected_sections` from `HybridSelectionResult`
-  const selectedSections = useSelector((state: RootState) => state.matches.selected_sections || []);
-
-  // Prepare payload using the shared utility - memoize to prevent unnecessary re-computations
-  const apiPayload = useMemo(() => {
-    return {
-      profileSectionsWithRequirements: getMatchedProfileSectionWithRequirements(selectedSections, profileSections || []),
-      companyContext: companyContext || "",
-      toneGuidance: toneGuidance
-    };
-  }, [selectedSections, profileSections, companyContext, toneGuidance]);
-
-  // Auto-retrigger integration
-  const onAutoRun = useCallback(async (isLatest: () => boolean) => {
-    const data = await generateCoverLetter(
-      apiPayload.profileSectionsWithRequirements,
-      apiPayload.companyContext,
-      apiPayload.toneGuidance
-    );
-    if (!isLatest() || !data) return;
-    dispatch(setCoverLetter(data.cover_letter_markdown || ""));
-    dispatch(setOptimizationSummary(data.optimization_summary || null));
-  }, [generateCoverLetter, apiPayload, dispatch]);
-
-  const { showBanner, setShowBanner, onManualRun: onRegenerate, isRunning, error: autoError } = useAutoRetrigger({
-    stepKey: "generate-cover-letter",
-    inputs: apiPayload,
-    onAutoRun,
-  });
-
+  const finalIsLoading = isLoading || isRunning;
+  const finalError = error || autoError;
 
   return (
     <div className="container mx-auto max-w-5xl py-8 px-4 space-y-6">
-
-      {/* Regenerate Banner */}
       {showBanner && (
         <ChangeAlertBanner
           message="Your inputs changed slightly since the last cover letter."
           subtitle="Major changes regenerate automatically; minor changes let you choose."
           ctaText="Regenerate now"
-          onCta={onRegenerate}
+          onCta={handleRegenerate}
           onDismiss={() => setShowBanner(false)}
         />
       )}
 
-      {/* Loading State */}
-  {(isLoading || isRunning) && (
+      {finalIsLoading && !finalError && !coverLetter && !optimizationSummary && (
         <LoadingState
           message="Generating your cover letter..."
           variant="card"
@@ -110,18 +119,16 @@ const GenerateCoverLetter: React.FC = () => {
         />
       )}
 
-      {/* Error State */}
-  {(error || autoError) && (
+      {finalError && (
         <ErrorState
           title="Generation Failed"
           error="Failed to generate cover letter. Please try again."
-          onRetry={onRegenerate}
+          onRetry={handleRegenerate}
           variant="card"
         />
       )}
 
-      {/* No Cover Letter State */}
-      {!coverLetter && !isLoading && !error && (
+      {!finalIsLoading && !finalError && !coverLetter && (
         <Card>
           <CardContent className="flex items-center justify-center py-12">
             <div className="text-center space-y-4">
@@ -135,16 +142,13 @@ const GenerateCoverLetter: React.FC = () => {
         </Card>
       )}
 
-      {/* Cover Letter Content */}
-  {coverLetter && !(isLoading || isRunning) && (
+      {!finalError && coverLetter && (
         <div className="space-y-6">
-
-          {/* Main Editor Card */}
           <CoverLetterEditor
             coverLetter={coverLetter}
             editMode={editMode}
             onToggleEdit={setEditMode}
-            onContentChange={(newContent) => dispatch(updateCoverLetter(newContent))}
+            onContentChange={(newContent) => dispatch(setCoverLetter(newContent))}
             actionBarProps={{
               onCopy: async () => {
                 try {
@@ -162,8 +166,8 @@ const GenerateCoverLetter: React.FC = () => {
                 a.click();
                 URL.revokeObjectURL(url);
               },
-              onRegenerate,
-              isLoading
+              onRegenerate: handleRegenerate,
+              isLoading: finalIsLoading
             }}
           />
 

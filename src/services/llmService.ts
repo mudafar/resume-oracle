@@ -2,6 +2,7 @@ import { initChatModel } from "langchain/chat_models/universal";
 import { ChatPromptTemplate } from "@langchain/core/prompts";
 import { z } from "zod";
 import { LLMConfig } from "@/types/store";
+import { IterableReadableStream } from "@langchain/core/utils/stream";
 
 // interface LLMConfig {
 //   provider?: string;
@@ -84,7 +85,7 @@ export class LLMService {
     return await chain.invoke(inputs);
   }
 
-  async invokeWithStructuredOutput<T extends z.ZodType>(
+    async invokeWithStructuredOutput<T extends z.ZodType>(
     promptTemplate: ChatPromptTemplate,
     outputSchema: T,
     inputs: Record<string, any>,
@@ -96,6 +97,20 @@ export class LLMService {
   const llm = await this.getLLM(config);
     const chain = promptTemplate.pipe(llm.withStructuredOutput(outputSchema));
     return await chain.invoke(inputs);
+  }
+
+  async streamStructuredOutput<T extends z.ZodType>(
+    promptTemplate: ChatPromptTemplate,
+    outputSchema: T,
+    inputs: Record<string, any>,
+    config?: LLMConfig
+  ) {
+    /**
+     * Stream LLM response with prompt template and structured output
+     */
+    const llm = await this.getLLM(config);
+    const chain = promptTemplate.pipe(llm.withStructuredOutput(outputSchema));
+    return chain.stream(inputs) as Promise<IterableReadableStream<z.infer<T>>>;
   }
 }
 

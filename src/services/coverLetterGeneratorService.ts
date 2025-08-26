@@ -6,6 +6,7 @@ import {
 } from "@/schemas/coverLetter";
 import { ProfileSectionWithRequirements } from "@/schemas/profile/profileEnhancement.schema";
 import { buildSectionsContext } from "./utils";
+import { IterableReadableStream } from "@langchain/core/utils/stream";
 
 export class CoverLetterGeneratorService {
   /**
@@ -16,14 +17,14 @@ export class CoverLetterGeneratorService {
     companyContext: string = "",
     toneGuidance: string = "",
     llmConfig?: any
-  ): Promise<GeneratedCoverLetterResult> {
+  ): Promise<IterableReadableStream<GeneratedCoverLetterResult>> {
     /**
      * Generate a strategically optimized cover letter designed to secure interview invitations
      * @param profileSectionsWithRequirements - List of profile sections with their already-matched requirements
      * @param companyContext - Optional brief description of company values and culture
      * @param toneGuidance - Job description snippet to set appropriate tone and wording
      * @param llmConfig - Optional LLM config dict
-     * @returns GeneratedCoverLetterResult object containing interview optimization summary and cover letter markdown
+     * @returns Stream of GeneratedCoverLetterResult partial objects
      */
     const prompt = ChatPromptTemplate.fromTemplate(`
             You are a Senior Career Strategist and Interview Landing Specialist with expertise in creating compelling cover letters that secure interview invitations.
@@ -86,13 +87,11 @@ export class CoverLetterGeneratorService {
             Generate a strategically crafted cover letter that maximizes the candidate's interview potential while maintaining complete authenticity to their documented experience.
     `);
 
-    // Build comprehensive context with all sections and their requirements (match Python formatting)
-    const sectionsContext = buildSectionsContext(profileSectionsWithRequirements)
-
+    const sectionsContext = buildSectionsContext(profileSectionsWithRequirements);
     const companyContextText = companyContext || "No specific company context provided";
     const toneGuidanceText = toneGuidance || "Standard professional tone";
 
-    const result = await llmService.invokeWithStructuredOutput(
+    const stream = await llmService.streamStructuredOutput(
       prompt,
       GeneratedCoverLetterResultSchema,
       {
@@ -102,7 +101,8 @@ export class CoverLetterGeneratorService {
       },
       llmConfig
     );
-    return result;
+
+    return stream;
   }
 }
 
