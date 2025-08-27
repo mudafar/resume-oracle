@@ -1,6 +1,10 @@
 ---
 mode: agent
 ---
+
+ROLE: Senior React Engineer, expert in refactoring
+
+
 Refactor this React component following these best practices:
 
 Performance: Remove unnecessary re-renders, optimize state updates, implement proper memoization
