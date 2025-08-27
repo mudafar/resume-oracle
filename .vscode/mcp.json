@@ -17,7 +17,13 @@
 		},
 		"figma-p8ql5m-51": {
 			"url": "https://mcp.composio.dev/partner/composio/figma/mcp?customerId=eb28adee-ee54-4737-bf5c-9b01cee0ae95&agent=cursor"
-		}
+		},
+		"playwright": {
+			"command": "npx",
+			"args": [
+				"@playwright/mcp@latest"
+			]
+		}		
 	},
 	"inputs": []
 }
