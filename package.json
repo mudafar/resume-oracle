@@ -7,9 +7,9 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "test": "playwright test",
-    "test:headed": "playwright test --headed",
-    "test:ui": "playwright test --ui"
+    "test": "playwright test --reporter=html",
+    "test:headed": "playwright test --headed --reporter=html",
+    "test:ui": "playwright test --ui --reporter=html"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.1.1",
