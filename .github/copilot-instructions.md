@@ -81,7 +81,9 @@ import { SelectedSection } from "@/services/zodModels";
 - Use `invokeWithStructuredOutput` for structured output from LLM services
  - Import inferred types from domain schemas when needed using `z.infer<typeof Schema>` 
 
-
+# agent command line
+- use powershell window commands
+- prefer npm than npx for package management and run scripts from project root
 
 # Code Standards
 ## TypeScript Requirements

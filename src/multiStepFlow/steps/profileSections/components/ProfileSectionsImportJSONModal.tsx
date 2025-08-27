@@ -1,5 +1,5 @@
 import React, { useState, useRef } from "react";
-import { SharedModal, ModalAction } from "../../../components/shared/modal";
+import { SharedModal, ModalAction } from "../../../../components/shared/modal";
 import { Button } from "@/components/ui/button";
 import { FileUp, Upload, File, AlertCircle } from "lucide-react";
 import type { ProfileSection } from "@/schemas/profile";

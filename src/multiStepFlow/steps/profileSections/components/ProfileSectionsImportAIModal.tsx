@@ -14,7 +14,7 @@ import { nanoid } from "nanoid";
 import { ProfileSectionsPreview } from "./ProfileSectionsPreview";
 import { useLlmService } from '@/hooks/useLlmService';
 import { profileParserService } from "@/services/profileSectionsParserService";
-import { WizardModal } from "../../../components/shared/modal";
+import { WizardModal } from "../../../../components/shared/modal";
 
 // Mock types - replace with your actual types
 interface ProfileSection {

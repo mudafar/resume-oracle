@@ -1,5 +1,5 @@
 import React from "react";
-import { ConfirmationModal } from "../../../components/shared/modal";
+import { ConfirmationModal } from "../../../../components/shared/modal";
 import { Trash2 } from "lucide-react";
 
 interface DeleteAllProfileSectionsModalProps {

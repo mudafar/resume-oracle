@@ -1,24 +1,25 @@
 import React from "react";
 import type { ProfileSection } from "@/schemas/profile";
-import { ProfileSectionCard } from "../ProfileSectionCard";
+import { ProfileSectionCard } from "./ProfileSectionCard";
+import { SectionTypeEnum } from "@/types/store";
 
 interface SectionsListProps {
   sections: ProfileSection[];
-  collapsed: Record<string, boolean>;
+  collapsedSections: Record<string, boolean>;
   onToggleCollapse: (id: string) => void;
   onEdit: (id: string, type: string, content: string) => void;
   onDelete: (id: string) => void;
   editingId: string | null;
-  editType: any;
+  editType: SectionTypeEnum;
   editContent: string;
-  setEditType: (type: any) => void;
+  setEditType: (type: SectionTypeEnum) => void;
   setEditContent: (content: string) => void;
   setEditingId: (id: string | null) => void;
 }
 
 export const SectionsList: React.FC<SectionsListProps> = ({
   sections,
-  collapsed,
+  collapsedSections,
   onToggleCollapse,
   onEdit,
   onDelete,
@@ -41,7 +42,7 @@ export const SectionsList: React.FC<SectionsListProps> = ({
         <ProfileSectionCard
           key={section.id}
           section={section}
-          isCollapsed={collapsed[section.id]}
+          isCollapsed={collapsedSections[section.id]}
           onToggleCollapse={() => onToggleCollapse(section.id)}
           onEdit={onEdit}
           onDelete={onDelete}

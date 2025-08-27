@@ -1,5 +1,5 @@
 import React, { useMemo, useState } from "react";
-import { SharedModal, ModalAction } from "../../../components/shared/modal";
+import { SharedModal, ModalAction } from "../../../../components/shared/modal";
 import { Download, Copy, Check, FileText } from "lucide-react";
 import type { ProfileSection } from "@/schemas/profile";
 

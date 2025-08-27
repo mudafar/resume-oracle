@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { FormModal } from "../../../components/shared/modal";
+import { FormModal } from "@/components/shared/modal";
 import { SectionTypeEnum, sectionTypes } from "@/types/store";
 import { Plus } from "lucide-react";
 

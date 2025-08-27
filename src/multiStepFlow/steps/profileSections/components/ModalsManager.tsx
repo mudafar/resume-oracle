@@ -1,79 +1,93 @@
 import React from "react";
 import type { ProfileSection } from "@/schemas/profile";
-import { NewProfileSectionModal } from "../NewProfileSectionModal";
-import { ProfileSectionsExportModal } from "../ProfileSectionsExportModal";
-import { DeleteAllProfileSectionsModal } from "../DeleteAllProfileSectionsModal";
-import { ProfileSectionsImportJSONModal } from "../ProfileSectionsImportJSONModal";
+import { NewProfileSectionModal } from "./NewProfileSectionModal";
+import { ProfileSectionsExportModal } from "./ProfileSectionsExportModal";
+import { DeleteAllProfileSectionsModal } from "./DeleteAllProfileSectionsModal";
+import { ProfileSectionsImportJSONModal } from "./ProfileSectionsImportJSONModal";
+import { SectionTypeEnum } from "@/types/store";
+import { toast } from "sonner";
+
+interface ProfileSectionsService {
+  sections: ProfileSection[];
+  addSection: (type: SectionTypeEnum, content: string) => void;
+  deleteAllSections: () => void;
+}
 
 interface ModalsManagerProps {
-  // New Section Modal
+  // Services
+  profileSections: ProfileSectionsService;
+
+  // Modal states
   newSectionModalOpen: boolean;
-  onCloseNewSection: () => void;
-  onAddSection: (section: { type: any; content: string }) => void;
-
-  // Export Modal
   exportModalOpen: boolean;
-  onCloseExport: () => void;
-  profileSections: ProfileSection[];
-
-  // Delete All Modal
+  importModalOpen: boolean;
   deleteAllConfirm: boolean;
+
+  // Modal actions
+  onCloseNewSection: () => void;
+  onCloseExport: () => void;
+  onCloseImport: () => void;
   onCancelDeleteAll: () => void;
-  onConfirmDeleteAll: () => void;
-
-  // Import JSON Modal
-  importJSONModalOpen: boolean;
-  onCloseImportJSON: () => void;
-  onImportSection: (section: ProfileSection) => void;
-  onImportAll: (sections: ProfileSection[]) => void;
-
-  // Toast callback
-  onToast: (message: string, type?: "success" | "error") => void;
 }
 
 export const ModalsManager: React.FC<ModalsManagerProps> = ({
-  newSectionModalOpen,
-  onCloseNewSection,
-  onAddSection,
-  exportModalOpen,
-  onCloseExport,
   profileSections,
+  newSectionModalOpen,
+  exportModalOpen,
+  importModalOpen,
   deleteAllConfirm,
-  onCancelDeleteAll,
-  onConfirmDeleteAll,
-  importJSONModalOpen,
-  onCloseImportJSON,
-  onImportSection,
-  onImportAll,
-  onToast
+  onCloseNewSection,
+  onCloseExport,
+  onCloseImport,
+  onCancelDeleteAll
 }) => {
+  const handleAddSection = ({ type, content }: { type: SectionTypeEnum; content: string }) => {
+    profileSections.addSection(type, content);
+    onCloseNewSection();
+  };
+
+  const handleConfirmDeleteAll = () => {
+    profileSections.deleteAllSections();
+    onCancelDeleteAll();
+  };
+
+  const handleImportSection = (section: ProfileSection) => {
+    profileSections.addSection(section.type as SectionTypeEnum, section.content);
+  };
+
+  const handleImportAll = (sections: ProfileSection[]) => {
+    sections.forEach(section => {
+      profileSections.addSection(section.type as SectionTypeEnum, section.content);
+    });
+  };
+
   return (
     <>
       <ProfileSectionsExportModal
         open={exportModalOpen}
         onClose={onCloseExport}
-        profileSections={profileSections}
-        onToast={onToast}
+        profileSections={profileSections.sections}
+        onToast={(message, type) => type === "error" ? toast.error(message) : toast.success(message)}
       />
-      
+
       <NewProfileSectionModal
         open={newSectionModalOpen}
         onClose={onCloseNewSection}
-        onAdd={onAddSection}
+        onAdd={handleAddSection}
       />
-      
+
       <DeleteAllProfileSectionsModal
         open={deleteAllConfirm}
         onCancel={onCancelDeleteAll}
-        onConfirm={onConfirmDeleteAll}
+        onConfirm={handleConfirmDeleteAll}
       />
-      
+
       <ProfileSectionsImportJSONModal
-        open={importJSONModalOpen}
-        onClose={onCloseImportJSON}
-        onImportSection={onImportSection}
-        onImportAll={onImportAll}
-        onToast={onToast}
+        open={importModalOpen}
+        onClose={onCloseImport}
+        onImportSection={handleImportSection}
+        onImportAll={handleImportAll}
+        onToast={(message, type) => type === "error" ? toast.error(message) : toast.success(message)}
       />
     </>
   );

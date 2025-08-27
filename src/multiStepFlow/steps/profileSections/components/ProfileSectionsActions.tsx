@@ -1,6 +1,6 @@
 import React from "react";
-import { ProfileSectionsActionBar } from "../ProfileSectionsActionBar";
-import { ModelConfigPrompt } from "../ModelConfigPrompt";
+import { ProfileSectionsActionBar } from "./ProfileSectionsActionBar";
+import { ModelConfigPrompt } from "./ModelConfigPrompt";
 
 interface ProfileSectionsActionsProps {
   // Model Config Prompt
@@ -35,7 +35,7 @@ export const ProfileSectionsActions: React.FC<ProfileSectionsActionsProps> = ({
         onClose={onClosePrompt}
         onConfigure={onConfigure}
       />
-      
+
       <ProfileSectionsActionBar
         onNewSection={onNewSection}
         onImportFile={onImportFile}

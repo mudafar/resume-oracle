@@ -13,13 +13,13 @@ import { Privacy } from './components/Privacy';
 import { Contact } from './components/Contact';
 import { Footer } from './components/Footer';
 import { FullBleedSection } from './components/FullBleedSection';
-import { ProfileSectionImportAIModal } from '@/multiStepFlow/steps/profileSections/ProfileSectionsImportAIModal';
 import { useDispatch } from 'react-redux';
 import { addSection } from '@/store/slices/profileSectionsSlice';
 import { setCurrentStep } from '@/store/slices/stepSlice';
 import { openConfigModal } from '@/store/slices/llmConfigSlice';
 import { useRouter } from 'next/navigation';
 import { SettingsModalWrapper } from '@/multiStepFlow/settingsModal/SettingsModalWrapper';
+import { ProfileSectionImportAIModal } from '@/multiStepFlow/steps/profileSections';
 
 export const Landing: React.FC = () => {
     const [importAIModalOpen, setImportAIModalOpen] = React.useState(false);
