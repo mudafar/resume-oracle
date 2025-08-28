@@ -56,11 +56,11 @@ export function useLlmStreamingService<T>(serviceFn: ServiceFunction<T>): UseLlm
 
   const trigger = useCallback(
     async (...params: any[]) => {
-      if (cacheRef.current && cacheRef.current.result && areParamsEqual(params, cacheRef.current.params, llmConfig, cacheRef.current.llmConfig)) {
-        console.log("[CACHE] Using cached result for LLM streaming service call");
-        setData(cacheRef.current.result);
-        return;
-      }
+      // if (cacheRef.current && cacheRef.current.result && areParamsEqual(params, cacheRef.current.params, llmConfig, cacheRef.current.llmConfig)) {
+      //   console.log("[CACHE] Using cached result for LLM streaming service call");
+      //   setData(cacheRef.current.result);
+      //   return;
+      // }
 
       setIsLoading(true);
       setError(null);
@@ -86,7 +86,7 @@ export function useLlmStreamingService<T>(serviceFn: ServiceFunction<T>): UseLlm
             result: finalData,
             timestamp: Date.now()
           };
-          localStorage.setItem("llmStreamingServiceCache", JSON.stringify(cacheRef.current));
+          // localStorage.setItem("llmStreamingServiceCache", JSON.stringify(cacheRef.current));
         }
 
         setIsLoading(false);

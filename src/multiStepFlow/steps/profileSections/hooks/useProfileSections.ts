@@ -69,9 +69,7 @@ export const useProfileSections = (): UseProfileSectionsReturn => {
   }, [dispatch]);
 
   const handleDeleteSection = useCallback((id: string) => {
-    if (window.confirm("Delete this section?")) {
-      dispatch(deleteSection(id));
-    }
+    dispatch(deleteSection(id));
   }, [dispatch]);
 
   const handleDeleteAllSections = useCallback(() => {
