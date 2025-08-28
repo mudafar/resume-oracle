@@ -2,7 +2,7 @@
  * LLM Config slice state & related types.
  * Extracted from src/store/slices/llmConfigSlice.ts (no content changes).
  */
-export type LLMProvider = "free" | "google-genai" | "groq" | "openai";
+export type LLMProvider = "free" | "google-genai" | "groq" | "openai" | "openrouter";
 export type LLMVariant = string;
 
 export interface LLMConfig {

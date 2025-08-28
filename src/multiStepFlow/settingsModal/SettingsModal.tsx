@@ -18,7 +18,6 @@ import {
   Key, 
   Globe, 
   Zap, 
-  Shield, 
   RotateCcw, 
   Save,
   AlertCircle,
@@ -26,7 +25,8 @@ import {
   Info,
   ChevronDown,
   ChevronRight,
-  Brain
+  Brain,
+  Network
 } from "lucide-react";
 import { SharedModal, ModalAction } from "@/components/shared";
 
@@ -51,6 +51,11 @@ const PROVIDERS: { value: LLMProvider; label: string; icon: React.ReactNode }[] 
     label: "OpenAI", 
     icon: <Brain className="w-4 h-4 text-green-500" />
   },
+  { 
+    value: "openrouter", 
+    label: "OpenRouter", 
+    icon: <Network className="w-4 h-4 text-orange-500" />
+  },
 ];
 
 const PROVIDER_VARIANTS: Record<LLMProvider, { value: LLMVariant; label: string }[]> = {
@@ -68,9 +73,13 @@ const PROVIDER_VARIANTS: Record<LLMProvider, { value: LLMVariant; label: string 
     { value: "meta-llama/llama-4-maverick-17b-128e-instruct", label: "llama 4 Maverick" },
   ],
   openai: [
+    { value: "gpt-5", label: "GPT-5" },
+    { value: "gpt-5-mini", label: "GPT-5 Mini" },
     { value: "gpt-4o", label: "GPT-4o" },
     { value: "gpt-4-turbo", label: "GPT-4 Turbo" },
-    { value: "gpt-3.5-turbo", label: "GPT-3.5 Turbo" },
+  ],
+  openrouter: [
+    { value: "deepseek/deepseek-r1-0528:free", label: "Deepseek R1 (Free)" },
   ],
 };
 

@@ -1,4 +1,5 @@
 import { initChatModel } from "langchain/chat_models/universal";
+import { ChatOpenAI } from "@langchain/openai";
 import { ChatPromptTemplate } from "@langchain/core/prompts";
 import { z } from "zod";
 import { LLMConfig } from "@/types/store";
@@ -23,10 +24,27 @@ export class LLMService {
 
   private async iniLLM(config?: LLMConfig) {
     /**
-     * Initialize Google's Gemini LLM
+     * Initialize LLM based on provider
      * If config is not provided or provider is 'free', use environment API key
      */
     try {
+      // Handle OpenRouter specifically
+      if (config?.provider === "openrouter") {
+        return new ChatOpenAI({
+          model: config.variant || "",
+          temperature: config.temperature || 0,
+          topP: config.topP || 0.90,
+          apiKey: config.apiKey || undefined,
+          configuration: {
+            baseURL: config.endpointUrl ||"https://openrouter.ai/api/v1",
+            defaultHeaders: {
+              "HTTP-Referer": process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000",
+              "X-Title": "Resume Oracle"
+            }
+          }
+        });
+      }
+
       const isFreeProvider = !config || config.provider === 'free';
       const apiKey = isFreeProvider 
         ? process.env.NEXT_PUBLIC_GEMINI_API_KEY 
