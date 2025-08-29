@@ -168,9 +168,9 @@ export const SharedModal: React.FC<ModalProps> = ({
         </DialogHeader>
 
         <div className={cn(
-          'min-h-0',
+          'min-h-0 flex overflow-hidden',
           // For full-height modals, make content area flexible and properly scrollable
-          height === 'full' || height === 'tall' ? 'flex-1 overflow-hidden' : 'overflow-hidden',
+          height === 'full' || height === 'tall' ? 'flex-1 ' : '',
           actions.length > 0 ? 'pb-0' : 'pb-6'
         )}>
           {children}

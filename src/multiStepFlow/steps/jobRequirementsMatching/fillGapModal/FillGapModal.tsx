@@ -142,9 +142,9 @@ export const FillGapModal: React.FC<FillGapModalProps> = ({
       canNext={experienceInput.trim().length > 0}
       canFinish={generatedContent.trim().length > 0}
     >
-      <div className="flex gap-6 h-[calc(80vh-2rem)] overflow-hidden">
+      <div className="flex gap-6 min-h-0 overflow-hidden">
         {/* Left Panel: Gap Context */}
-        <div className="w-1/3 flex-shrink-0">
+        <div className="w-1/3 flex-shrink-0 overflow-y-auto">
           <GapContextPanel gap={gap} />
         </div>
 

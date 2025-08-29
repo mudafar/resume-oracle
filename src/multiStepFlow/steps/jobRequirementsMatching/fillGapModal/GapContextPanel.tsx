@@ -20,10 +20,10 @@ const getPriorityColor = (priority: string) => {
 
 const getGapTypeIcon = (gapType: string) => {
   switch (gapType) {
-    case 'no_match': return <XCircle className="h-4 w-4 text-red-500" />;
-    case 'below_threshold': return <AlertTriangle className="h-4 w-4 text-orange-500" />;
-    case 'covered': return <Target className="h-4 w-4 text-green-500" />;
-    default: return <AlertTriangle className="h-4 w-4 text-gray-500" />;
+    case 'no_match': return <XCircle className="h-6 w-6 text-red-500" />;
+    case 'below_threshold': return <AlertTriangle className="h-6 w-6 text-orange-500" />;
+    case 'covered': return <Target className="h-6 w-6 text-green-500" />;
+    default: return <AlertTriangle className="h-6 w-6 text-gray-500" />;
   }
 };
 
@@ -31,18 +31,16 @@ export const GapContextPanel: React.FC<GapContextPanelProps> = ({ gap }) => {
   return (
     <div className="space-y-4 h-full">
       <Card className="border-l-4 border-red-500">
-        <CardHeader className="pb-3">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              {getGapTypeIcon(gap.gap_type)}
-              <CardTitle className="text-lg">{gap.requirement_cluster.cluster_name}</CardTitle>
-            </div>
+        <CardHeader className="pb-2">
+          <div className="flex items-center justify-betwee flex-wrap gap-2">
+            {getGapTypeIcon(gap.gap_type)}
+            <CardTitle className="text-md">{gap.requirement_cluster.cluster_name}</CardTitle>
             <Badge className={getPriorityColor(gap.requirement_cluster.priority_tier)}>
-              {gap.requirement_cluster.priority_tier.replace('_', ' ').toUpperCase()}
+              {gap.requirement_cluster.priority_tier.replaceAll('_', ' ').toUpperCase()}
             </Badge>
           </div>
         </CardHeader>
-        
+
         <CardContent className="space-y-4">
           {/* Requirements in this cluster */}
           <div>
