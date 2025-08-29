@@ -105,12 +105,8 @@ export const Landing: React.FC = () => {
                 onImportAll={(sections) => {
                     sections.forEach(sec => dispatch(addSection(sec)));
                     setImportAIModalOpen(false);
-                    dispatch(setCurrentStep(1));
+                    dispatch(setCurrentStep(0));
                     router.push('/wizard');
-                }}
-                onToast={(msg, type = "success") => {
-                    // TODO: Handle toast notification
-                    console.log(msg, type);
                 }}
             />
 
