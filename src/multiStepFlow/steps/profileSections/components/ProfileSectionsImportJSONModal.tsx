@@ -160,7 +160,7 @@ export const ProfileSectionsImportJSONModal: React.FC<JSONImportModalProps> = ({
       actions={getActions()}
       closeOnOverlayClick={!isLoading}
     >
-      <div className="p-6 space-y-6 overflow-y-auto h-full">
+      <div className="p-6 space-y-6 overflow-y-auto h-full flex-auto">
         {/* File Drop Zone */}
         <div
           className={`relative border-2 border-dashed rounded-lg p-8 transition-all duration-200 cursor-pointer hover:border-primary/50 hover:bg-muted/20 ${dragActive

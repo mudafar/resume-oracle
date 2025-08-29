@@ -60,7 +60,7 @@ export const FormModal: React.FC<FormModalProps> = ({
       actions={actions}
       closeOnOverlayClick={!isLoading}
     >
-      <div className="p-6">
+      <div className="p-6 flex-auto">
         {children}
       </div>
     </SharedModal>
