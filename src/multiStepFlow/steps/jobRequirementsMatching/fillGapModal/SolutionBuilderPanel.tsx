@@ -6,9 +6,11 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
+import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import type { CoverageGap } from "@/schemas/matching";
 import type { ProfileSection } from "@/schemas/profile";
-import { ArrowLeft, Sparkles, Save } from "lucide-react";
+import { SectionTypeEnum, sectionTypes } from "@/types/store";
+import { ArrowLeft, Sparkles, Save, Edit3, Plus } from "lucide-react";
 
 interface SolutionBuilderPanelProps {
   phase: 'input' | 'review';
@@ -124,150 +126,129 @@ export const SolutionBuilderPanel: React.FC<SolutionBuilderPanelProps> = ({
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4">
       <Card>
         <CardHeader>
-          <CardTitle>Choose Action</CardTitle>
+          <CardTitle>How would you like to address this gap?</CardTitle>
         </CardHeader>
-        <CardContent>
-          <div className="space-y-4">
-            {/* Extend Existing Section */}
-            <div className="flex items-start space-x-3">
-              <input
-                type="radio"
-                id="extend"
-                name="action"
-                value="extend"
-                checked={selectedAction === 'extend'}
-                onChange={(e) => setSelectedAction(e.target.value as 'extend' | 'create')}
-                className="mt-1"
-              />
-              <div className="flex-1 space-y-2">
-                <Label htmlFor="extend" className="font-medium cursor-pointer">
-                  Extend existing profile section
-                </Label>
-                  <p className="text-sm text-gray-600">
-                    Add missing experience to your existing content
-                  </p>
-                  
-                  {selectedAction === 'extend' && (
-                    <div className="space-y-3 mt-3">
-                      <div>
-                        <Label htmlFor="section-select">Select Profile Section</Label>
-                        <Select value={selectedSectionId} onValueChange={setSelectedSectionId}>
-                          <SelectTrigger className="mt-1">
-                            <SelectValue placeholder="Choose a section to extend..." />
-                          </SelectTrigger>
-                          <SelectContent>
-                            {profileSections.map((section) => (
-                              <SelectItem key={section.id} value={section.id}>
-                                {section.type.charAt(0).toUpperCase() + section.type.slice(1)}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                      </div>
+        <CardContent className="space-y-6">
+          {/* Action Toggle */}
+          <div>
+            <ToggleGroup
+              type="single"
+              value={selectedAction}
+              onValueChange={(value) => value && setSelectedAction(value as 'extend' | 'create')}
+              className="w-full"
+            >
+              <ToggleGroupItem value="extend" className="flex-1 flex items-center gap-2">
+                <Edit3 className="h-4 w-4" />
+                Extend Existing
+              </ToggleGroupItem>
+              <ToggleGroupItem value="create" className="flex-1 flex items-center gap-2">
+                <Plus className="h-4 w-4" />
+                Create New
+              </ToggleGroupItem>
+            </ToggleGroup>
+          </div>
 
-                      {selectedSection && (
-                        <div>
-                          <Label>Current Content Preview</Label>
-                          <div className="mt-1 p-3 bg-gray-50 rounded-md border text-sm max-h-32 overflow-y-auto">
-                            <pre className="whitespace-pre-wrap font-sans">
-                              {selectedSection.content}
-                            </pre>
-                          </div>
-                        </div>
-                      )}
-                    </div>
-                  )}
-                </div>
-              </div>
-
-              {/* Create New Section */}
-              <div className="flex items-start space-x-3">
-                <input
-                  type="radio"
-                  id="create"
-                  name="action"
-                  value="create"
-                  checked={selectedAction === 'create'}
-                  onChange={(e) => setSelectedAction(e.target.value as 'extend' | 'create')}
-                  className="mt-1"
-                />
-                <div className="flex-1 space-y-2">
-                  <Label htmlFor="create" className="font-medium cursor-pointer">
-                    Create new profile section
-                  </Label>
-                  <p className="text-sm text-gray-600">
-                    Build a complete new section from scratch
-                  </p>
-                  
-                  {selectedAction === 'create' && (
-                    <div className="mt-3">
-                      <Label htmlFor="section-type">Section Type</Label>
-                      <Input
-                        id="section-type"
-                        value={newSectionType}
-                        onChange={(e) => setNewSectionType(e.target.value)}
-                        placeholder="e.g., experience, projects, skills"
-                        className="mt-1"
-                      />
-                    </div>
-                  )}
-                </div>
-              </div>
+          {/* Conditional Content */}
+          {selectedAction === 'extend' && (
+            <div>
+              <Label htmlFor="section-select">Select Profile Section</Label>
+              <Select value={selectedSectionId} onValueChange={setSelectedSectionId}>
+                <SelectTrigger className="mt-1 w-full">
+                  <SelectValue placeholder="Choose a section to extend..." />
+                </SelectTrigger>
+                <SelectContent className="w-full">
+                  {profileSections.map((section) => (
+                    <SelectItem key={section.id} value={section.id} className="w-full">
+                      <span className="text-sm truncate w-full">
+                        <span className="font-medium">
+                          {section.type.charAt(0).toUpperCase() + section.type.slice(1)}
+                        </span>
+                        <span className="text-muted-foreground">
+                          : {section.content.slice(0, 80)}...
+                        </span>
+                      </span>
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
-        </CardContent>
-      </Card>
+          )}
 
-      {/* Experience Input */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Experience Input</CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div>
-            <Label htmlFor="experience-input">
-              {selectedAction === 'extend' ? 'Brief Experience' : 'Your Experience'} *
-            </Label>
-            <Textarea
-              id="experience-input"
-              value={experienceInput}
-              onChange={(e) => setExperienceInput(e.target.value)}
-              placeholder={
-                selectedAction === 'extend'
-                  ? "Briefly describe the missing experience to add..."
-                  : "Provide detailed description of your experience, projects, achievements..."
-              }
-              className={`mt-1 ${selectedAction === 'extend' ? 'min-h-[100px]' : 'min-h-[200px]'}`}
-              required
-            />
-          </div>
+          {selectedAction === 'create' && (
+            <div>
+              <Label htmlFor="section-type">Profile Section Type</Label>
+              <Select value={newSectionType} onValueChange={setNewSectionType}>
+                <SelectTrigger className="mt-1 w-full">
+                  <SelectValue placeholder="Choose a section type..." />
+                </SelectTrigger>
+                <SelectContent className="w-full">
+                  {Object.entries(sectionTypes).map(([key, label]) => (
+                    <SelectItem key={key} value={key}>
+                      {label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          )}
 
-          <div>
-            <Label htmlFor="additional-context">Additional Context (optional)</Label>
-            <Textarea
-              id="additional-context"
-              value={additionalContext}
-              onChange={(e) => setAdditionalContext(e.target.value)}
-              placeholder="Any additional context that might help..."
-              className="mt-1 min-h-[80px]"
-            />
-          </div>
+          {/* Experience Input - Show after action selection */}
+          {(selectedAction && ((selectedAction === 'extend' && selectedSectionId) || selectedAction === 'create')) && (
+            <>
+              <div className="border-t pt-4">
+                <div>
+                  <Label htmlFor="experience-input">
+                    {selectedAction === 'extend' ? 'What experience is missing?' : `Describe your ${sectionTypes[newSectionType as keyof typeof sectionTypes]?.toLowerCase() || 'experience'}`} *
+                  </Label>
+                  <Textarea
+                    id="experience-input"
+                    value={experienceInput}
+                    onChange={(e) => setExperienceInput(e.target.value)}
+                    placeholder={
+                      selectedAction === 'extend'
+                        ? "Briefly describe the missing experience to add..."
+                        : `Provide details about your ${sectionTypes[newSectionType as keyof typeof sectionTypes]?.toLowerCase() || 'experience'}...`
+                    }
+                    className="mt-1 min-h-[120px] resize-y"
+                    required
+                  />
+                </div>
 
-          <Button 
-            onClick={onGenerate} 
-            disabled={!canGenerate || isLoading}
-            className="w-full"
-          >
-            <Sparkles className="h-4 w-4 mr-2" />
-            {isLoading 
-              ? 'Generating...'
-              : selectedAction === 'extend' 
-                ? `Enhance ${selectedSection?.type || 'Section'}` 
-                : 'Generate New Profile Section'
-            }
-          </Button>
+                {/* Collapsible Additional Context */}
+                <details className="mt-3">
+                  <summary className="text-sm text-muted-foreground cursor-pointer hover:text-foreground">
+                    Additional Context (optional)
+                  </summary>
+                  <div className="mt-2">
+                    <Textarea
+                      id="additional-context"
+                      value={additionalContext}
+                      onChange={(e) => setAdditionalContext(e.target.value)}
+                      placeholder="Any additional context that might help..."
+                      className="min-h-[60px] resize-y"
+                    />
+                  </div>
+                </details>
+              </div>
+
+              <Button 
+                onClick={onGenerate} 
+                disabled={!canGenerate || isLoading}
+                className="w-full"
+              >
+                <Sparkles className="h-4 w-4 mr-2" />
+                {isLoading 
+                  ? 'Generating...'
+                  : selectedAction === 'extend' 
+                    ? `Enhance ${selectedSection?.type || 'Section'}` 
+                    : `Generate ${sectionTypes[newSectionType as keyof typeof sectionTypes]} Section`
+                }
+              </Button>
+            </>
+          )}
         </CardContent>
       </Card>
     </div>

@@ -20,64 +20,55 @@ const getPriorityColor = (priority: string) => {
 
 const getGapTypeIcon = (gapType: string) => {
   switch (gapType) {
-    case 'no_match': return <XCircle className="h-6 w-6 text-red-500" />;
-    case 'below_threshold': return <AlertTriangle className="h-6 w-6 text-orange-500" />;
-    case 'covered': return <Target className="h-6 w-6 text-green-500" />;
-    default: return <AlertTriangle className="h-6 w-6 text-gray-500" />;
+    case 'no_match': return <XCircle className="h-5 w-5 text-red-500" />;
+    case 'below_threshold': return <AlertTriangle className="h-5 w-5 text-orange-500" />;
+    case 'covered': return <Target className="h-5 w-5 text-green-500" />;
+    default: return <AlertTriangle className="h-5 w-5 text-gray-500" />;
   }
 };
 
 export const GapContextPanel: React.FC<GapContextPanelProps> = ({ gap }) => {
   return (
-    <div className="space-y-4 h-full">
-      <Card className="border-l-4 border-red-500">
-        <CardHeader className="pb-2">
-          <div className="flex items-center justify-betwee flex-wrap gap-2">
-            {getGapTypeIcon(gap.gap_type)}
-            <CardTitle className="text-md">{gap.requirement_cluster.cluster_name}</CardTitle>
-            <Badge className={getPriorityColor(gap.requirement_cluster.priority_tier)}>
-              {gap.requirement_cluster.priority_tier.replaceAll('_', ' ').toUpperCase()}
-            </Badge>
-          </div>
-        </CardHeader>
+    <div className="space-y-4">
+      {/* Header */}
+      <div className="flex items-start gap-3 p-4 bg-red-50 border border-red-200 rounded-lg">
+        <div className="flex-shrink-0 mt-0.5">
+          {getGapTypeIcon(gap.gap_type)}
+        </div>
+        <div className="flex-1 min-w-0">
+          <h3 className="font-semibold text-lg text-gray-900 leading-tight">
+            {gap.requirement_cluster.cluster_name}
+          </h3>
+          <Badge className={`${getPriorityColor(gap.requirement_cluster.priority_tier)} mt-2`}>
+            {gap.requirement_cluster.priority_tier.replaceAll('_', ' ').toUpperCase()}
+          </Badge>
+        </div>
+      </div>
 
-        <CardContent className="space-y-4">
-          {/* Requirements in this cluster */}
-          <div>
-            <h4 className="font-semibold text-sm mb-2 text-red-700">Requirements in this cluster</h4>
-            <ul className="space-y-1">
-              {gap.requirement_cluster.requirements && gap.requirement_cluster.requirements.length > 0 ? (
-                gap.requirement_cluster.requirements.map((req: string, idx: number) => (
-                  <li key={idx} className="flex items-start gap-2 text-sm">
-                    <span className="text-red-500 mt-1">•</span>
-                    <span>{req}</span>
-                  </li>
-                ))
-              ) : (
-                <li className="text-sm text-gray-500 italic">No specific requirements listed</li>
-              )}
-            </ul>
-          </div>
+      {/* Requirements */}
+      <div className="space-y-2">
+        <h4 className="text-sm font-medium text-gray-700">Requirements</h4>
+        <ul className="space-y-1.5">
+          {gap.requirement_cluster.requirements && gap.requirement_cluster.requirements.length > 0 ? (
+            gap.requirement_cluster.requirements.map((req: string, idx: number) => (
+              <li key={idx} className="flex items-start gap-2 text-sm text-gray-600">
+                <span className="text-red-400 mt-1 flex-shrink-0">•</span>
+                <span className="leading-relaxed">{req}</span>
+              </li>
+            ))
+          ) : (
+            <li className="text-sm text-gray-400 italic">No specific requirements listed</li>
+          )}
+        </ul>
+      </div>
 
-          {/* Rationale */}
-          <div>
-            <h4 className="font-semibold text-sm mb-2 text-blue-700">Rationale</h4>
-            <p className="text-sm text-gray-700 leading-relaxed">
-              {gap.requirement_cluster.rationale}
-            </p>
-          </div>
-
-          {/* Gap Type */}
-          <div>
-            <h4 className="font-semibold text-sm mb-2 text-gray-700">Gap Type</h4>
-            <p className="text-sm text-gray-600">
-              {gap.gap_type === 'no_match' && 'No matching profile section found for these requirements'}
-              {gap.gap_type === 'below_threshold' && 'Found profile sections but they don\'t meet the minimum threshold'}
-              {gap.gap_type === 'covered' && 'Requirements are covered by existing profile sections'}
-            </p>
-          </div>
-        </CardContent>
-      </Card>
+      {/* Rationale */}
+      <div className="space-y-2">
+        <h4 className="text-sm font-medium text-gray-700">Why this matters</h4>
+        <p className="text-sm text-gray-600 leading-relaxed">
+          {gap.requirement_cluster.rationale}
+        </p>
+      </div>
     </div>
   );
 };

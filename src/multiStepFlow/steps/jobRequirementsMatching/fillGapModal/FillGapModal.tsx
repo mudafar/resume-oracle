@@ -1,6 +1,7 @@
 "use client";
 import React, { useState } from "react";
 import type { ProfileSection } from "@/schemas/profile";
+import { SectionTypeEnum } from "@/types/store";
 import { GapContextPanel } from "./GapContextPanel";
 import { SolutionBuilderPanel } from "./SolutionBuilderPanel";
 import { useLlmService } from "@/hooks/useLlmService";
@@ -30,7 +31,7 @@ export const FillGapModal: React.FC<FillGapModalProps> = ({
   const [generatedContent, setGeneratedContent] = useState<string>("");
   const [selectedAction, setSelectedAction] = useState<'extend' | 'create'>('extend');
   const [selectedSectionId, setSelectedSectionId] = useState<string>(() => profileSections.length > 0 ? profileSections[0].id : "");
-  const [newSectionType, setNewSectionType] = useState<string>("experience");
+  const [newSectionType, setNewSectionType] = useState<string>(SectionTypeEnum.Experience);
   const [experienceInput, setExperienceInput] = useState<string>("");
   const [additionalContext, setAdditionalContext] = useState<string>("");
   const [structureRationale, setStructureRationale] = useState<string>("");
@@ -112,7 +113,7 @@ export const FillGapModal: React.FC<FillGapModalProps> = ({
     setGeneratedContent("");
     setSelectedAction('extend');
     setSelectedSectionId(profileSections.length > 0 ? profileSections[0].id : "");
-    setNewSectionType("experience");
+    setNewSectionType(SectionTypeEnum.Experience);
     setExperienceInput("");
     setAdditionalContext("");
     setStructureRationale("");
