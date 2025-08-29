@@ -45,7 +45,6 @@ export const EnhancementInterface: React.FC<EnhancementInterfaceProps> = ({
         setAdditionalContext={setAdditionalContext}
         isLoading={isLoading}
         onGenerate={onGenerate}
-        onClose={onClose}
       />
     );
   }

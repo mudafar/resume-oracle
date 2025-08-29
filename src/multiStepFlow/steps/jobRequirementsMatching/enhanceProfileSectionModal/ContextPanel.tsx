@@ -16,7 +16,7 @@ export const ContextPanel: React.FC<ContextPanelProps> = ({
   selectedSection,
 }) => {
   return (
-    <>
+    <div className="space-y-4">
       <CurrentSectionOverview
         profileSection={profileSection}
         selectedSection={selectedSection}
@@ -27,6 +27,6 @@ export const ContextPanel: React.FC<ContextPanelProps> = ({
       />
       
       <EnhancementTips />
-    </>
+    </div>
   );
 };

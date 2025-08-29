@@ -5,6 +5,9 @@ import { z } from "zod";
 import { LLMConfig } from "@/types/store";
 import { IterableReadableStream } from "@langchain/core/utils/stream";
 
+// Get the return type of initChatModel for proper typing
+type InitChatModelReturn = Awaited<ReturnType<typeof initChatModel>>;
+
 // interface LLMConfig {
 //   provider?: string;
 //   variant?: string;
@@ -87,7 +90,8 @@ export class LLMService {
      * Get LLM with structured output capability
      */
     const llm = await this.getLLM(config);
-    return llm.withStructuredOutput(outputSchema);
+    // Use initChatModel return type to handle structured output
+    return (llm as InitChatModelReturn).withStructuredOutput(outputSchema);
   }
 
   async invoke(
@@ -113,7 +117,8 @@ export class LLMService {
      * Invoke LLM with prompt template and structured output
      */
   const llm = await this.getLLM(config);
-    const chain = promptTemplate.pipe(llm.withStructuredOutput(outputSchema));
+    // Use initChatModel return type to handle structured output
+    const chain = promptTemplate.pipe((llm as InitChatModelReturn).withStructuredOutput(outputSchema));
     return await chain.invoke(inputs) as z.infer<T>;
   }
 
@@ -127,7 +132,8 @@ export class LLMService {
      * Stream LLM response with prompt template and structured output
      */
     const llm = await this.getLLM(config);
-    const chain = promptTemplate.pipe(llm.withStructuredOutput(outputSchema));
+    // Use initChatModel return type to handle structured output
+    const chain = promptTemplate.pipe((llm as InitChatModelReturn).withStructuredOutput(outputSchema));
     return chain.stream(inputs) as Promise<IterableReadableStream<z.infer<T>>>;
   }
 }

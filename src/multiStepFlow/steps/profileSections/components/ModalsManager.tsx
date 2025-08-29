@@ -85,7 +85,7 @@ export const ModalsManager: React.FC<ModalsManagerProps> = ({
       <ProfileSectionsImportJSONModal
         open={importModalOpen}
         onClose={onCloseImport}
-        onImportSection={handleImportSection}
+        // onImportSection={handleImportSection}
         onImportAll={handleImportAll}
         onToast={(message, type) => type === "error" ? toast.error(message) : toast.success(message)}
       />

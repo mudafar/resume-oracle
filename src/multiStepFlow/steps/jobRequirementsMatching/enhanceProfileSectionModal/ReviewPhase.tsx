@@ -39,7 +39,7 @@ export const ReviewPhase: React.FC<ReviewPhaseProps> = ({
       {/* Integration Summary and Key Additions */}
       {(integrationSummary || (keyAdditions && keyAdditions.length > 0)) && (
         <div className="mt-4 p-4 bg-gray-50 rounded border border-gray-200">
-          <h3 className="text-lg font-semibold mb-2">Integration Summary</h3>
+          <h3 className="text-md font-semibold mb-2">Integration Summary</h3>
           {integrationSummary && (
             <p className="mb-2 text-gray-700">{integrationSummary}</p>
           )}
