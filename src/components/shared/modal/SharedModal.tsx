@@ -104,6 +104,8 @@ export const SharedModal: React.FC<ModalProps> = ({
     variant !== 'default' ? variantClasses[variant] : sizeClasses[size],
     heightClasses[height],
     'overflow-hidden',
+    // Add flex layout for full-height modals to properly distribute space
+    height === 'full' || height === 'tall' ? 'flex flex-col' : '',
     className
   );
 
@@ -113,7 +115,7 @@ export const SharedModal: React.FC<ModalProps> = ({
         className={modalClasses}
         showCloseButton={false} // We'll handle close button manually
       >
-        <DialogHeader className="flex flex-row items-center justify-between space-y-0 pb-4 border-b min-h-0">
+        <DialogHeader className="flex flex-row items-center justify-between space-y-0 pb-4 border-b min-h-0 flex-shrink-0">
           <div className="flex items-center gap-3 flex-1 min-w-0">
             {icon && (
               <div className="p-2 bg-blue-100 dark:bg-blue-900/20 rounded-lg flex-shrink-0">
@@ -166,8 +168,9 @@ export const SharedModal: React.FC<ModalProps> = ({
         </DialogHeader>
 
         <div className={cn(
-          'min-h-0 overflow-hidden',
-          height === 'full' || height === 'tall' ? 'flex-1' : '',
+          'min-h-0',
+          // For full-height modals, make content area flexible and properly scrollable
+          height === 'full' || height === 'tall' ? 'flex-1 overflow-hidden' : 'overflow-hidden',
           actions.length > 0 ? 'pb-0' : 'pb-6'
         )}>
           {children}
